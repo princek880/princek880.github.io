@@ -32,18 +32,28 @@
     th {
       background-color: #e0e0e0;
     }
-    #ocrOutput {
+    #ocrOutput, #ocrTextArea {
       white-space: pre-wrap;
       background: #f0f0f0;
       padding: 10px;
       margin-top: 10px;
+      width: 100%;
+      min-height: 100px;
+      font-family: monospace;
+    }
+    .instructions {
+      font-size: 0.9rem;
+      background: #e9f1ff;
+      padding: 10px;
+      border-left: 4px solid #007bff;
+      margin: 10px 0;
     }
   </style>
 </head>
 <body>
   <h2>Grade Tracker & GPA Calculator</h2>
 
-  <h3>Add Course</h3>
+  <h3>Add Course Manually</h3>
   <input id="semester" placeholder="Semester (e.g. 01, 02)" />
   <input id="courseCode" placeholder="Course Code" />
   <input id="courseName" placeholder="Course Name" />
@@ -65,13 +75,31 @@
   </select>
   <button onclick="addCourse()">Add Course</button>
 
-  <h3>Paste Gradecard</h3>
-  <textarea id="gradecardInput" rows="6" cols="80" placeholder="Paste gradecard lines here. First column = Semester"></textarea><br>
+  <h3>Paste Gradecard Text</h3>
+  <div class="instructions">
+    Paste your gradecard lines here, one per line, format:<br>
+    <code>Semester CourseCode CourseName(with spaces) Credits Grade (other columns ignored)</code><br>
+    Example:<br>
+    <code>01 ID1200 Ecology and Environment 4 A G 2022</code><br>
+    <code>02 MA1301 Mathematics I 4 B G 2022</code><br>
+    Then click <b>Import Courses</b>.
+  </div>
+  <textarea id="gradecardInput" rows="6" cols="80" placeholder="Paste gradecard lines here..."></textarea><br>
   <button onclick="parseGradecard()">Import Courses</button>
 
-  <h3>Or Upload Gradecard Image</h3>
+  <h3>Or Upload Gradecard Image for OCR</h3>
   <input type="file" accept="image/*" onchange="handleImageUpload(event)" />
-  <div id="ocrOutput"></div>
+  
+  <div class="instructions">
+    After image upload and OCR finishes, edit or review the extracted text below, then click <b>Import from OCR Text</b>.<br>
+    Format same as above:<br>
+    <code>Semester CourseCode CourseName Credits Grade ...</code><br>
+    Example:<br>
+    <code>01 ID1200 Ecology and Environment 4 A G 2022</code>
+  </div>
+  
+  <textarea id="ocrTextArea" placeholder="OCR extracted text will appear here..." ></textarea><br>
+  <button onclick="parseFromOCRText()">Import from OCR Text</button>
 
   <h3>Courses</h3>
   <table>
@@ -122,24 +150,47 @@
 
   function parseGradecard() {
     const raw = document.getElementById('gradecardInput').value;
-    const lines = raw.split('\n');
+    parseTextAndAddCourses(raw);
+  }
+
+  function parseFromOCRText() {
+    const raw = document.getElementById('ocrTextArea').value;
+    parseTextAndAddCourses(raw);
+  }
+
+  function parseTextAndAddCourses(rawText) {
+    const lines = rawText.split('\n');
     const categories = ['Professional', 'Science', 'Engineering', 'Humanities', 'Free'];
 
+    let importedCount = 0;
     for (const line of lines) {
+      if (!line.trim()) continue;
+
+      // split line by spaces/tabs - handle multiple spaces
       const parts = line.trim().split(/\s+/);
-      if (parts.length < 6) continue;
+
+      // Require at least: Semester, Code, Name..., Credits, Grade (at least 5 parts)
+      if (parts.length < 5) continue;
 
       const semester = parts[0];
       const code = parts[1];
-      const credits = parseFloat(parts[parts.length - 3]);
-      const grade = parts[parts.length - 2];
+
+      // Credits assumed third from last (parts.length -3), grade second from last (parts.length -2)
+      const creditsRaw = parts[parts.length - 3];
+      const gradeRaw = parts[parts.length - 2].toUpperCase();
+
+      const credits = parseFloat(creditsRaw);
+      const grade = gradeRaw;
+
+      if (isNaN(credits) || !(grade in gradeMap)) {
+        // skip line if credits or grade invalid
+        continue;
+      }
+
+      // course name is from 3rd element up to credits position
       const name = parts.slice(2, parts.length - 3).join(' ');
 
-      if (isNaN(credits)) continue;
-
-      const point = gradeMap[grade] || 0;
-
-      // Prompt user for category with default "Professional"
+      // Prompt for category with default Professional
       let category = prompt(`Select category for course:\n${code} - ${name}\nOptions: ${categories.join(', ')}`, 'Professional');
       if (!category || !categories.includes(category.trim())) {
         category = 'Professional';
@@ -147,8 +198,13 @@
         category = category.trim();
       }
 
+      const point = gradeMap[grade] || 0;
       courses.push({ semester, name: `${code} - ${name}`, credits, grade, point, category });
+      importedCount++;
     }
+
+    if(importedCount === 0) alert('No valid courses found to import.');
+    else alert(`Imported ${importedCount} courses.`);
     render();
   }
 
@@ -198,14 +254,18 @@
     const file = event.target.files[0];
     if (!file) return;
 
+    document.getElementById('ocrTextArea').value = "Performing OCR, please wait...";
+
     Tesseract.recognize(
       file,
       'eng',
       { logger: m => console.log(m) }
     ).then(({ data: { text } }) => {
-      document.getElementById('ocrOutput').innerText = text;
-      document.getElementById('gradecardInput').value = text;
-      alert('Text extracted from image. Now click "Import Courses".');
+      document.getElementById('ocrTextArea').value = text;
+      alert('OCR complete! Review/edit the extracted text, then click "Import from OCR Text".');
+    }).catch(e => {
+      document.getElementById('ocrTextArea').value = '';
+      alert('OCR failed: ' + e.message);
     });
   }
 </script>

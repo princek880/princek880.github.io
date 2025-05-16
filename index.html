@@ -122,12 +122,12 @@
       const lines = raw.split('\n');
       lines.forEach(line => {
         const parts = line.trim().split(/\s+/);
-        if (parts.length < 5) return;
+        if (parts.length < 6) return;
 
         const code = parts[1];
-        const name = parts.slice(2, parts.length - 3).join(' ');
         const credits = parseFloat(parts[parts.length - 3]);
         const grade = parts[parts.length - 2];
+        const name = parts.slice(2, parts.length - 3).join(' ');
         const semester = 'OCR';
         const category = 'Professional';
         const point = gradeMap[grade] || 0;

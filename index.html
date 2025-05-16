@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Grade Tracker & GPA Calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -29,6 +30,12 @@
     }
     th {
       background-color: #e0e0e0;
+    }
+    #ocrOutput {
+      white-space: pre-wrap;
+      background: #f0f0f0;
+      padding: 10px;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -60,6 +67,10 @@
   <h3>Paste Gradecard</h3>
   <textarea id="gradecardInput" rows="6" cols="80" placeholder="Paste gradecard table..."></textarea><br>
   <button onclick="parseGradecard()">Import Courses</button>
+
+  <h3>Or Upload Gradecard Image</h3>
+  <input type="file" accept="image/*" onchange="handleImageUpload(event)" />
+  <div id="ocrOutput"></div>
 
   <h3>Courses</h3>
   <table>
@@ -154,6 +165,21 @@
       }
       summary += `<p>Total Credits: ${totalCredits}</p>`;
       document.getElementById('summary').innerHTML = summary;
+    }
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      Tesseract.recognize(
+        file,
+        'eng',
+        { logger: m => console.log(m) }
+      ).then(({ data: { text } }) => {
+        document.getElementById('ocrOutput').innerText = text;
+        document.getElementById('gradecardInput').value = text;
+        alert('Text extracted from image. Now click "Import Courses".');
+      });
     }
   </script>
 </body>

@@ -1,388 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academic Course Planner</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <style>
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .category-Professional { background-color: #FFEB3B; }
-        .category-Free { background-color: #CDDC39; }
-        .category-Engineering { background-color: #8BC34A; }
-        .category-Humanities { background-color: #4CAF50; }
-        .category-Science { background-color: #009688; }
-        
-        .semester-header {
-            background-color: #f0f0f0;
-            font-weight: bold;
-        }
-        
-        .grade-A { background-color: #A5D6A7; }
-        .grade-B { background-color: #C5E1A5; }
-        .grade-C { background-color: #FFF59D; }
-        .grade-D { background-color: #FFCC80; }
-        .grade-E { background-color: #EF9A9A; }
-        .grade-S { background-color: #B3E5FC; }
-        .grade-P { background-color: #E1BEE7; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Course Planner & GPA Calculator</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input, select, button { margin: 5px; }
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      padding: 6px;
+    }
+    .overflow { color: red; font-weight: bold; }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto p-4">
-        <h1 class="text-3xl font-bold text-center mb-4">Academic Course Planner</h1>
-        
-        <!-- Navigation Tabs -->
-        <div class="flex mb-4 border-b">
-            <button class="tab-button py-2 px-4 font-semibold text-blue-600 border-b-2 border-blue-600" data-target="dashboard">Dashboard</button>
-            <button class="tab-button py-2 px-4 font-semibold" data-target="courses">Courses</button>
-            <button class="tab-button py-2 px-4 font-semibold" data-target="planning">Semester Planning</button>
-            <button class="tab-button py-2 px-4 font-semibold" data-target="settings">Settings</button>
-        </div>
-        
-        <!-- Dashboard Tab -->
-        <div id="dashboard" class="tab-content active">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h2 class="text-xl font-semibold mb-2">Academic Progress</h2>
-                    <div class="flex flex-col space-y-2">
-                        <div class="flex justify-between">
-                            <span>Overall CGPA:</span>
-                            <span id="overall-cgpa" class="font-semibold">-</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Total Credits Completed:</span>
-                            <span id="total-credits-done" class="font-semibold">-</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>Credits Remaining:</span>
-                            <span id="total-credits-left" class="font-semibold">-</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h2 class="text-xl font-semibold mb-2">Credit Distribution</h2>
-                    <div id="credit-distribution" class="flex flex-col space-y-2"></div>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h2 class="text-xl font-semibold mb-2">Semester GPA Trends</h2>
-                    <div id="gpa-chart" style="height: 250px;" class="border rounded">
-                        <!-- GPA Chart will be rendered here -->
-                        <div class="h-full flex items-center justify-center text-gray-500">
-                            GPA chart will appear after adding courses
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h2 class="text-xl font-semibold mb-2">Recent Courses</h2>
-                    <div id="recent-courses" class="overflow-auto max-h-64">
-                        <table class="w-full">
-                            <thead>
-                                <tr>
-                                    <th>Course</th>
-                                    <th>Credits</th>
-                                    <th>Grade</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recent-courses-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Courses Tab -->
-        <div id="courses" class="tab-content">
-            <div class="bg-white rounded-lg shadow p-4 mb-4">
-                <h2 class="text-xl font-semibold mb-2">Add New Course</h2>
-                <form id="add-course-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="col-span-1">
-                        <label class="block text-sm font-medium mb-1">Semester</label>
-                        <select id="course-semester" class="w-full px-3 py-2 border rounded">
-                            <option value="">Select Semester</option>
-                            <option value="SEM 1">Semester 1</option>
-                            <option value="SEM 2">Semester 2</option>
-                            <option value="SEM 3">Semester 3</option>
-                            <option value="SEM 4">Semester 4</option>
-                            <option value="SEM 5">Semester 5</option>
-                            <option value="SEM 6">Semester 6</option>
-                            <option value="SEM 7">Semester 7</option>
-                            <option value="SEM 8">Semester 8</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Course Code</label>
-                        <input type="text" id="course-code" class="w-full px-3 py-2 border rounded" placeholder="e.g. AM1100">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Course Name</label>
-                        <input type="text" id="course-name" class="w-full px-3 py-2 border rounded" placeholder="e.g. Engineering Mechanics">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Credits</label>
-                        <input type="number" id="course-credits" class="w-full px-3 py-2 border rounded" min="0" step="1" value="0">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Category</label>
-                        <select id="course-category" class="w-full px-3 py-2 border rounded">
-                            <option value="Professional">Professional</option>
-                            <option value="Free">Free</option>
-                            <option value="Engineering">Engineering</option>
-                            <option value="Humanities">Humanities</option>
-                            <option value="Science">Science</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Letter Grade</label>
-                        <select id="course-grade" class="w-full px-3 py-2 border rounded">
-                            <option value="S">S</option>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                            <option value="D">D</option>
-                            <option value="E">E</option>
-                            <option value="P">P</option>
-                        </select>
-                    </div>
-                    
-                    <div class="col-span-1 md:col-span-3 flex justify-end">
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Course</button>
-                    </div>
-                </form>
-            </div>
-            
-            <div class="bg-white rounded-lg shadow p-4">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold">Course List</h2>
-                    <div class="flex space-x-2">
-                        <button id="import-courses" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">Import CSV</button>
-                        <button id="export-courses" class="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700">Export CSV</button>
-                        <input type="file" id="csv-file-input" accept=".csv" class="hidden">
-                    </div>
-                </div>
-                
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr>
-                                <th>Semester</th>
-                                <th>Code</th>
-                                <th>Course Name</th>
-                                <th>Credits</th>
-                                <th>Category</th>
-                                <th>Grade</th>
-                                <th>Grade Point</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="courses-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Planning Tab -->
-        <div id="planning" class="tab-content">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h2 class="text-xl font-semibold mb-4">Credit Requirements</h2>
-                    <form id="credit-requirements-form">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-1">Professional Credits</label>
-                                <input type="number" id="req-professional" class="w-full px-3 py-2 border rounded" value="232">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">Free Credits</label>
-                                <input type="number" id="req-free" class="w-full px-3 py-2 border rounded" value="42">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">Engineering Credits</label>
-                                <input type="number" id="req-engineering" class="w-full px-3 py-2 border rounded" value="57">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">Humanities Credits</label>
-                                <input type="number" id="req-humanities" class="w-full px-3 py-2 border rounded" value="27">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">Science Credits</label>
-                                <input type="number" id="req-science" class="w-full px-3 py-2 border rounded" value="102">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-1">Total Credits Required</label>
-                                <input type="number" id="req-total" class="w-full px-3 py-2 border rounded" value="460" readonly>
-                            </div>
-                        </div>
-                        <div class="mt-4 flex justify-end">
-                            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Update Requirements</button>
-                        </div>
-                    </form>
-                </div>
-                
-                <div class="bg-white rounded-lg shadow p-4">
-                    <h2 class="text-xl font-semibold mb-4">Credit Progress</h2>
-                    <div id="credit-progress" class="space-y-3">
-                        <!-- Credit progress bars will be displayed here -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-white rounded-lg shadow p-4">
-                <h2 class="text-xl font-semibold mb-4">Semester Planning</h2>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">Select Semester to Plan</label>
-                    <div class="flex space-x-2">
-                        <select id="plan-semester" class="px-3 py-2 border rounded">
-                            <option value="SEM 1">Semester 1</option>
-                            <option value="SEM 2">Semester 2</option>
-                            <option value="SEM 3">Semester 3</option>
-                            <option value="SEM 4">Semester 4</option>
-                            <option value="SEM 5">Semester 5</option>
-                            <option value="SEM 6">Semester 6</option>
-                            <option value="SEM 7" selected>Semester 7</option>
-                            <option value="SEM 8">Semester 8</option>
-                        </select>
-                        <button id="add-planned-course" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Add Course</button>
-                    </div>
-                </div>
-                
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr>
-                                <th>Code</th>
-                                <th>Course Name</th>
-                                <th>Credits</th>
-                                <th>Category</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="planned-courses-body"></tbody>
-                        <tfoot>
-                            <tr class="font-semibold">
-                                <td colspan="2">Total</td>
-                                <td id="planned-total-credits">0</td>
-                                <td colspan="2"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-                
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-5 gap-4">
-                    <div class="bg-gray-100 p-3 rounded">
-                        <h4 class="font-semibold">Professional</h4>
-                        <div id="plan-professional" class="text-center text-lg">0</div>
-                    </div>
-                    <div class="bg-gray-100 p-3 rounded">
-                        <h4 class="font-semibold">Free</h4>
-                        <div id="plan-free" class="text-center text-lg">0</div>
-                    </div>
-                    <div class="bg-gray-100 p-3 rounded">
-                        <h4 class="font-semibold">Engineering</h4>
-                        <div id="plan-engineering" class="text-center text-lg">0</div>
-                    </div>
-                    <div class="bg-gray-100 p-3 rounded">
-                        <h4 class="font-semibold">Humanities</h4>
-                        <div id="plan-humanities" class="text-center text-lg">0</div>
-                    </div>
-                    <div class="bg-gray-100 p-3 rounded">
-                        <h4 class="font-semibold">Science</h4>
-                        <div id="plan-science" class="text-center text-lg">0</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Settings Tab -->
-        <div id="settings" class="tab-content">
-            <div class="bg-white rounded-lg shadow p-4">
-                <h2 class="text-xl font-semibold mb-4">Grade Point Conversion</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr>
-                                <th>Letter Grade</th>
-                                <th>Grade Point</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="grade-conversion-body">
-                            <!-- Grade conversion table will be populated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Add Course to Plan Modal -->
-    <div id="plan-course-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
-        <div class="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 class="text-xl font-semibold mb-4">Add Planned Course</h3>
-            <form id="add-plan-course-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Course Code</label>
-                    <input type="text" id="plan-course-code" class="w-full px-3 py-2 border rounded" placeholder="e.g. AM1100">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium mb-1">Course Name</label>
-                    <input type="text" id="plan-course-name" class="w-full px-3 py-2 border rounded" placeholder="e.g. Engineering Mechanics">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium mb-1">Credits</label>
-                    <input type="number" id="plan-course-credits" class="w-full px-3 py-2 border rounded" min="0" step="1" value="0">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium mb-1">Category</label>
-                    <select id="plan-course-category" class="w-full px-3 py-2 border rounded">
-                        <option value="Professional">Professional</option>
-                        <option value="Free">Free</option>
-                        <option value="Engineering">Engineering</option>
-                        <option value="Humanities">Humanities</option>
-                        <option value="Science">Science</option>
-                    </select>
-                </div>
-                
-                <div class="flex justify-end space-x-2">
-                    <button type="button" id="close-plan-modal" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Course</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-    <script src="app.js"></script>
+<body>
+  <h2>Course Manager & GPA Calculator</h2>
+
+  <h3>Add Course</h3>
+  <form id="courseForm">
+    <input type="text" id="courseName" placeholder="Course Name" required>
+    <input type="number" id="credits" placeholder="Credits" required>
+    <select id="gradeLetter" required>
+      <option value="">Grade</option>
+      <option>S</option>
+      <option>A</option>
+      <option>B</option>
+      <option>C</option>
+      <option>D</option>
+      <option>E</option>
+      <option>F</option>
+    </select>
+    <select id="category" required>
+      <option value="">Category</option>
+      <option>Professional</option>
+      <option>Free</option>
+      <option>Engineering</option>
+      <option>Science</option>
+      <option>Humanities</option>
+    </select>
+    <input type="text" id="semester" placeholder="Semester (e.g. SEM 1)" required>
+    <button type="submit">Add Course</button>
+  </form>
+
+  <h3>Course List</h3>
+  <table id="courseTable">
+    <thead>
+      <tr>
+        <th>Course</th><th>Credits</th><th>Grade</th><th>Category</th><th>Semester</th><th>Grade Point</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h3>Credit Summary</h3>
+  <ul id="creditSummary"></ul>
+
+  <h3>Semester GPA</h3>
+  <ul id="gpaSummary"></ul>
+
+  <h3>CGPA</h3>
+  <p id="cgpa"></p>
+
+  <h3>Planning Credits</h3>
+  <form id="planForm">
+    Max Professional: <input type="number" id="maxProfessional" value="232"><br>
+    Max Free: <input type="number" id="maxFree" value="42"><br>
+    Max Engineering: <input type="number" id="maxEngineering" value="57"><br>
+    Max Science: <input type="number" id="maxScience" value="102"><br>
+    Max Humanities: <input type="number" id="maxHumanities" value="27"><br>
+    <button type="submit">Check Plan</button>
+  </form>
+  <ul id="planSummary"></ul>
+
+  <script>
+    const gradeMap = { S: 10, A: 9, B: 8, C: 7, D: 6, E: 4, F: 0 };
+    const courses = [];
+
+    document.getElementById('courseForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const name = courseName.value;
+      const credits = +creditsInput.value;
+      const grade = gradeLetter.value;
+      const category = categoryInput.value;
+      const semester = semesterInput.value;
+
+      const point = gradeMap[grade] || 0;
+      const course = { name, credits, grade, point, category, semester };
+      courses.push(course);
+      render();
+    });
+
+    document.getElementById('planForm').addEventListener('submit', e => {
+      e.preventDefault();
+      render();
+    });
+
+    function render() {
+      const tbody = document.querySelector('#courseTable tbody');
+      tbody.innerHTML = '';
+      courses.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${c.name}</td><td>${c.credits}</td><td>${c.grade}</td>
+                        <td>${c.category}</td><td>${c.semester}</td><td>${c.point}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      // Credit Summary
+      const creditCount = {};
+      courses.forEach(c => {
+        creditCount[c.category] = (creditCount[c.category] || 0) + c.credits;
+      });
+
+      const categories = ['Professional', 'Free', 'Engineering', 'Science', 'Humanities'];
+      const summaryUl = document.getElementById('creditSummary');
+      summaryUl.innerHTML = '';
+      categories.forEach(cat => {
+        const li = document.createElement('li');
+        li.textContent = `${cat}: ${creditCount[cat] || 0}`;
+        summaryUl.appendChild(li);
+      });
+
+      // GPA per semester
+      const semMap = {};
+      courses.forEach(c => {
+        if (!semMap[c.semester]) semMap[c.semester] = [];
+        semMap[c.semester].push(c);
+      });
+
+      const gpaUl = document.getElementById('gpaSummary');
+      gpaUl.innerHTML = '';
+      let totalPoints = 0, totalCredits = 0;
+      for (const [sem, list] of Object.entries(semMap)) {
+        let points = 0, credits = 0;
+        list.forEach(c => {
+          points += c.point * c.credits;
+          credits += c.credits;
+        });
+        totalPoints += points;
+        totalCredits += credits;
+        const gpa = (points / credits).toFixed(2);
+        const li = document.createElement('li');
+        li.textContent = `${sem}: GPA = ${gpa}`;
+        gpaUl.appendChild(li);
+      }
+
+      // CGPA
+      document.getElementById('cgpa').textContent = totalCredits ? `CGPA = ${(totalPoints / totalCredits).toFixed(2)}` : "N/A";
+
+      // Planning
+      const max = {
+        Professional: +document.getElementById('maxProfessional').value,
+        Free: +document.getElementById('maxFree').value,
+        Engineering: +document.getElementById('maxEngineering').value,
+        Science: +document.getElementById('maxScience').value,
+        Humanities: +document.getElementById('maxHumanities').value,
+      };
+
+      const planned = { ...creditCount };
+      const overflow = {};
+      categories.forEach(cat => {
+        if (planned[cat] > max[cat]) {
+          overflow[cat] = planned[cat] - max[cat];
+        }
+      });
+
+      const planUl = document.getElementById('planSummary');
+      planUl.innerHTML = '';
+      categories.forEach(cat => {
+        const li = document.createElement('li');
+        let text = `${cat}: ${planned[cat] || 0}`;
+        if (cat !== 'Free') {
+          if ((overflow[cat] || 0) > 0) {
+            text += ` → Free (-${overflow[cat]})`;
+          }
+        }
+        li.innerHTML = text;
+        if (overflow[cat]) li.classList.add('overflow');
+        planUl.appendChild(li);
+      });
+    }
+
+    const courseName = document.getElementById('courseName');
+    const creditsInput = document.getElementById('credits');
+    const gradeLetter = document.getElementById('gradeLetter');
+    const categoryInput = document.getElementById('category');
+    const semesterInput = document.getElementById('semester');
+  </script>
 </body>
 </html>

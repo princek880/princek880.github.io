@@ -2,191 +2,159 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Course Planner & GPA Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grade Tracker & GPA Calculator</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    input, select, button { margin: 5px; }
-    table, th, td {
-      border: 1px solid black;
-      border-collapse: collapse;
-      padding: 6px;
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f5f7fa;
     }
-    .overflow { color: red; font-weight: bold; }
+    h2 {
+      color: #333;
+    }
+    input, select, textarea, button {
+      margin: 5px;
+      padding: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #e0e0e0;
+    }
   </style>
 </head>
 <body>
-  <h2>Course Manager & GPA Calculator</h2>
+  <h2>Grade Tracker & GPA Calculator</h2>
 
   <h3>Add Course</h3>
-  <form id="courseForm">
-    <input type="text" id="courseName" placeholder="Course Name" required>
-    <input type="number" id="credits" placeholder="Credits" required>
-    <select id="gradeLetter" required>
-      <option value="">Grade</option>
-      <option>S</option>
-      <option>A</option>
-      <option>B</option>
-      <option>C</option>
-      <option>D</option>
-      <option>E</option>
-      <option>F</option>
-    </select>
-    <select id="category" required>
-      <option value="">Category</option>
-      <option>Professional</option>
-      <option>Free</option>
-      <option>Engineering</option>
-      <option>Science</option>
-      <option>Humanities</option>
-    </select>
-    <input type="text" id="semester" placeholder="Semester (e.g. SEM 1)" required>
-    <button type="submit">Add Course</button>
-  </form>
+  <input id="semester" placeholder="Semester" />
+  <input id="courseCode" placeholder="Course Code" />
+  <input id="courseName" placeholder="Course Name" />
+  <input id="credits" type="number" placeholder="Credits" />
+  <select id="grade">
+    <option>S</option>
+    <option>A</option>
+    <option>B</option>
+    <option>C</option>
+    <option>D</option>
+    <option>E</option>
+  </select>
+  <select id="category">
+    <option>Professional</option>
+    <option>Science</option>
+    <option>Engineering</option>
+    <option>Humanities</option>
+    <option>Free</option>
+  </select>
+  <button onclick="addCourse()">Add Course</button>
 
-  <h3>Course List</h3>
-  <table id="courseTable">
+  <h3>Paste Gradecard</h3>
+  <textarea id="gradecardInput" rows="6" cols="80" placeholder="Paste gradecard table..."></textarea><br>
+  <button onclick="parseGradecard()">Import Courses</button>
+
+  <h3>Courses</h3>
+  <table>
     <thead>
       <tr>
-        <th>Course</th><th>Credits</th><th>Grade</th><th>Category</th><th>Semester</th><th>Grade Point</th>
+        <th>Semester</th>
+        <th>Course</th>
+        <th>Credits</th>
+        <th>Grade</th>
+        <th>Point</th>
+        <th>Category</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody id="courseTable"></tbody>
   </table>
 
-  <h3>Credit Summary</h3>
-  <ul id="creditSummary"></ul>
-
-  <h3>Semester GPA</h3>
-  <ul id="gpaSummary"></ul>
-
-  <h3>CGPA</h3>
-  <p id="cgpa"></p>
-
-  <h3>Planning Credits</h3>
-  <form id="planForm">
-    Max Professional: <input type="number" id="maxProfessional" value="232"><br>
-    Max Free: <input type="number" id="maxFree" value="42"><br>
-    Max Engineering: <input type="number" id="maxEngineering" value="57"><br>
-    Max Science: <input type="number" id="maxScience" value="102"><br>
-    Max Humanities: <input type="number" id="maxHumanities" value="27"><br>
-    <button type="submit">Check Plan</button>
-  </form>
-  <ul id="planSummary"></ul>
+  <h3>Summary</h3>
+  <div id="summary"></div>
 
   <script>
-    const gradeMap = { S: 10, A: 9, B: 8, C: 7, D: 6, E: 4, F: 0 };
-    const courses = [];
+    const gradeMap = { S: 10, A: 9, B: 8, C: 7, D: 6, E: 4 };
+    const maxCategoryCredits = {
+      Professional: 232,
+      Free: 42,
+      Science: 102,
+      Engineering: 57,
+      Humanities: 27
+    };
 
-    document.getElementById('courseForm').addEventListener('submit', e => {
-      e.preventDefault();
-      const name = courseName.value;
-      const credits = +creditsInput.value;
-      const grade = gradeLetter.value;
-      const category = categoryInput.value;
-      const semester = semesterInput.value;
+    let courses = [];
+
+    function addCourse() {
+      const semester = document.getElementById('semester').value;
+      const code = document.getElementById('courseCode').value;
+      const name = document.getElementById('courseName').value;
+      const credits = parseFloat(document.getElementById('credits').value);
+      const grade = document.getElementById('grade').value;
+      const category = document.getElementById('category').value;
+
+      if (!credits || isNaN(credits)) return;
 
       const point = gradeMap[grade] || 0;
-      const course = { name, credits, grade, point, category, semester };
-      courses.push(course);
+      courses.push({ semester, name: `${code} - ${name}`, credits, grade, point, category });
       render();
-    });
-
-    document.getElementById('planForm').addEventListener('submit', e => {
-      e.preventDefault();
-      render();
-    });
-
-    function render() {
-      const tbody = document.querySelector('#courseTable tbody');
-      tbody.innerHTML = '';
-      courses.forEach(c => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${c.name}</td><td>${c.credits}</td><td>${c.grade}</td>
-                        <td>${c.category}</td><td>${c.semester}</td><td>${c.point}</td>`;
-        tbody.appendChild(tr);
-      });
-
-      // Credit Summary
-      const creditCount = {};
-      courses.forEach(c => {
-        creditCount[c.category] = (creditCount[c.category] || 0) + c.credits;
-      });
-
-      const categories = ['Professional', 'Free', 'Engineering', 'Science', 'Humanities'];
-      const summaryUl = document.getElementById('creditSummary');
-      summaryUl.innerHTML = '';
-      categories.forEach(cat => {
-        const li = document.createElement('li');
-        li.textContent = `${cat}: ${creditCount[cat] || 0}`;
-        summaryUl.appendChild(li);
-      });
-
-      // GPA per semester
-      const semMap = {};
-      courses.forEach(c => {
-        if (!semMap[c.semester]) semMap[c.semester] = [];
-        semMap[c.semester].push(c);
-      });
-
-      const gpaUl = document.getElementById('gpaSummary');
-      gpaUl.innerHTML = '';
-      let totalPoints = 0, totalCredits = 0;
-      for (const [sem, list] of Object.entries(semMap)) {
-        let points = 0, credits = 0;
-        list.forEach(c => {
-          points += c.point * c.credits;
-          credits += c.credits;
-        });
-        totalPoints += points;
-        totalCredits += credits;
-        const gpa = (points / credits).toFixed(2);
-        const li = document.createElement('li');
-        li.textContent = `${sem}: GPA = ${gpa}`;
-        gpaUl.appendChild(li);
-      }
-
-      // CGPA
-      document.getElementById('cgpa').textContent = totalCredits ? `CGPA = ${(totalPoints / totalCredits).toFixed(2)}` : "N/A";
-
-      // Planning
-      const max = {
-        Professional: +document.getElementById('maxProfessional').value,
-        Free: +document.getElementById('maxFree').value,
-        Engineering: +document.getElementById('maxEngineering').value,
-        Science: +document.getElementById('maxScience').value,
-        Humanities: +document.getElementById('maxHumanities').value,
-      };
-
-      const planned = { ...creditCount };
-      const overflow = {};
-      categories.forEach(cat => {
-        if (planned[cat] > max[cat]) {
-          overflow[cat] = planned[cat] - max[cat];
-        }
-      });
-
-      const planUl = document.getElementById('planSummary');
-      planUl.innerHTML = '';
-      categories.forEach(cat => {
-        const li = document.createElement('li');
-        let text = `${cat}: ${planned[cat] || 0}`;
-        if (cat !== 'Free') {
-          if ((overflow[cat] || 0) > 0) {
-            text += ` → Free (-${overflow[cat]})`;
-          }
-        }
-        li.innerHTML = text;
-        if (overflow[cat]) li.classList.add('overflow');
-        planUl.appendChild(li);
-      });
     }
 
-    const courseName = document.getElementById('courseName');
-    const creditsInput = document.getElementById('credits');
-    const gradeLetter = document.getElementById('gradeLetter');
-    const categoryInput = document.getElementById('category');
-    const semesterInput = document.getElementById('semester');
+    function parseGradecard() {
+      const raw = document.getElementById('gradecardInput').value;
+      const lines = raw.split('\n');
+      lines.forEach(line => {
+        const parts = line.split('|').map(s => s.trim());
+        if (parts.length < 6) return;
+        const [semester, code, name, creditStr, grade, category] = parts;
+        const credits = parseFloat(creditStr);
+        const point = gradeMap[grade] || 0;
+        if (!isNaN(credits)) {
+          courses.push({ semester, name: `${code} - ${name}`, credits, grade, point, category });
+        }
+      });
+      render();
+    }
+
+    function render() {
+      const tbody = document.getElementById('courseTable');
+      tbody.innerHTML = '';
+      courses.forEach(c => {
+        const row = `<tr><td>${c.semester}</td><td>${c.name}</td><td>${c.credits}</td><td>${c.grade}</td><td>${c.point}</td><td>${c.category}</td></tr>`;
+        tbody.innerHTML += row;
+      });
+
+      let totalCredits = 0, totalPoints = 0;
+      let categoryCredits = { Professional: 0, Free: 0, Science: 0, Engineering: 0, Humanities: 0 };
+
+      courses.forEach(c => {
+        totalCredits += c.credits;
+        totalPoints += c.credits * c.point;
+        if (categoryCredits[c.category] !== undefined) {
+          categoryCredits[c.category] += c.credits;
+        }
+      });
+
+      const cgpa = (totalPoints / totalCredits).toFixed(2);
+      let summary = `<p><b>CGPA:</b> ${cgpa}</p>`;
+      for (const cat in categoryCredits) {
+        let extra = '';
+        const diff = categoryCredits[cat] - maxCategoryCredits[cat];
+        if (cat !== 'Free' && diff > 0) {
+          categoryCredits['Free'] += diff;
+          extra = ` (+${diff} shown in Free)`;
+        }
+        summary += `<p>${cat}: ${categoryCredits[cat]}${extra}</p>`;
+      }
+      summary += `<p>Total Credits: ${totalCredits}</p>`;
+      document.getElementById('summary').innerHTML = summary;
+    }
   </script>
 </body>
 </html>

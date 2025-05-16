@@ -11,13 +11,13 @@
       padding: 20px;
       background-color: #f5f7fa;
     }
-    h2 {
+    h2, h3 {
       color: #333;
     }
     input, select, textarea, button {
-      margin: 5px;
-      padding: 5px;
-      font-size: 1rem;
+      margin: 5px 5px 10px 0;
+      padding: 6px;
+      font-size: 14px;
     }
     table {
       width: 100%;
@@ -32,21 +32,24 @@
     th {
       background-color: #e0e0e0;
     }
-    #ocrOutput, #ocrTextArea {
+    #ocrTextArea {
+      width: 100%;
+      height: 120px;
+      font-family: monospace;
       white-space: pre-wrap;
       background: #f0f0f0;
-      padding: 10px;
       margin-top: 10px;
-      width: 100%;
-      min-height: 100px;
-      font-family: monospace;
     }
     .instructions {
-      font-size: 0.9rem;
-      background: #e9f1ff;
+      background: #d9edf7;
+      border: 1px solid #bce8f1;
       padding: 10px;
-      border-left: 4px solid #007bff;
-      margin: 10px 0;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      color: #31708f;
+    }
+    button {
+      cursor: pointer;
     }
   </style>
 </head>
@@ -54,10 +57,10 @@
   <h2>Grade Tracker & GPA Calculator</h2>
 
   <h3>Add Course Manually</h3>
-  <input id="semester" placeholder="Semester (e.g. 01, 02)" />
-  <input id="courseCode" placeholder="Course Code" />
-  <input id="courseName" placeholder="Course Name" />
-  <input id="credits" type="number" placeholder="Credits" />
+  <input id="semester" placeholder="Semester (e.g. 01)" />
+  <input id="courseCode" placeholder="Course Code (e.g. MA1101)" />
+  <input id="courseName" placeholder="Course Name (e.g. Calculus)" />
+  <input id="credits" type="number" placeholder="Credits" min="0" />
   <select id="grade">
     <option>S</option>
     <option>A</option>
@@ -75,31 +78,22 @@
   </select>
   <button onclick="addCourse()">Add Course</button>
 
-  <h3>Paste Gradecard Text</h3>
+  <h3>Import Courses from Gradecard Text</h3>
   <div class="instructions">
-    Paste your gradecard lines here, one per line, format:<br>
-    <code>Semester CourseCode CourseName(with spaces) Credits Grade (other columns ignored)</code><br>
+    Paste your gradecard text here. Format per line:<br>
+    <code>Semester CourseCode CourseName Credits Grade [other columns ignored]</code><br>
     Example:<br>
-    <code>01 ID1200 Ecology and Environment 4 A G 2022</code><br>
-    <code>02 MA1301 Mathematics I 4 B G 2022</code><br>
-    Then click <b>Import Courses</b>.
+    <pre>01 AM1100 Engineering Mechanics 10 S VG 2022<br>01 MA1101 Functions of Several Variables 10 A G 2022</pre>
+    Grade must be one of: <b>S, A, B, C, D, E</b><br>
+    After pasting, click <b>Import from Text</b> and assign categories when prompted.
   </div>
-  <textarea id="gradecardInput" rows="6" cols="80" placeholder="Paste gradecard lines here..."></textarea><br>
-  <button onclick="parseGradecard()">Import Courses</button>
+  <textarea id="gradecardInput" placeholder="Paste gradecard text here..."></textarea><br>
+  <button onclick="parseTextAndAddCourses()">Import from Text</button>
 
   <h3>Or Upload Gradecard Image for OCR</h3>
   <input type="file" accept="image/*" onchange="handleImageUpload(event)" />
-  
-  <div class="instructions">
-    After image upload and OCR finishes, edit or review the extracted text below, then click <b>Import from OCR Text</b>.<br>
-    Format same as above:<br>
-    <code>Semester CourseCode CourseName Credits Grade ...</code><br>
-    Example:<br>
-    <code>01 ID1200 Ecology and Environment 4 A G 2022</code>
-  </div>
-  
-  <textarea id="ocrTextArea" placeholder="OCR extracted text will appear here..." ></textarea><br>
-  <button onclick="parseFromOCRText()">Import from OCR Text</button>
+  <textarea id="ocrTextArea" placeholder="OCR result will appear here..." readonly></textarea><br>
+  <button onclick="parseTextAndAddCoursesFromOCR()">Import from OCR Text</button>
 
   <h3>Courses</h3>
   <table>
@@ -111,6 +105,7 @@
         <th>Grade</th>
         <th>Point</th>
         <th>Category</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody id="courseTable"></tbody>
@@ -128,6 +123,7 @@
     Engineering: 57,
     Humanities: 27
   };
+
   let courses = [];
 
   function addCourse() {
@@ -135,62 +131,86 @@
     const code = document.getElementById('courseCode').value.trim();
     const name = document.getElementById('courseName').value.trim();
     const credits = parseFloat(document.getElementById('credits').value);
-    const grade = document.getElementById('grade').value;
-    const category = document.getElementById('category').value;
+    const grade = document.getElementById('grade').value.trim().toUpperCase();
+    const category = document.getElementById('category').value.trim();
 
-    if (!semester || !code || !name || !credits || isNaN(credits)) {
-      alert('Please fill all fields with valid data.');
+    if (!semester || !code || !name) {
+      alert("Please fill semester, course code, and course name.");
+      return;
+    }
+    if (!credits || isNaN(credits)) {
+      alert("Please enter valid credits.");
+      return;
+    }
+    if (!gradeMap[grade]) {
+      alert("Invalid grade. Use one of: S, A, B, C, D, E");
       return;
     }
 
-    const point = gradeMap[grade] || 0;
+    const point = gradeMap[grade];
     courses.push({ semester, name: `${code} - ${name}`, credits, grade, point, category });
+    clearInputFields();
     render();
   }
 
-  function parseGradecard() {
-    const raw = document.getElementById('gradecardInput').value;
-    parseTextAndAddCourses(raw);
+  function clearInputFields() {
+    document.getElementById('semester').value = '';
+    document.getElementById('courseCode').value = '';
+    document.getElementById('courseName').value = '';
+    document.getElementById('credits').value = '';
   }
 
-  function parseFromOCRText() {
-    const raw = document.getElementById('ocrTextArea').value;
-    parseTextAndAddCourses(raw);
+  function parseTextAndAddCourses() {
+    const rawText = document.getElementById('gradecardInput').value;
+    parseTextAndAddCoursesHelper(rawText);
   }
 
-  function parseTextAndAddCourses(rawText) {
+  function parseTextAndAddCoursesFromOCR() {
+    const rawText = document.getElementById('ocrTextArea').value;
+    parseTextAndAddCoursesHelper(rawText);
+  }
+
+  function parseTextAndAddCoursesHelper(rawText) {
     const lines = rawText.split('\n');
     const categories = ['Professional', 'Science', 'Engineering', 'Humanities', 'Free'];
+    const validGrades = new Set(['S','A','B','C','D','E']);
 
     let importedCount = 0;
     for (const line of lines) {
       if (!line.trim()) continue;
 
-      // split line by spaces/tabs - handle multiple spaces
       const parts = line.trim().split(/\s+/);
+      if (parts.length < 4) continue;
 
-      // Require at least: Semester, Code, Name..., Credits, Grade (at least 5 parts)
-      if (parts.length < 5) continue;
+      // Find grade token scanning from right to left
+      let gradeIndex = -1;
+      for(let i = parts.length - 1; i >= 0; i--) {
+        const token = parts[i].toUpperCase();
+        if(validGrades.has(token)) {
+          gradeIndex = i;
+          break;
+        }
+      }
+      if(gradeIndex === -1) continue;  // no valid grade found
 
+      // credits should be the token before grade
+      const creditsIndex = gradeIndex - 1;
+      if(creditsIndex < 0) continue;
+
+      const grade = parts[gradeIndex].toUpperCase();
+      const credits = parseFloat(parts[creditsIndex]);
+      if(isNaN(credits)) continue;
+
+      // semester is first token
       const semester = parts[0];
+      // code is second token
       const code = parts[1];
 
-      // Credits assumed third from last (parts.length -3), grade second from last (parts.length -2)
-      const creditsRaw = parts[parts.length - 3];
-      const gradeRaw = parts[parts.length - 2].toUpperCase();
+      // course name is everything from parts[2] up to creditsIndex -1
+      const nameTokens = parts.slice(2, creditsIndex);
+      const name = nameTokens.join(' ');
 
-      const credits = parseFloat(creditsRaw);
-      const grade = gradeRaw;
-
-      if (isNaN(credits) || !(grade in gradeMap)) {
-        // skip line if credits or grade invalid
-        continue;
-      }
-
-      // course name is from 3rd element up to credits position
-      const name = parts.slice(2, parts.length - 3).join(' ');
-
-      // Prompt for category with default Professional
+      // prompt for category with default Professional
       let category = prompt(`Select category for course:\n${code} - ${name}\nOptions: ${categories.join(', ')}`, 'Professional');
       if (!category || !categories.includes(category.trim())) {
         category = 'Professional';
@@ -198,7 +218,7 @@
         category = category.trim();
       }
 
-      const point = gradeMap[grade] || 0;
+      const point = gradeMap[grade];
       courses.push({ semester, name: `${code} - ${name}`, credits, grade, point, category });
       importedCount++;
     }
@@ -211,18 +231,28 @@
   function render() {
     const tbody = document.getElementById('courseTable');
     tbody.innerHTML = '';
-    courses.forEach(c => {
-      const row = `<tr>
-        <td>${c.semester}</td>
-        <td>${c.name}</td>
-        <td>${c.credits}</td>
-        <td>${c.grade}</td>
-        <td>${c.point}</td>
-        <td>${c.category}</td>
-      </tr>`;
-      tbody.innerHTML += row;
+    courses.forEach((c, idx) => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${c.semester}</td>
+          <td>${c.name}</td>
+          <td>${c.credits.toFixed(1)}</td>
+          <td>${c.grade}</td>
+          <td>${c.point.toFixed(1)}</td>
+          <td>
+            <select onchange="updateCategory(${idx}, this.value)">
+              <option value="Professional" ${c.category === 'Professional' ? 'selected' : ''}>Professional</option>
+              <option value="Science" ${c.category === 'Science' ? 'selected' : ''}>Science</option>
+              <option value="Engineering" ${c.category === 'Engineering' ? 'selected' : ''}>Engineering</option>
+              <option value="Humanities" ${c.category === 'Humanities' ? 'selected' : ''}>Humanities</option>
+              <option value="Free" ${c.category === 'Free' ? 'selected' : ''}>Free</option>
+            </select>
+          </td>
+          <td><button onclick="removeCourse(${idx})">Remove</button></td>
+        </tr>`;
     });
 
+    // Calculate CGPA and credits per category
     let totalCredits = 0, totalPoints = 0;
     let categoryCredits = { Professional: 0, Free: 0, Science: 0, Engineering: 0, Humanities: 0 };
 
@@ -234,40 +264,56 @@
       }
     });
 
-    const cgpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "0.00";
-
-    let summary = `<p><b>CGPA:</b> ${cgpa}</p>`;
+    // Handle excess credits
+    let summary = '';
     for (const cat in categoryCredits) {
       let extra = '';
       const diff = categoryCredits[cat] - maxCategoryCredits[cat];
       if (cat !== 'Free' && diff > 0) {
-        categoryCredits['Free'] += diff;
-        extra = ` (+${diff.toFixed(1)} shown in Free)`;
+        extra = ` <b>(Exceeds max by ${diff.toFixed(1)} credits)</b>`;
       }
-      summary += `<p>${cat}: ${categoryCredits[cat].toFixed(1)}${extra}</p>`;
+      summary += `<div>${cat}: ${categoryCredits[cat].toFixed(1)} credits (max ${maxCategoryCredits[cat]})${extra}</div>`;
     }
-    summary += `<p>Total Credits: ${totalCredits.toFixed(1)}</p>`;
+
+    let cgpa = totalCredits ? (totalPoints / totalCredits) : 0;
+    cgpa = cgpa.toFixed(2);
+
+    summary += `<div><br><b>Total Credits:</b> ${totalCredits.toFixed(1)}</div>`;
+    summary += `<div><b>CGPA:</b> ${cgpa}</div>`;
+
     document.getElementById('summary').innerHTML = summary;
   }
 
+  function updateCategory(index, newCategory) {
+    courses[index].category = newCategory;
+    render();
+  }
+
+  function removeCourse(index) {
+    courses.splice(index, 1);
+    render();
+  }
+
+  // OCR image handling
   function handleImageUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    document.getElementById('ocrTextArea').value = "Performing OCR, please wait...";
-
-    Tesseract.recognize(
-      file,
-      'eng',
-      { logger: m => console.log(m) }
-    ).then(({ data: { text } }) => {
-      document.getElementById('ocrTextArea').value = text;
-      alert('OCR complete! Review/edit the extracted text, then click "Import from OCR Text".');
-    }).catch(e => {
-      document.getElementById('ocrTextArea').value = '';
-      alert('OCR failed: ' + e.message);
-    });
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('ocrTextArea').value = 'Recognizing text, please wait...';
+      Tesseract.recognize(e.target.result, 'eng', { logger: m => {} })
+        .then(({ data: { text } }) => {
+          document.getElementById('ocrTextArea').value = text;
+        })
+        .catch(err => {
+          document.getElementById('ocrTextArea').value = 'OCR failed: ' + err.message;
+        });
+    };
+    reader.readAsDataURL(file);
   }
+
+  render();
 </script>
 </body>
 </html>

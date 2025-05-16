@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Grade Tracker & GPA Calculator</title>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
   <style>
@@ -17,6 +17,7 @@
     input, select, textarea, button {
       margin: 5px;
       padding: 5px;
+      font-size: 1rem;
     }
     table {
       width: 100%;
@@ -43,7 +44,7 @@
   <h2>Grade Tracker & GPA Calculator</h2>
 
   <h3>Add Course</h3>
-  <input id="semester" placeholder="Semester" />
+  <input id="semester" placeholder="Semester (e.g. 01, 02)" />
   <input id="courseCode" placeholder="Course Code" />
   <input id="courseName" placeholder="Course Name" />
   <input id="credits" type="number" placeholder="Credits" />
@@ -65,7 +66,7 @@
   <button onclick="addCourse()">Add Course</button>
 
   <h3>Paste Gradecard</h3>
-  <textarea id="gradecardInput" rows="6" cols="80" placeholder="Paste gradecard table..."></textarea><br>
+  <textarea id="gradecardInput" rows="6" cols="80" placeholder="Paste gradecard lines here. First column = Semester"></textarea><br>
   <button onclick="parseGradecard()">Import Courses</button>
 
   <h3>Or Upload Gradecard Image</h3>
@@ -90,103 +91,123 @@
   <h3>Summary</h3>
   <div id="summary"></div>
 
-  <script>
-    const gradeMap = { S: 10, A: 9, B: 8, C: 7, D: 6, E: 4 };
-    const maxCategoryCredits = {
-      Professional: 232,
-      Free: 42,
-      Science: 102,
-      Engineering: 57,
-      Humanities: 27
-    };
+<script>
+  const gradeMap = { S: 10, A: 9, B: 8, C: 7, D: 6, E: 4 };
+  const maxCategoryCredits = {
+    Professional: 232,
+    Free: 42,
+    Science: 102,
+    Engineering: 57,
+    Humanities: 27
+  };
+  let courses = [];
 
-    let courses = [];
+  function addCourse() {
+    const semester = document.getElementById('semester').value.trim();
+    const code = document.getElementById('courseCode').value.trim();
+    const name = document.getElementById('courseName').value.trim();
+    const credits = parseFloat(document.getElementById('credits').value);
+    const grade = document.getElementById('grade').value;
+    const category = document.getElementById('category').value;
 
-    function addCourse() {
-      const semester = document.getElementById('semester').value;
-      const code = document.getElementById('courseCode').value;
-      const name = document.getElementById('courseName').value;
-      const credits = parseFloat(document.getElementById('credits').value);
-      const grade = document.getElementById('grade').value;
-      const category = document.getElementById('category').value;
+    if (!semester || !code || !name || !credits || isNaN(credits)) {
+      alert('Please fill all fields with valid data.');
+      return;
+    }
 
-      if (!credits || isNaN(credits)) return;
+    const point = gradeMap[grade] || 0;
+    courses.push({ semester, name: `${code} - ${name}`, credits, grade, point, category });
+    render();
+  }
+
+  function parseGradecard() {
+    const raw = document.getElementById('gradecardInput').value;
+    const lines = raw.split('\n');
+    const categories = ['Professional', 'Science', 'Engineering', 'Humanities', 'Free'];
+
+    for (const line of lines) {
+      const parts = line.trim().split(/\s+/);
+      if (parts.length < 6) continue;
+
+      const semester = parts[0];
+      const code = parts[1];
+      const credits = parseFloat(parts[parts.length - 3]);
+      const grade = parts[parts.length - 2];
+      const name = parts.slice(2, parts.length - 3).join(' ');
+
+      if (isNaN(credits)) continue;
 
       const point = gradeMap[grade] || 0;
-      courses.push({ semester, name: `${code} - ${name}`, credits, grade, point, category });
-      render();
-    }
 
-    function parseGradecard() {
-      const raw = document.getElementById('gradecardInput').value;
-      const lines = raw.split('\n');
-      lines.forEach(line => {
-        const parts = line.trim().split(/\s+/);
-        if (parts.length < 6) return;
-
-        const code = parts[1];
-        const credits = parseFloat(parts[parts.length - 3]);
-        const grade = parts[parts.length - 2];
-        const name = parts.slice(2, parts.length - 3).join(' ');
-        const semester = 'OCR';
-        const category = 'Professional';
-        const point = gradeMap[grade] || 0;
-
-        if (!isNaN(credits)) {
-          courses.push({ semester, name: `${code} - ${name}`, credits, grade, point, category });
-        }
-      });
-      render();
-    }
-
-    function render() {
-      const tbody = document.getElementById('courseTable');
-      tbody.innerHTML = '';
-      courses.forEach(c => {
-        const row = `<tr><td>${c.semester}</td><td>${c.name}</td><td>${c.credits}</td><td>${c.grade}</td><td>${c.point}</td><td>${c.category}</td></tr>`;
-        tbody.innerHTML += row;
-      });
-
-      let totalCredits = 0, totalPoints = 0;
-      let categoryCredits = { Professional: 0, Free: 0, Science: 0, Engineering: 0, Humanities: 0 };
-
-      courses.forEach(c => {
-        totalCredits += c.credits;
-        totalPoints += c.credits * c.point;
-        if (categoryCredits[c.category] !== undefined) {
-          categoryCredits[c.category] += c.credits;
-        }
-      });
-
-      const cgpa = (totalPoints / totalCredits).toFixed(2);
-      let summary = `<p><b>CGPA:</b> ${cgpa}</p>`;
-      for (const cat in categoryCredits) {
-        let extra = '';
-        const diff = categoryCredits[cat] - maxCategoryCredits[cat];
-        if (cat !== 'Free' && diff > 0) {
-          categoryCredits['Free'] += diff;
-          extra = ` (+${diff} shown in Free)`;
-        }
-        summary += `<p>${cat}: ${categoryCredits[cat]}${extra}</p>`;
+      // Prompt user for category with default "Professional"
+      let category = prompt(`Select category for course:\n${code} - ${name}\nOptions: ${categories.join(', ')}`, 'Professional');
+      if (!category || !categories.includes(category.trim())) {
+        category = 'Professional';
+      } else {
+        category = category.trim();
       }
-      summary += `<p>Total Credits: ${totalCredits}</p>`;
-      document.getElementById('summary').innerHTML = summary;
-    }
 
-    function handleImageUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      Tesseract.recognize(
-        file,
-        'eng',
-        { logger: m => console.log(m) }
-      ).then(({ data: { text } }) => {
-        document.getElementById('ocrOutput').innerText = text;
-        document.getElementById('gradecardInput').value = text;
-        alert('Text extracted from image. Now click "Import Courses".');
-      });
+      courses.push({ semester, name: `${code} - ${name}`, credits, grade, point, category });
     }
-  </script>
+    render();
+  }
+
+  function render() {
+    const tbody = document.getElementById('courseTable');
+    tbody.innerHTML = '';
+    courses.forEach(c => {
+      const row = `<tr>
+        <td>${c.semester}</td>
+        <td>${c.name}</td>
+        <td>${c.credits}</td>
+        <td>${c.grade}</td>
+        <td>${c.point}</td>
+        <td>${c.category}</td>
+      </tr>`;
+      tbody.innerHTML += row;
+    });
+
+    let totalCredits = 0, totalPoints = 0;
+    let categoryCredits = { Professional: 0, Free: 0, Science: 0, Engineering: 0, Humanities: 0 };
+
+    courses.forEach(c => {
+      totalCredits += c.credits;
+      totalPoints += c.credits * c.point;
+      if (categoryCredits[c.category] !== undefined) {
+        categoryCredits[c.category] += c.credits;
+      }
+    });
+
+    const cgpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "0.00";
+
+    let summary = `<p><b>CGPA:</b> ${cgpa}</p>`;
+    for (const cat in categoryCredits) {
+      let extra = '';
+      const diff = categoryCredits[cat] - maxCategoryCredits[cat];
+      if (cat !== 'Free' && diff > 0) {
+        categoryCredits['Free'] += diff;
+        extra = ` (+${diff.toFixed(1)} shown in Free)`;
+      }
+      summary += `<p>${cat}: ${categoryCredits[cat].toFixed(1)}${extra}</p>`;
+    }
+    summary += `<p>Total Credits: ${totalCredits.toFixed(1)}</p>`;
+    document.getElementById('summary').innerHTML = summary;
+  }
+
+  function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    Tesseract.recognize(
+      file,
+      'eng',
+      { logger: m => console.log(m) }
+    ).then(({ data: { text } }) => {
+      document.getElementById('ocrOutput').innerText = text;
+      document.getElementById('gradecardInput').value = text;
+      alert('Text extracted from image. Now click "Import Courses".');
+    });
+  }
+</script>
 </body>
 </html>

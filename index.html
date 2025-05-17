@@ -1,105 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Prince Kumar | Personal Website</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet"/>
   <style>
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
-      background: #f9f9f9;
-      color: #222;
+      background-color: #f4f4f9;
+      color: #333;
     }
     header {
-      background-color: #111;
+      background-color: #2b2d42;
       color: white;
       padding: 2rem;
       text-align: center;
     }
-    main {
-      max-width: 900px;
-      margin: auto;
-      padding: 2rem;
+    nav {
+      background: #8d99ae;
+      padding: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
     }
-    h1, h2 {
-      color: #111;
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
     }
     section {
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
     }
-    a {
-      color: #007acc;
+    h2 {
+      color: #2b2d42;
+      border-bottom: 2px solid #8d99ae;
+      padding-bottom: 0.5rem;
+    }
+    .btn {
+      background-color: #ef233c;
+      color: white;
+      padding: 0.5rem 1rem;
       text-decoration: none;
+      border-radius: 5px;
     }
-    a:hover {
-      text-decoration: underline;
+    .btn:hover {
+      background-color: #d90429;
     }
     footer {
       text-align: center;
-      padding: 2rem;
-      background-color: #eee;
+      background-color: #2b2d42;
+      color: white;
+      padding: 1rem;
+      margin-top: 3rem;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Prince Kumar</h1>
-    <p>Undergraduate Researcher | Engineering Physics @ IIT Madras</p>
-    <p>Experimental High-Energy Physics • Machine Learning • Detector Design</p>
-    <p><a href="mailto:ep22b045@smail.iitm.ac.in">ep22b045@smail.iitm.ac.in</a> | <a href="https://github.com/princek880">GitHub</a> | <a href="https://www.linkedin.com/in/prince-kumar-3a11391b1/">LinkedIn</a></p>
-  </header>
+<header>
+  <h1>Prince Kumar</h1>
+  <p>Undergraduate @ IIT Madras | Experimental HEP | ML + Detector Systems</p>
+  <p>Email: <a href="mailto:ep22b045@smail.iitm.ac.in" style="color: #ffd166;">ep22b045@smail.iitm.ac.in</a></p>
+  <a class="btn" href="CVPrince_Updated_Visa_compressed.pdf" download>Download CV (PDF)</a>
+</header>
 
-  <main>
+<nav>
+  <a href="#education">Education</a>
+  <a href="#research">Research</a>
+  <a href="#projects">Projects</a>
+  <a href="#skills">Skills</a>
+  <a href="#achievements">Achievements</a>
+</nav>
 
-    <section>
-      <h2>About Me</h2>
-      <p>
-        I’m a 3rd-year undergraduate student at IIT Madras majoring in Engineering Physics. My research interests lie in experimental high-energy physics, with a particular focus on machine learning techniques for jet/track classification, silicon detector technologies, and rare decay channel analyses in heavy-ion collisions.
-      </p>
-    </section>
+<div class="container">
 
-    <section>
-      <h2>Current Projects</h2>
-      <ul>
-        <li>🔬 Jet and track classification in PbPb collisions using ML (Run 3 CMS MiniAOD)</li>
-        <li>🧪 Studying rare decay Λ<sub>b</sub><sup>0</sup> → J/ψ + Λ<sup>0</sup> in CMS Heavy Ion data</li>
-        <li>🖥️ Contributing to CMSSW with a b-jet and track tagger tool</li>
-        <li>⚙️ B.Tech Project: Setting up the first Transient Current Technique (TCT) system in India</li>
-        <li>🇫🇷 Summer intern at École Polytechnique (LLR), France – ML for b-tagging</li>
-      </ul>
-    </section>
+  <section id="education">
+    <h2>Education</h2>
+    <p><strong>B.Tech in Engineering Physics</strong><br>IIT Madras, CGPA: 9.12 / 10.0 (2022–2026)</p>
+    <p><strong>Senior Secondary</strong><br>DPS R.K. Puram, CBSE – 97.4%</p>
+    <p><strong>Matriculation</strong><br>The Kirk View School, ICSE – 95.2%</p>
+  </section>
 
-    <section>
-      <h2>Skills</h2>
-      <p><strong>Languages:</strong> Python, C++, VHDL</p>
-      <p><strong>Frameworks:</strong> CMSSW, PyTorch, scikit-learn, uproot, awkward-array</p>
-      <p><strong>Tools:</strong> Vivado, ROOT, Git, HDF5, Jupyter</p>
-    </section>
+  <section id="research">
+    <h2>Research Experiences</h2>
+    <p><strong>Firmware Development for ATLAS MALTA Readout Chain</strong><br>IIT Madras | Nov 2024 – Present</p>
+    <ul>
+      <li>FPGA design using Vivado, IPBus, adapting KC705 to AXKU040 with RGMII support.</li>
+    </ul>
 
-    <section>
-      <h2>Education</h2>
-      <p><strong>Indian Institute of Technology Madras</strong> — B.Tech. in Engineering Physics (2022–2026)</p>
-      <p>CGPA: 9.12/10</p>
-    </section>
+    <p><strong>B-Hadron Tagging in CMS using Deep Learning</strong><br>IIT Madras + École Polytechnique | May 2024 – Present</p>
+    <ul>
+      <li>Developed novel point cloud & graph-based classifiers for b-jet tagging with 0.97 AUC.</li>
+    </ul>
 
-    <section>
-      <h2>CV & Links</h2>
-      <ul>
-        <li><a href="your-cv.pdf" target="_blank">Download my CV (PDF)</a></li>
-        <li><a href="https://github.com/yourusername">GitHub Projects</a></li>
-        <li><a href="https://www.linkedin.com/in/yourlinkedin">LinkedIn</a></li>
-      </ul>
-    </section>
+    <p><strong>Λ<sub>b</sub> → Λ + J/ψ Rare Decay in PbPb</strong><br>CMS PbPb Run3 | Sept 2024 – Present</p>
+    <ul>
+      <li>Designed custom gen fragments, produced 1M+ rare events using CMSSW and CRAB.</li>
+    </ul>
 
-  </main>
+    <p><strong>Flare Artifact Removal via GANs</strong><br>IIT Madras | Feb 2024 – May 2024</p>
+    <ul>
+      <li>Used UNet + GAN models achieving PSNR 23.5, SSIM 0.66 on flare7kpp dataset.</li>
+    </ul>
+  </section>
 
-  <footer>
-    <p>© 2025 Prince Kumar | Built with ❤️ and GitHub Pages</p>
-  </footer>
+  <section id="projects">
+    <h2>Projects</h2>
+    <p><strong>AstroStellar Simulation</strong><br>CFI, IIT Madras</p>
+    <ul>
+      <li>3D N-body simulation with Hamiltonian mechanics and Barnes-Hut optimization.</li>
+    </ul>
+
+    <p><strong>LED-Speaker Analog System</strong><br>EE2019 Course Project</p>
+    <ul>
+      <li>Built synchronized audio-visual system using analog circuits (filters, amplifiers).</li>
+    </ul>
+  </section>
+
+  <section id="skills">
+    <h2>Technical Skills</h2>
+    <p><strong>Languages:</strong> Python (PyTorch, PyG), C++, VHDL, MATLAB</p>
+    <p><strong>Tools:</strong> ROOT, PYTHIA, Vivado, KiCAD, Uproot, LTSpice, GitHub, Canva</p>
+  </section>
+
+  <section id="achievements">
+    <h2>Notable Achievements</h2>
+    <ul>
+      <li>Selected as 1 of 17 Young Research Fellows (from 300+ applicants), 2024</li>
+      <li>Top 5 in Engineering Physics Department at IITM, 2024</li>
+      <li>Top 1% in JEE Mains, Top 5% in JEE Advanced, 2022</li>
+    </ul>
+  </section>
+
+</div>
+
+<footer>
+  <p>Connect: 
+    <a href="https://inspirehep.net/authors/1068424" style="color:#ffd166;">InspireHEP</a> | 
+    <a href="https://drive.google.com/file/d/1xoiUDzVbqcTXFggYlJSlhHV_Xc1NJetF/view?usp=sharing" style="color:#ffd166;">Google Drive</a>
+  </p>
+  <p>© 2025 Prince Kumar</p>
+</footer>
 
 </body>
 </html>

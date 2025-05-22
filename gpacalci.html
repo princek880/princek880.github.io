@@ -169,7 +169,16 @@
 
   <div class="section-container">
     <h3>Add Course Manually</h3>
-    <input id="semester" placeholder="Semester (e.g. 01)" />
+    <select id="semester">
+      <option value="01">01</option>
+      <option value="02">02</option>
+      <option value="03">03</option>
+      <option value="04">04</option>
+      <option value="05">05</option>
+      <option value="06">06</option>
+      <option value="07">07</option>
+      <option value="08">08</option>
+    </select>
     <input id="courseCode" placeholder="Course Code (e.g. MA1101)" />
     <input id="courseName" placeholder="Course Name (e.g. Calculus)" />
     <input id="credits" type="number" placeholder="Credits" min="0" />
@@ -264,7 +273,8 @@
   }
 
   function clearInputFields() {
-    document.getElementById('semester').value = '';
+    // For semester, setting it back to the first option
+    document.getElementById('semester').value = '01';
     document.getElementById('courseCode').value = '';
     document.getElementById('courseName').value = '';
     document.getElementById('credits').value = '';
@@ -306,12 +316,16 @@
       if(isNaN(credits)) continue;
 
       const semester = parts[0];
+      // Ensure semester is a valid two-digit number if it's imported
+      const formattedSemester = String(parseInt(semester, 10)).padStart(2, '0');
+      if (isNaN(parseInt(formattedSemester, 10))) continue; // Skip if semester is not a valid number
+
       const code = parts[1];
       const name = parts.slice(2, creditsIndex).join(' ');
       const point = gradeMap[grade] || 0;
       const category = (grade === 'P') ? 'None' : 'None';
 
-      courses.push({ semester, name: `${code} - ${name}`, credits, grade, point, category });
+      courses.push({ semester: formattedSemester, name: `${code} - ${name}`, credits, grade, point, category });
       importedCount++;
     }
     alert(importedCount + ' courses imported.');
@@ -322,9 +336,20 @@
     const tbody = document.getElementById('courseTable');
     tbody.innerHTML = '';
     courses.forEach((c, idx) => {
+      // Create options for the semester dropdown in the table row
+      let semesterOptions = '';
+      for (let i = 1; i <= 8; i++) {
+        const semValue = String(i).padStart(2, '0');
+        semesterOptions += `<option value="${semValue}" ${c.semester === semValue ? 'selected' : ''}>${semValue}</option>`;
+      }
+
       tbody.innerHTML += `
         <tr>
-          <td><input value="${c.semester}" onchange="updateField(${idx}, 'semester', this.value)" /></td>
+          <td>
+            <select onchange="updateField(${idx}, 'semester', this.value)">
+              ${semesterOptions}
+            </select>
+          </td>
           <td><input value="${c.name}" onchange="updateField(${idx}, 'name', this.value)" /></td>
           <td><input type="number" value="${c.credits}" onchange="updateField(${idx}, 'credits', parseFloat(this.value))" /></td>
           <td><input value="${c.grade}" onchange="updateGrade(${idx}, this.value)" /></td>
@@ -347,7 +372,8 @@
     let categoryCredits = { Professional: 0, Free: 0, Science: 0, Engineering: 0, Humanities: 0 };
 
     courses.forEach(c => {
-      if (c.category !== 'None') {
+      // Only include courses with a valid grade point in the calculation, ignoring 'P' (Pass) grades
+      if (c.category !== 'None' && c.grade !== 'P') {
         totalCredits += c.credits;
         totalPoints += c.credits * c.point;
         if (categoryCredits[c.category] !== undefined) {
@@ -367,7 +393,7 @@
     }
 
     const cgpa = totalCredits ? (totalPoints / totalCredits).toFixed(2) : '0.00';
-    summary += `<div><br><b>Total Credits:</b> ${totalCredits.toFixed(1)}</div>`;
+    summary += `<div><br><b>Total Credits (excluding P grades):</b> ${totalCredits.toFixed(1)}</div>`;
     summary += `<div><b>CGPA:</b> ${cgpa}</div>`;
     document.getElementById('summary').innerHTML = summary;
   }

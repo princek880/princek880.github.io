@@ -406,6 +406,8 @@ F23 CS101 Introduction to Programming 3 B</pre>
         const rawText = document.getElementById('gradecardInput').value;
         parseTextHelper(rawText);
         document.getElementById('gradecardInput').value = ''; // Clear text area after import
+        // IMPORTANT: Call render after parsing
+        saveAndRender(); // THIS LINE WAS ADDED/MOVED
     }
 
     // Handles parsing text from the OCR result area
@@ -413,6 +415,8 @@ F23 CS101 Introduction to Programming 3 B</pre>
         const rawText = document.getElementById('ocrTextArea').value;
         parseTextHelper(rawText);
         document.getElementById('ocrTextArea').value = ''; // Clear text area after import
+        // IMPORTANT: Call render after parsing
+        saveAndRender(); // THIS LINE WAS ADDED/MOVED
     }
 
     // Helper function to parse text and add courses
@@ -470,7 +474,8 @@ F23 CS101 Introduction to Programming 3 B</pre>
             importedCount++;
         }
         alert(`${importedCount} courses imported successfully!`);
-        saveAndRender();
+        // The render call was moved out of this helper to be called only once
+        // after all lines are processed, which is handled by saveAndRender()
     }
 
     // Renders the courses in the table and updates the summary

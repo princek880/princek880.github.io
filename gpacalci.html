@@ -1,678 +1,418 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Academic Compass: Grade & GPA Tracker</title>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #4A90E2;
-            --secondary-color: #50E3C2;
-            --text-color: #333;
-            --background-color: #f5f7fa;
-            --card-background: #ffffff;
-            --border-color: #e0e0e0;
-            --shadow-light: rgba(0, 0, 0, 0.05);
-            --shadow-medium: rgba(0, 0, 0, 0.1);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grade Tracker & GPA Calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
 
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
+    body {
+      font-family: 'Roboto', sans-serif;
+      padding: 30px;
+      background-color: #eef1f5; /* Light background for a modern feel */
+      color: #333;
+      line-height: 1.6;
+    }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: var(--card-background);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px var(--shadow-light);
-        }
+    h2, h3 {
+      color: #2c3e50; /* Darker heading color */
+      margin-bottom: 15px;
+      border-bottom: 2px solid #3498db; /* Accent color for headings */
+      padding-bottom: 5px;
+    }
 
-        h1, h2, h3 {
-            color: var(--primary-color);
-            text-align: center;
-            margin-bottom: 25px;
-            font-weight: 700;
-        }
+    /* Card-like containers for sections */
+    .section-container {
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      padding: 25px;
+      margin-bottom: 30px;
+    }
 
-        h2 {
-            font-size: 1.8em;
-            margin-top: 40px;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
-            color: var(--text-color);
-        }
+    input, select, textarea, button {
+      margin: 8px 8px 15px 0;
+      padding: 10px 12px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+      box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    }
 
-        h3 {
-            font-size: 1.4em;
-            margin-top: 30px;
-            color: var(--primary-color);
-        }
+    input[type="number"] {
+      -moz-appearance: textfield; /* Firefox spinner removal */
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none; /* Webkit spinner removal */
+      margin: 0;
+    }
 
-        .section-card {
-            background-color: var(--card-background);
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px var(--shadow-light);
-            margin-bottom: 30px;
-        }
+    input:focus, select:focus, textarea:focus {
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+      outline: none;
+    }
 
-        input[type="text"],
-        input[type="number"],
-        select,
-        textarea {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1em;
-            transition: all 0.3s ease;
-        }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
 
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
-            outline: none;
-        }
+    button:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+    }
 
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-            font-family: 'Roboto Mono', monospace; /* For code-like input */
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden; /* Ensures rounded corners apply to content */
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
 
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            margin-right: 10px;
-        }
+    th, td {
+      padding: 12px 15px;
+      border: 1px solid #e0e0e0;
+      text-align: left;
+    }
 
-        button:hover {
-            background-color: #3a7bd5;
-            transform: translateY(-2px);
-        }
+    th {
+      background-color: #f2f2f2; /* Lighter header background */
+      font-weight: 600;
+      color: #555;
+    }
 
-        button:active {
-            transform: translateY(0);
-        }
+    tr:nth-child(even) {
+      background-color: #f9f9f9; /* Zebra striping for table rows */
+    }
 
-        button.secondary {
-            background-color: #6c757d;
-        }
+    tr:hover {
+      background-color: #f1f7fc; /* Highlight row on hover */
+    }
 
-        button.secondary:hover {
-            background-color: #5a6268;
-        }
+    #ocrTextArea {
+      width: 100%;
+      height: 150px;
+      font-family: 'Roboto Mono', monospace; /* Monospace for OCR text */
+      white-space: pre-wrap;
+      background: #fdfdfd;
+      margin-top: 10px;
+      border: 1px solid #dcdcdc;
+      border-radius: 5px;
+      padding: 10px;
+      box-sizing: border-box;
+      resize: vertical; /* Allow vertical resizing */
+    }
 
-        .input-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
+    .instructions {
+      background: #e7f3ff; /* Lighter blue for instructions */
+      border: 1px solid #cce5ff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      color: #0056b3;
+      font-size: 0.95em;
+    }
 
-        .input-group > input, .input-group > select {
-            flex: 1;
-            min-width: 120px; /* Adjust as needed for smaller screens */
-            margin: 0; /* Override default margin */
-        }
+    .instructions code {
+      background-color: #e0e0e0;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-family: 'Roboto Mono', monospace;
+    }
 
-        .input-group.full-width > input, .input-group.full-width > select {
-            width: 100%;
-        }
+    .instructions pre {
+      background-color: #f0f0f0;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto; /* For long lines in preformatted text */
+      margin-top: 10px;
+    }
 
+    #summary {
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      padding: 25px;
+      margin-top: 30px;
+      font-size: 1.1em;
+      line-height: 1.8;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: separate; /* Use separate for rounded corners on cells */
-            border-spacing: 0;
-            margin-top: 20px;
-            box-shadow: 0 2px 10px var(--shadow-light);
-            border-radius: 8px; /* Apply border-radius to the table */
-            overflow: hidden; /* Ensure content respects border-radius */
-        }
+    #summary div:last-child {
+      font-weight: bold;
+      color: #2c3e50;
+      margin-top: 10px;
+    }
 
-        th, td {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
-            text-align: left;
-        }
-
-        th {
-            background-color: var(--primary-color);
-            color: white;
-            font-weight: 400;
-            text-transform: uppercase;
-            font-size: 0.9em;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        tbody tr:hover {
-            background-color: #eaf3ff;
-        }
-
-        td input, td select {
-            margin: 0;
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: calc(100% - 12px);
-            box-sizing: border-box;
-        }
-
-        .instructions {
-            background: #e6f7ff;
-            border: 1px solid #91d5ff;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            color: #1890ff;
-            font-size: 0.95em;
-            line-height: 1.5;
-        }
-        .instructions pre {
-            background: #f0f8ff;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px dashed #d9efff;
-            margin-top: 10px;
-            font-size: 0.9em;
-            overflow-x: auto;
-        }
-
-        #ocrTextArea {
-            background: #fdfdfd;
-            border: 1px dashed #ccc;
-            min-height: 150px;
-            font-family: 'Roboto Mono', monospace;
-            white-space: pre-wrap;
-            margin-top: 10px;
-        }
-
-        #summary {
-            background-color: #e6ffe6;
-            border: 1px solid #8cff8c;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 30px;
-            line-height: 1.8;
-        }
-        #summary div {
-            margin-bottom: 5px;
-        }
-        #summary b {
-            color: var(--primary-color);
-        }
-        .error-message {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            .input-group {
-                flex-direction: column;
-            }
-            .input-group > input, .input-group > select {
-                width: 100%;
-                min-width: unset;
-            }
-            table, thead, tbody, th, td, tr {
-                display: block;
-            }
-            thead tr {
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
-            tr {
-                border: 1px solid var(--border-color);
-                margin-bottom: 10px;
-                border-radius: 8px;
-                overflow: hidden;
-            }
-            td {
-                border: none;
-                border-bottom: 1px solid #eee;
-                position: relative;
-                padding-left: 50%;
-                text-align: right;
-            }
-            td:last-child {
-                border-bottom: none;
-            }
-            td::before {
-                content: attr(data-label);
-                position: absolute;
-                left: 10px;
-                width: 45%;
-                padding-right: 10px;
-                white-space: nowrap;
-                text-align: left;
-                font-weight: bold;
-                color: var(--primary-color);
-            }
-            td input, td select {
-                width: calc(100% - 10px);
-            }
-        }
-    </style>
+    #summary b {
+      color: #3498db;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Academic Compass: Your Grade & GPA Tracker</h1>
+  <h2>Grade Tracker & GPA Calculator</h2>
 
-        <section class="section-card">
-            <h3>📈 Add a Course Manually</h3>
-            <div class="input-group">
-                <input id="semester" type="text" placeholder="Semester (e.g., F23, 01)" />
-                <input id="courseCode" type="text" placeholder="Course Code (e.g., CS101)" />
-                <input id="courseName" type="text" placeholder="Course Name (e.g., Intro to Programming)" />
-                <input id="credits" type="number" placeholder="Credits" min="0" step="0.5" />
-                <select id="grade">
-                    <option value="S">S (Excellent)</option>
-                    <option value="A">A (Very Good)</option>
-                    <option value="B">B (Good)</option>
-                    <option value="C">C (Average)</option>
-                    <option value="D">D (Pass)</option>
-                    <option value="E">E (Marginal Pass)</option>
-                    <option value="P">P (Pass/No Credits)</option>
-                </select>
-                <select id="category">
-                    <option value="Professional">Professional</option>
-                    <option value="Science">Science</option>
-                    <option value="Engineering">Engineering</option>
-                    <option value="Humanities">Humanities</option>
-                    <option value="Free">Free Elective</option>
-                    <option value="None">Not Applicable</option>
-                </select>
-            </div>
-            <button onclick="addCourse()">Add Course</button>
-        </section>
+  <div class="section-container">
+    <h3>Add Course Manually</h3>
+    <input id="semester" placeholder="Semester (e.g. 01)" />
+    <input id="courseCode" placeholder="Course Code (e.g. MA1101)" />
+    <input id="courseName" placeholder="Course Name (e.g. Calculus)" />
+    <input id="credits" type="number" placeholder="Credits" min="0" />
+    <select id="grade">
+      <option>S</option>
+      <option>A</option>
+      <option>B</option>
+      <option>C</option>
+      <option>D</option>
+      <option>E</option>
+    </select>
+    <select id="category">
+      <option>Professional</option>
+      <option>Science</option>
+      <option>Engineering</option>
+      <option>Humanities</option>
+      <option>Free</option>
+      <option>None</option>
+    </select>
+    <button onclick="addCourse()">Add Course</button>
+  </div>
 
-        <section class="section-card">
-            <h3>📋 Import Courses from Gradecard Text</h3>
-            <div class="instructions">
-                Paste your gradecard text below. Each course should be on a new line, following this format:<br>
-                <code>Semester CourseCode CourseName Credits Grade</code><br>
-                Example:<br>
-                <pre>01 AM1100 Engineering Mechanics 10 S
-01 MA1101 Functions of Several Variables 10 A
-F23 CS101 Introduction to Programming 3 B</pre>
-                Accepted Grades: <b>S, A, B, C, D, E, P</b>. Courses with a 'P' grade will be excluded from CGPA calculation.
-            </div>
-            <textarea id="gradecardInput" placeholder="Paste your gradecard text here..."></textarea><br>
-            <button onclick="parseTextAndAddCourses()">Import from Text</button>
-        </section>
-
-        <section class="section-card">
-            <h3>📸 Or Upload Gradecard Image for OCR</h3>
-            <input type="file" accept="image/*" onchange="handleImageUpload(event)" /><br>
-            <textarea id="ocrTextArea" placeholder="OCR result will appear here..." readonly></textarea><br>
-            <button onclick="parseTextAndAddCoursesFromOCR()">Import from OCR Text</button>
-        </section>
-
-        <h2>📚 Your Courses</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Semester</th>
-                    <th>Course Details</th>
-                    <th>Credits</th>
-                    <th>Grade</th>
-                    <th>Point</th>
-                    <th>Category</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="courseTable">
-                </tbody>
-        </table>
-
-        <h2>📊 Academic Summary</h2>
-        <div id="summary" class="section-card">
-            Calculating your progress...
-        </div>
+  <div class="section-container">
+    <h3>Import Courses from Gradecard Text</h3>
+    <div class="instructions">
+      Paste your gradecard text here. Format per line:<br>
+      <code>Semester CourseCode CourseName Credits Grade</code><br>
+      Example:<br>
+      <pre>01 AM1100 Engineering Mechanics 10 S<br>01 MA1101 Functions of Several Variables 10 A</pre>
+      Grade must be one of: <b>S, A, B, C, D, E, P</b><br>
+      Courses with grade P will be ignored in CGPA calculation.
     </div>
+    <textarea id="gradecardInput" placeholder="Paste gradecard text here..."></textarea><br>
+    <button onclick="parseTextAndAddCourses()">Import from Text</button>
+  </div>
+
+  <div class="section-container">
+    <h3>Or Upload Gradecard Image for OCR</h3>
+    <input type="file" accept="image/*" onchange="handleImageUpload(event)" />
+    <textarea id="ocrTextArea" placeholder="OCR result will appear here..." readonly></textarea><br>
+    <button onclick="parseTextAndAddCoursesFromOCR()">Import from OCR Text</button>
+  </div>
+
+  <div class="section-container">
+    <h3>Courses</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Semester</th>
+          <th>Course</th>
+          <th>Credits</th>
+          <th>Grade</th>
+          <th>Point</th>
+          <th>Category</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="courseTable"></tbody>
+    </table>
+  </div>
+
+  <div id="summary"></div>
 
 <script>
-    const gradeMap = { S: 10, A: 9, B: 8, C: 7, D: 6, E: 4, P: 0 };
-    const maxCategoryCredits = {
-        Professional: 232,
-        Free: 42,
-        Science: 102,
-        Engineering: 57,
-        Humanities: 27
+  const gradeMap = { S: 10, A: 9, B: 8, C: 7, D: 6, E: 4, P: 0 };
+  const maxCategoryCredits = {
+    Professional: 232,
+    Free: 42,
+    Science: 102,
+    Engineering: 57,
+    Humanities: 27
+  };
+  let courses = [];
+
+  function addCourse() {
+    const semester = document.getElementById('semester').value.trim();
+    const code = document.getElementById('courseCode').value.trim();
+    const name = document.getElementById('courseName').value.trim();
+    const credits = parseFloat(document.getElementById('credits').value);
+    const grade = document.getElementById('grade').value.trim().toUpperCase();
+    const category = document.getElementById('category').value.trim();
+
+    if (!semester || !code || !name || isNaN(credits)) {
+      alert("Please fill all course details.");
+      return;
+    }
+
+    const point = gradeMap[grade] || 0;
+    courses.push({ semester, name: `${code} - ${name}`, credits, grade, point, category });
+    render();
+    clearInputFields();
+  }
+
+  function clearInputFields() {
+    document.getElementById('semester').value = '';
+    document.getElementById('courseCode').value = '';
+    document.getElementById('courseName').value = '';
+    document.getElementById('credits').value = '';
+  }
+
+  function parseTextAndAddCourses() {
+    const rawText = document.getElementById('gradecardInput').value;
+    parseTextHelper(rawText);
+  }
+
+  function parseTextAndAddCoursesFromOCR() {
+    const rawText = document.getElementById('ocrTextArea').value;
+    parseTextHelper(rawText);
+  }
+
+  function parseTextHelper(rawText) {
+    const lines = rawText.split('\n');
+    const validGrades = new Set(['S','A','B','C','D','E','P']);
+    let importedCount = 0;
+    for (const line of lines) {
+      const parts = line.trim().split(/\s+/);
+      if (parts.length < 4) continue;
+
+      let gradeIndex = -1;
+      for(let i = parts.length - 1; i >= 0; i--) {
+        const token = parts[i].toUpperCase();
+        if(validGrades.has(token)) {
+          gradeIndex = i;
+          break;
+        }
+      }
+      if (gradeIndex === -1) continue;
+
+      const creditsIndex = gradeIndex - 1;
+      if (creditsIndex < 0) continue;
+
+      const grade = parts[gradeIndex].toUpperCase();
+      const credits = parseFloat(parts[creditsIndex]);
+      if(isNaN(credits)) continue;
+
+      const semester = parts[0];
+      const code = parts[1];
+      const name = parts.slice(2, creditsIndex).join(' ');
+      const point = gradeMap[grade] || 0;
+      const category = (grade === 'P') ? 'None' : 'None';
+
+      courses.push({ semester, name: `${code} - ${name}`, credits, grade, point, category });
+      importedCount++;
+    }
+    alert(importedCount + ' courses imported.');
+    render();
+  }
+
+  function render() {
+    const tbody = document.getElementById('courseTable');
+    tbody.innerHTML = '';
+    courses.forEach((c, idx) => {
+      tbody.innerHTML += `
+        <tr>
+          <td><input value="${c.semester}" onchange="updateField(${idx}, 'semester', this.value)" /></td>
+          <td><input value="${c.name}" onchange="updateField(${idx}, 'name', this.value)" /></td>
+          <td><input type="number" value="${c.credits}" onchange="updateField(${idx}, 'credits', parseFloat(this.value))" /></td>
+          <td><input value="${c.grade}" onchange="updateGrade(${idx}, this.value)" /></td>
+          <td>${c.point.toFixed(1)}</td>
+          <td>
+            <select onchange="updateCategory(${idx}, this.value)">
+              <option ${c.category==='Professional'?'selected':''}>Professional</option>
+              <option ${c.category==='Science'?'selected':''}>Science</option>
+              <option ${c.category==='Engineering'?'selected':''}>Engineering</option>
+              <option ${c.category==='Humanities'?'selected':''}>Humanities</option>
+              <option ${c.category==='Free'?'selected':''}>Free</option>
+              <option ${c.category==='None'?'selected':''}>None</option>
+            </select>
+          </td>
+          <td><button onclick="removeCourse(${idx})">Remove</button></td>
+        </tr>`;
+    });
+
+    let totalCredits = 0, totalPoints = 0;
+    let categoryCredits = { Professional: 0, Free: 0, Science: 0, Engineering: 0, Humanities: 0 };
+
+    courses.forEach(c => {
+      if (c.category !== 'None') {
+        totalCredits += c.credits;
+        totalPoints += c.credits * c.point;
+        if (categoryCredits[c.category] !== undefined) {
+          categoryCredits[c.category] += c.credits;
+        }
+      }
+    });
+
+    let summary = '';
+    for (const cat in categoryCredits) {
+      let extra = '';
+      const diff = categoryCredits[cat] - maxCategoryCredits[cat];
+      if (cat !== 'Free' && diff > 0) {
+        extra = ` <b>(Exceeds max by ${diff.toFixed(1)} credits)</b>`;
+      }
+      summary += `<div>${cat}: ${categoryCredits[cat].toFixed(1)} credits (max ${maxCategoryCredits[cat]})${extra}</div>`;
+    }
+
+    const cgpa = totalCredits ? (totalPoints / totalCredits).toFixed(2) : '0.00';
+    summary += `<div><br><b>Total Credits:</b> ${totalCredits.toFixed(1)}</div>`;
+    summary += `<div><b>CGPA:</b> ${cgpa}</div>`;
+    document.getElementById('summary').innerHTML = summary;
+  }
+
+  function updateField(index, field, value) {
+    courses[index][field] = value;
+    render();
+  }
+
+  function updateGrade(index, grade) {
+    grade = grade.toUpperCase();
+    courses[index].grade = grade;
+    courses[index].point = gradeMap[grade] || 0;
+    render();
+  }
+
+  function updateCategory(index, value) {
+    courses[index].category = value;
+    render();
+  }
+
+  function removeCourse(index) {
+    courses.splice(index, 1);
+    render();
+  }
+
+  function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('ocrTextArea').value = 'Recognizing text...';
+      Tesseract.recognize(e.target.result, 'eng', { logger: m => {} })
+        .then(({ data: { text } }) => {
+          document.getElementById('ocrTextArea').value = text;
+        })
+        .catch(err => {
+          document.getElementById('ocrTextArea').value = 'OCR failed: ' + err.message;
+        });
     };
-    let courses = JSON.parse(localStorage.getItem('academicCompassCourses')) || []; // Load from local storage
+    reader.readAsDataURL(file);
+  }
 
-    // Function to add a course manually
-    function addCourse() {
-        const semester = document.getElementById('semester').value.trim();
-        const code = document.getElementById('courseCode').value.trim();
-        const name = document.getElementById('courseName').value.trim();
-        const credits = parseFloat(document.getElementById('credits').value);
-        const grade = document.getElementById('grade').value.trim().toUpperCase();
-        const category = document.getElementById('category').value.trim();
-
-        if (!semester || !code || !name || isNaN(credits) || credits <= 0) {
-            alert("Please fill in all course details correctly and ensure credits are positive.");
-            return;
-        }
-
-        const point = gradeMap[grade] || 0;
-        courses.push({ semester, name: `${code} - ${name}`, credits, grade, point, category });
-        saveAndRender();
-        clearInputFields();
-        alert('Course added successfully!');
-    }
-
-    // Clears the manual input fields after adding a course
-    function clearInputFields() {
-        document.getElementById('semester').value = '';
-        document.getElementById('courseCode').value = '';
-        document.getElementById('courseName').value = '';
-        document.getElementById('credits').value = '';
-        document.getElementById('grade').value = 'S'; // Reset to default grade
-        document.getElementById('category').value = 'Professional'; // Reset to default category
-    }
-
-    // Handles parsing text input from the gradecard text area
-    function parseTextAndAddCourses() {
-        const rawText = document.getElementById('gradecardInput').value;
-        parseTextHelper(rawText);
-        document.getElementById('gradecardInput').value = ''; // Clear text area after import
-        saveAndRender(); // Ensures table and summary refresh
-    }
-
-    // Handles parsing text from the OCR result area
-    function parseTextAndAddCoursesFromOCR() {
-        const rawText = document.getElementById('ocrTextArea').value;
-        parseTextHelper(rawText);
-        document.getElementById('ocrTextArea').value = ''; // Clear text area after import
-        saveAndRender(); // Ensures table and summary refresh
-    }
-
-    // Helper function to parse text and add courses
-    function parseTextHelper(rawText) {
-        const lines = rawText.split('\n');
-        const validGrades = new Set(['S', 'A', 'B', 'C', 'D', 'E', 'P']);
-        let importedCount = 0;
-        let skippedLines = []; // To track lines that couldn't be parsed
-
-        for (const line of lines) {
-            const trimmedLine = line.trim();
-            if (trimmedLine === '') continue; // Skip empty lines
-
-            // Use a more flexible split, allowing for multiple spaces
-            const parts = trimmedLine.split(/\s+/);
-
-            if (parts.length < 4) { // Minimum: Semester, Code, Credits, Grade
-                skippedLines.push(`Too few parts: "${trimmedLine}"`);
-                continue;
-            }
-
-            let grade = null;
-            let credits = NaN;
-            let gradeIndex = -1;
-            let creditsIndex = -1;
-
-            // Try to find grade and credits from the end of the line
-            for (let i = parts.length - 1; i >= 0; i--) {
-                const token = parts[i].toUpperCase();
-                if (validGrades.has(token)) {
-                    grade = token;
-                    gradeIndex = i;
-                    break;
-                }
-            }
-
-            if (gradeIndex === -1) {
-                skippedLines.push(`Grade not found: "${trimmedLine}"`);
-                continue; // Grade not found
-            }
-
-            // Credits should be right before the grade
-            if (gradeIndex > 0) {
-                const potentialCredits = parseFloat(parts[gradeIndex - 1]);
-                if (!isNaN(potentialCredits) && potentialCredits >= 0) {
-                    credits = potentialCredits;
-                    creditsIndex = gradeIndex - 1;
-                }
-            }
-
-            if (isNaN(credits) || creditsIndex === -1) {
-                skippedLines.push(`Credits not found or invalid: "${trimmedLine}"`);
-                continue; // Credits not found or invalid
-            }
-
-            const semester = parts[0];
-            const courseCode = parts[1];
-            // Course name is everything between courseCode and credits
-            const courseNameParts = parts.slice(2, creditsIndex);
-            const courseName = courseNameParts.join(' ').trim();
-
-            // Additional validation for extracted parts
-            if (!semester || !courseCode || !courseName || courseName.length === 0 || credits <= 0) {
-                skippedLines.push(`Incomplete or invalid course data: "${trimmedLine}"`);
-                continue;
-            }
-
-            const point = gradeMap[grade]; // Use the exact grade map point, will be 0 for P
-            const category = (grade === 'P') ? 'None' : 'None'; // Default category for imported courses
-
-            courses.push({ semester, name: `${courseCode} - ${courseName}`, credits, grade, point, category });
-            importedCount++;
-        }
-
-        let message = `${importedCount} courses imported successfully!`;
-        if (skippedLines.length > 0) {
-            message += `\n${skippedLines.length} lines skipped due to parsing errors:`;
-            skippedLines.forEach(line => message += `\n- ${line}`);
-            console.warn('Skipped lines during gradecard import:', skippedLines);
-        }
-        alert(message);
-    }
-
-    // Renders the courses in the table and updates the summary
-    function render() {
-        const tbody = document.getElementById('courseTable');
-        tbody.innerHTML = ''; // Clear existing content
-
-        const fragment = document.createDocumentFragment(); // Create a document fragment for efficient DOM updates
-
-        courses.forEach((c, idx) => {
-            const tr = document.createElement('tr'); // Create table row element
-
-            // Options for the category select dropdown
-            const categoryOptions = Object.keys(maxCategoryCredits).map(cat =>
-                `<option value="${cat}" ${c.category === cat ? 'selected' : ''}>${cat}</option>`
-            ).join('');
-            // Ensure 'None' is always an option if it's not a maxCategoryCredit
-            if (!Object.keys(maxCategoryCredits).includes('None')) {
-                categoryOptions += `<option value="None" ${c.category === 'None' ? 'selected' : ''}>Not Applicable</option>`;
-            }
-
-            // Set innerHTML for the row (still uses string, but only once per row)
-            tr.innerHTML = `
-                <td data-label="Semester"><input type="text" value="${c.semester}" onchange="updateField(${idx}, 'semester', this.value)" /></td>
-                <td data-label="Course Details"><input type="text" value="${c.name}" onchange="updateField(${idx}, 'name', this.value)" /></td>
-                <td data-label="Credits"><input type="number" value="${c.credits}" onchange="updateField(${idx}, 'credits', parseFloat(this.value))" min="0" step="0.5" /></td>
-                <td data-label="Grade"><input type="text" value="${c.grade}" onchange="updateGrade(${idx}, this.value)" /></td>
-                <td data-label="Point">${c.point !== undefined ? c.point.toFixed(1) : 'N/A'}</td>
-                <td data-label="Category">
-                    <select onchange="updateCategory(${idx}, this.value)">
-                        ${categoryOptions}
-                    </select>
-                </td>
-                <td data-label="Action"><button class="secondary" onclick="removeCourse(${idx})">Remove</button></td>
-            `;
-            fragment.appendChild(tr); // Append row to the fragment
-        });
-
-        tbody.appendChild(fragment); // Append fragment to the table body (single DOM operation)
-
-        calculateSummary();
-    }
-
-    // Calculates and displays the GPA and credit summary
-    function calculateSummary() {
-        let totalCredits = 0;
-        let totalPoints = 0;
-        let categoryCredits = {};
-        for (const cat in maxCategoryCredits) {
-            categoryCredits[cat] = 0;
-        }
-
-        courses.forEach(c => {
-            // Only consider courses that are not 'P' grade AND have a valid point for CGPA calculation
-            if (c.grade !== 'P' && c.point !== undefined && c.point !== 0 && !isNaN(c.credits) && c.credits > 0) {
-                totalCredits += c.credits;
-                totalPoints += c.credits * c.point;
-            }
-
-            // Always track category credits for displaying totals
-            if (categoryCredits[c.category] !== undefined && !isNaN(c.credits) && c.credits > 0) {
-                categoryCredits[c.category] += c.credits;
-            } else if (c.category === 'None') {
-                // Do nothing, 'None' category credits are not tracked towards limits, but we ensure it doesn't cause errors
-            } else if (c.category && !categoryCredits.hasOwnProperty(c.category)) {
-                // Handle dynamically added/unknown categories in the array (e.g., from old saves or manual edits)
-                categoryCredits[c.category] = (categoryCredits[c.category] || 0) + (isNaN(c.credits) ? 0 : c.credits);
-            }
-        });
-
-        let summaryHtml = '';
-        for (const cat in categoryCredits) {
-            let extra = '';
-            const max = maxCategoryCredits[cat];
-            if (max !== undefined) { // Check if there's a defined max for this category
-                const diff = categoryCredits[cat] - max;
-                if (cat !== 'Free' && diff > 0) {
-                    extra = ` <span class="error-message">(Exceeds max by ${diff.toFixed(1)} credits!)</span>`;
-                }
-                summaryHtml += `<div><b>${cat} Credits:</b> ${categoryCredits[cat].toFixed(1)} / ${max.toFixed(1)}${extra}</div>`;
-            } else if (cat !== 'None') { // Show other categories not in maxCategoryCredits but present in data
-                summaryHtml += `<div><b>${cat} Credits:</b> ${categoryCredits[cat].toFixed(1)}</div>`;
-            }
-        }
-
-        const cgpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : '0.00';
-        summaryHtml += `<div style="margin-top: 15px;"><b>Total GPA-Contributing Credits:</b> ${totalCredits.toFixed(1)}</div>`;
-        summaryHtml += `<div><b>Cumulative GPA (CGPA):</b> <span style="font-size: 1.2em; color: ${cgpa >= 8.0 ? 'var(--secondary-color)' : 'var(--primary-color)'};">${cgpa}</span></div>`;
-        document.getElementById('summary').innerHTML = summaryHtml;
-    }
-
-    // Updates a specific field of a course object
-    function updateField(index, field, value) {
-        if (field === 'credits') {
-            const numValue = parseFloat(value);
-            if (isNaN(numValue) || numValue < 0) {
-                alert("Credits must be a non-negative number.");
-                render(); // Re-render to revert invalid input
-                return;
-            }
-            courses[index][field] = numValue;
-        } else {
-            courses[index][field] = value;
-        }
-        saveAndRender();
-    }
-
-    // Updates the grade and recalculates the point
-    function updateGrade(index, grade) {
-        grade = grade.toUpperCase();
-        if (!gradeMap.hasOwnProperty(grade)) {
-            alert(`Invalid grade: ${grade}. Please use S, A, B, C, D, E, or P.`);
-            render(); // Re-render to revert invalid input
-            return;
-        }
-        courses[index].grade = grade;
-        courses[index].point = gradeMap[grade];
-        saveAndRender();
-    }
-
-    // Updates the category of a course
-    function updateCategory(index, value) {
-        courses[index].category = value;
-        saveAndRender();
-    }
-
-    // Removes a course from the list
-    function removeCourse(index) {
-        if (confirm("Are you sure you want to remove this course?")) {
-            courses.splice(index, 1);
-            saveAndRender();
-        }
-    }
-
-    // Handles image upload for OCR
-    async function handleImageUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        document.getElementById('ocrTextArea').value = 'Initializing OCR engine...';
-
-        try {
-            const { data: { text } } = await Tesseract.recognize(
-                file,
-                'eng',
-                {
-                    logger: m => {
-                        let statusMessage = '';
-                        switch (m.status) {
-                            case 'loading tesseract core': statusMessage = 'Loading OCR core...'; break;
-                            case 'initialized api': statusMessage = 'Initializing API...'; break;
-                            case 'loading language traineddata': statusMessage = `Loading language data: ${(m.progress * 100).toFixed(0)}%`; break;
-                            case 'initializing api': statusMessage = 'Setting up OCR...'; break;
-                            case 'recognizing text': statusMessage = `Recognizing text: ${(m.progress * 100).toFixed(0)}%`; break;
-                            case 'finished': statusMessage = 'OCR finished!'; break;
-                            default: statusMessage = m.status; // Fallback for other statuses
-                        }
-                        document.getElementById('ocrTextArea').value = statusMessage;
-                    }
-                }
-            );
-            document.getElementById('ocrTextArea').value = text;
-            alert('OCR complete! Please review the extracted text for accuracy before importing.');
-        } catch (err) {
-            document.getElementById('ocrTextArea').value = `OCR failed: ${err.message || 'Unknown error'}. Please try a clearer image, check your internet connection, or paste text manually.`;
-            console.error('Tesseract.js OCR Error:', err); // Log the full error to the console for debugging
-        }
-    }
-
-    // Saves the current courses array to local storage and re-renders
-    function saveAndRender() {
-        localStorage.setItem('academicCompassCourses', JSON.stringify(courses));
-        render();
-    }
-
-    // Initial render when the page loads
-    document.addEventListener('DOMContentLoaded', saveAndRender);
+  // Initial render on page load
+  document.addEventListener('DOMContentLoaded', render);
 </script>
 </body>
 </html>

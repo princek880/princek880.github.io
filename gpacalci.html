@@ -406,8 +406,7 @@ F23 CS101 Introduction to Programming 3 B</pre>
         const rawText = document.getElementById('gradecardInput').value;
         parseTextHelper(rawText);
         document.getElementById('gradecardInput').value = ''; // Clear text area after import
-        // IMPORTANT: Call render after parsing
-        saveAndRender(); // THIS LINE WAS ADDED/MOVED
+        saveAndRender(); // Ensures table and summary refresh
     }
 
     // Handles parsing text from the OCR result area
@@ -415,8 +414,7 @@ F23 CS101 Introduction to Programming 3 B</pre>
         const rawText = document.getElementById('ocrTextArea').value;
         parseTextHelper(rawText);
         document.getElementById('ocrTextArea').value = ''; // Clear text area after import
-        // IMPORTANT: Call render after parsing
-        saveAndRender(); // THIS LINE WAS ADDED/MOVED
+        saveAndRender(); // Ensures table and summary refresh
     }
 
     // Helper function to parse text and add courses
@@ -424,11 +422,19 @@ F23 CS101 Introduction to Programming 3 B</pre>
         const lines = rawText.split('\n');
         const validGrades = new Set(['S', 'A', 'B', 'C', 'D', 'E', 'P']);
         let importedCount = 0;
+        let skippedLines = []; // To track lines that couldn't be parsed
 
         for (const line of lines) {
-            const parts = line.trim().split(/\s+/);
+            const trimmedLine = line.trim();
+            if (trimmedLine === '') continue; // Skip empty lines
 
-            if (parts.length < 4) continue; // Minimum parts: Semester, Code, Name (at least 1 word), Credits, Grade
+            // Use a more flexible split, allowing for multiple spaces
+            const parts = trimmedLine.split(/\s+/);
+
+            if (parts.length < 4) { // Minimum: Semester, Code, Credits, Grade
+                skippedLines.push(`Too few parts: "${trimmedLine}"`);
+                continue;
+            }
 
             let grade = null;
             let credits = NaN;
@@ -445,7 +451,10 @@ F23 CS101 Introduction to Programming 3 B</pre>
                 }
             }
 
-            if (gradeIndex === -1) continue; // Grade not found
+            if (gradeIndex === -1) {
+                skippedLines.push(`Grade not found: "${trimmedLine}"`);
+                continue; // Grade not found
+            }
 
             // Credits should be right before the grade
             if (gradeIndex > 0) {
@@ -456,57 +465,76 @@ F23 CS101 Introduction to Programming 3 B</pre>
                 }
             }
 
-            if (isNaN(credits) || creditsIndex === -1) continue; // Credits not found or invalid
+            if (isNaN(credits) || creditsIndex === -1) {
+                skippedLines.push(`Credits not found or invalid: "${trimmedLine}"`);
+                continue; // Credits not found or invalid
+            }
 
             const semester = parts[0];
             const courseCode = parts[1];
+            // Course name is everything between courseCode and credits
             const courseNameParts = parts.slice(2, creditsIndex);
-            const courseName = courseNameParts.join(' ');
+            const courseName = courseNameParts.join(' ').trim();
 
-            // Check if essential parts are extracted correctly
-            if (!semester || !courseCode || !courseName || courseName.length === 0) continue;
+            // Additional validation for extracted parts
+            if (!semester || !courseCode || !courseName || courseName.length === 0 || credits <= 0) {
+                skippedLines.push(`Incomplete or invalid course data: "${trimmedLine}"`);
+                continue;
+            }
 
-            const point = gradeMap[grade] || 0;
-            // For imported courses, default category to 'None' or determine based on code if possible
-            const category = (grade === 'P') ? 'None' : 'None'; // Default to 'None' for imported
+            const point = gradeMap[grade]; // Use the exact grade map point, will be 0 for P
+            const category = (grade === 'P') ? 'None' : 'None'; // Default category for imported courses
 
             courses.push({ semester, name: `${courseCode} - ${courseName}`, credits, grade, point, category });
             importedCount++;
         }
-        alert(`${importedCount} courses imported successfully!`);
-        // The render call was moved out of this helper to be called only once
-        // after all lines are processed, which is handled by saveAndRender()
+
+        let message = `${importedCount} courses imported successfully!`;
+        if (skippedLines.length > 0) {
+            message += `\n${skippedLines.length} lines skipped due to parsing errors:`;
+            skippedLines.forEach(line => message += `\n- ${line}`);
+            console.warn('Skipped lines during gradecard import:', skippedLines);
+        }
+        alert(message);
     }
 
     // Renders the courses in the table and updates the summary
     function render() {
         const tbody = document.getElementById('courseTable');
-        tbody.innerHTML = '';
+        tbody.innerHTML = ''; // Clear existing content
+
+        const fragment = document.createDocumentFragment(); // Create a document fragment for efficient DOM updates
+
         courses.forEach((c, idx) => {
+            const tr = document.createElement('tr'); // Create table row element
+
             // Options for the category select dropdown
             const categoryOptions = Object.keys(maxCategoryCredits).map(cat =>
                 `<option value="${cat}" ${c.category === cat ? 'selected' : ''}>${cat}</option>`
             ).join('');
-            // Add 'None' option if not already included
+            // Ensure 'None' is always an option if it's not a maxCategoryCredit
             if (!Object.keys(maxCategoryCredits).includes('None')) {
                 categoryOptions += `<option value="None" ${c.category === 'None' ? 'selected' : ''}>Not Applicable</option>`;
             }
 
-            tbody.innerHTML += `
-                <tr>
-                    <td data-label="Semester"><input type="text" value="${c.semester}" onchange="updateField(${idx}, 'semester', this.value)" /></td>
-                    <td data-label="Course Details"><input type="text" value="${c.name}" onchange="updateField(${idx}, 'name', this.value)" /></td>
-                    <td data-label="Credits"><input type="number" value="${c.credits}" onchange="updateField(${idx}, 'credits', parseFloat(this.value))" min="0" step="0.5" /></td>
-                    <td data-label="Grade"><input type="text" value="${c.grade}" onchange="updateGrade(${idx}, this.value)" /></td>
-                    <td data-label="Point">${c.point.toFixed(1)}</td>
-                    <td data-label="Category">
-                        <select onchange="updateCategory(${idx}, this.value)">
-                            ${categoryOptions}
-                        </select>
-                    </td>
-                    <td data-label="Action"><button class="secondary" onclick="removeCourse(${idx})">Remove</button></td>
-                </tr>`;
+            // Set innerHTML for the row (still uses string, but only once per row)
+            tr.innerHTML = `
+                <td data-label="Semester"><input type="text" value="${c.semester}" onchange="updateField(${idx}, 'semester', this.value)" /></td>
+                <td data-label="Course Details"><input type="text" value="${c.name}" onchange="updateField(${idx}, 'name', this.value)" /></td>
+                <td data-label="Credits"><input type="number" value="${c.credits}" onchange="updateField(${idx}, 'credits', parseFloat(this.value))" min="0" step="0.5" /></td>
+                <td data-label="Grade"><input type="text" value="${c.grade}" onchange="updateGrade(${idx}, this.value)" /></td>
+                <td data-label="Point">${c.point !== undefined ? c.point.toFixed(1) : 'N/A'}</td>
+                <td data-label="Category">
+                    <select onchange="updateCategory(${idx}, this.value)">
+                        ${categoryOptions}
+                    </select>
+                </td>
+                <td data-label="Action"><button class="secondary" onclick="removeCourse(${idx})">Remove</button></td>
+            `;
+            fragment.appendChild(tr); // Append row to the fragment
         });
+
+        tbody.appendChild(fragment); // Append fragment to the table body (single DOM operation)
 
         calculateSummary();
     }
@@ -521,21 +549,20 @@ F23 CS101 Introduction to Programming 3 B</pre>
         }
 
         courses.forEach(c => {
-            // Only consider courses that are not 'P' grade for CGPA calculation
-            if (c.grade !== 'P' && c.point !== 0) { // Also ensure points are not 0 (e.g., if grade was invalid)
+            // Only consider courses that are not 'P' grade AND have a valid point for CGPA calculation
+            if (c.grade !== 'P' && c.point !== undefined && c.point !== 0 && !isNaN(c.credits) && c.credits > 0) {
                 totalCredits += c.credits;
                 totalPoints += c.credits * c.point;
             }
 
-            // Always track category credits, regardless of 'P' grade
-            if (categoryCredits[c.category] !== undefined) {
+            // Always track category credits for displaying totals
+            if (categoryCredits[c.category] !== undefined && !isNaN(c.credits) && c.credits > 0) {
                 categoryCredits[c.category] += c.credits;
             } else if (c.category === 'None') {
-                 // Do nothing, 'None' category credits are not tracked towards limits
-            } else {
-                // If a new category is added or uncategorized, handle it
-                console.warn(`Category '${c.category}' not defined in maxCategoryCredits. Adding credits to it.`);
-                categoryCredits[c.category] = (categoryCredits[c.category] || 0) + c.credits;
+                // Do nothing, 'None' category credits are not tracked towards limits, but we ensure it doesn't cause errors
+            } else if (c.category && !categoryCredits.hasOwnProperty(c.category)) {
+                // Handle dynamically added/unknown categories in the array (e.g., from old saves or manual edits)
+                categoryCredits[c.category] = (categoryCredits[c.category] || 0) + (isNaN(c.credits) ? 0 : c.credits);
             }
         });
 
@@ -549,7 +576,7 @@ F23 CS101 Introduction to Programming 3 B</pre>
                     extra = ` <span class="error-message">(Exceeds max by ${diff.toFixed(1)} credits!)</span>`;
                 }
                 summaryHtml += `<div><b>${cat} Credits:</b> ${categoryCredits[cat].toFixed(1)} / ${max.toFixed(1)}${extra}</div>`;
-            } else {
+            } else if (cat !== 'None') { // Show other categories not in maxCategoryCredits but present in data
                 summaryHtml += `<div><b>${cat} Credits:</b> ${categoryCredits[cat].toFixed(1)}</div>`;
             }
         }
@@ -562,12 +589,17 @@ F23 CS101 Introduction to Programming 3 B</pre>
 
     // Updates a specific field of a course object
     function updateField(index, field, value) {
-        if (field === 'credits' && (isNaN(value) || value < 0)) {
-            alert("Credits must be a non-negative number.");
-            render(); // Re-render to revert invalid input
-            return;
+        if (field === 'credits') {
+            const numValue = parseFloat(value);
+            if (isNaN(numValue) || numValue < 0) {
+                alert("Credits must be a non-negative number.");
+                render(); // Re-render to revert invalid input
+                return;
+            }
+            courses[index][field] = numValue;
+        } else {
+            courses[index][field] = value;
         }
-        courses[index][field] = value;
         saveAndRender();
     }
 
@@ -603,7 +635,6 @@ F23 CS101 Introduction to Programming 3 B</pre>
         const file = event.target.files[0];
         if (!file) return;
 
-        // Provide immediate feedback to the user
         document.getElementById('ocrTextArea').value = 'Initializing OCR engine...';
 
         try {
@@ -612,29 +643,15 @@ F23 CS101 Introduction to Programming 3 B</pre>
                 'eng',
                 {
                     logger: m => {
-                        // More detailed logging for user feedback
                         let statusMessage = '';
                         switch (m.status) {
-                            case 'loading tesseract core':
-                                statusMessage = 'Loading OCR core...';
-                                break;
-                            case 'initialized api':
-                                statusMessage = 'Initializing API...';
-                                break;
-                            case 'loading language traineddata':
-                                statusMessage = `Loading language data: ${(m.progress * 100).toFixed(0)}%`;
-                                break;
-                            case 'initializing api':
-                                statusMessage = 'Setting up OCR...';
-                                break;
-                            case 'recognizing text':
-                                statusMessage = `Recognizing text: ${(m.progress * 100).toFixed(0)}%`;
-                                break;
-                            case 'finished':
-                                statusMessage = 'OCR finished!';
-                                break;
-                            default:
-                                statusMessage = m.status; // Fallback for other statuses
+                            case 'loading tesseract core': statusMessage = 'Loading OCR core...'; break;
+                            case 'initialized api': statusMessage = 'Initializing API...'; break;
+                            case 'loading language traineddata': statusMessage = `Loading language data: ${(m.progress * 100).toFixed(0)}%`; break;
+                            case 'initializing api': statusMessage = 'Setting up OCR...'; break;
+                            case 'recognizing text': statusMessage = `Recognizing text: ${(m.progress * 100).toFixed(0)}%`; break;
+                            case 'finished': statusMessage = 'OCR finished!'; break;
+                            default: statusMessage = m.status; // Fallback for other statuses
                         }
                         document.getElementById('ocrTextArea').value = statusMessage;
                     }
@@ -655,7 +672,7 @@ F23 CS101 Introduction to Programming 3 B</pre>
     }
 
     // Initial render when the page loads
-    document.addEventListener('DOMContentLoaded', render);
+    document.addEventListener('DOMContentLoaded', saveAndRender);
 </script>
 </body>
 </html>

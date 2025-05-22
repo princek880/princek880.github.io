@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Academic Compass: Grade & GPA Tracker</title>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -551,7 +551,7 @@ F23 CS101 Introduction to Programming 3 B</pre>
 
         const cgpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : '0.00';
         summaryHtml += `<div style="margin-top: 15px;"><b>Total GPA-Contributing Credits:</b> ${totalCredits.toFixed(1)}</div>`;
-        summaryHtml += `<div><b>Cumulative GPA (CGPA):</b> <span style="font-size: 1.2em; color: ${cgpa >= 8.0 ? 'var(--secondary-color)' : var(--primary-color)};">${cgpa}</span></div>`;
+        summaryHtml += `<div><b>Cumulative GPA (CGPA):</b> <span style="font-size: 1.2em; color: ${cgpa >= 8.0 ? 'var(--secondary-color)' : 'var(--primary-color)'};">${cgpa}</span></div>`;
         document.getElementById('summary').innerHTML = summaryHtml;
     }
 
@@ -598,7 +598,8 @@ F23 CS101 Introduction to Programming 3 B</pre>
         const file = event.target.files[0];
         if (!file) return;
 
-        document.getElementById('ocrTextArea').value = 'Processing image for text recognition... This might take a moment.';
+        // Provide immediate feedback to the user
+        document.getElementById('ocrTextArea').value = 'Initializing OCR engine...';
 
         try {
             const { data: { text } } = await Tesseract.recognize(
@@ -606,18 +607,39 @@ F23 CS101 Introduction to Programming 3 B</pre>
                 'eng',
                 {
                     logger: m => {
-                        // console.log(m); // Log OCR progress to console
-                        if (m.status === 'recognizing text') {
-                            document.getElementById('ocrTextArea').value = `Recognizing text: ${(m.progress * 100).toFixed(0)}%`;
+                        // More detailed logging for user feedback
+                        let statusMessage = '';
+                        switch (m.status) {
+                            case 'loading tesseract core':
+                                statusMessage = 'Loading OCR core...';
+                                break;
+                            case 'initialized api':
+                                statusMessage = 'Initializing API...';
+                                break;
+                            case 'loading language traineddata':
+                                statusMessage = `Loading language data: ${(m.progress * 100).toFixed(0)}%`;
+                                break;
+                            case 'initializing api':
+                                statusMessage = 'Setting up OCR...';
+                                break;
+                            case 'recognizing text':
+                                statusMessage = `Recognizing text: ${(m.progress * 100).toFixed(0)}%`;
+                                break;
+                            case 'finished':
+                                statusMessage = 'OCR finished!';
+                                break;
+                            default:
+                                statusMessage = m.status; // Fallback for other statuses
                         }
+                        document.getElementById('ocrTextArea').value = statusMessage;
                     }
                 }
             );
             document.getElementById('ocrTextArea').value = text;
-            alert('OCR complete! Review the text before importing.');
+            alert('OCR complete! Please review the extracted text for accuracy before importing.');
         } catch (err) {
-            document.getElementById('ocrTextArea').value = 'OCR failed: ' + err.message + '\nPlease try a different image or paste text manually.';
-            console.error('OCR Error:', err);
+            document.getElementById('ocrTextArea').value = `OCR failed: ${err.message || 'Unknown error'}. Please try a clearer image, check your internet connection, or paste text manually.`;
+            console.error('Tesseract.js OCR Error:', err); // Log the full error to the console for debugging
         }
     }
 

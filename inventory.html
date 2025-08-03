@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paint Inventory Management</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        /* Custom Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .color-preview {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid #6c757d;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+
+        .low-stock {
+            background-color: rgba(255, 193, 7, 0.15) !important;
+            --bs-table-hover-bg: rgba(255, 193, 7, 0.25) !important;
+        }
+
+        .action-icons i {
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 1.2rem;
+        }
+
+        .action-icons .bi-pencil-square { color: #0dcaf0; }
+        .action-icons .bi-trash { color: #dc3545; }
+        .action-icons .bi-check-circle { color: #198754; }
+        .action-icons .bi-x-circle { color: #ffc107; }
+
+        .table-responsive {
+            max-height: 60vh;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container py-4">
+        <header class="text-center mb-4">
+            <h1><i class="bi bi-palette"></i> Paint Inventory Management</h1>
+            <p class="lead">A client-side app to track your paint stock.</p>
+        </header>
+
+        <hr>
+
+        <section id="summary" class="mb-4">
+            <h2 class="h4">Inventory Snapshot</h2>
+            <div class="row text-center">
+                <div class="col-md-4 mb-3">
+                    <div class="card bg-primary-subtle">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Products</h5>
+                            <p class="card-text fs-3 fw-bold" id="total-products">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card bg-success-subtle">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Quantity (Liters)</h5>
+                            <p class="card-text fs-3 fw-bold" id="total-quantity">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card bg-info-subtle">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Inventory Value</h5>
+                            <p class="card-text fs-3 fw-bold" id="total-value">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <div class="accordion mb-4" id="add-form-accordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                        <i class="bi bi-plus-circle me-2"></i> Add New Paint Inventory
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#add-form-accordion">
+                    <div class="accordion-body">
+                        <form id="add-paint-form" class="row g-3">
+                            <div class="col-md-6">
+                                <label for="paint-name" class="form-label">Paint Name</label>
+                                <input type="text" class="form-control" id="paint-name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="color-code" class="form-label">Color Code (Hex)</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="color-code" placeholder="#FFFFFF" pattern="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$" required>
+                                    <span class="input-group-text p-0">
+                                        <input type="color" class="form-control form-control-color" id="color-picker" value="#FFFFFF" title="Choose a color">
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="quantity" class="form-label">Quantity (Liters)</label>
+                                <input type="number" class="form-control" id="quantity" min="0" step="0.01" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="batch-number" class="form-label">Batch Number</label>
+                                <input type="text" class="form-control" id="batch-number" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="unit-price" class="form-label">Unit Price ($)</label>
+                                <input type="number" class="form-control" id="unit-price" min="0" step="0.01" required>
+                            </div>
+                             <div class="col-md-6">
+                                <label for="production-date" class="form-label">Production Date</label>
+                                <input type="date" class="form-control" id="production-date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="expiry-date" class="form-label">Expiry Date</label>
+                                <input type="date" class="form-control" id="expiry-date" required>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-primary">Add Paint</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section id="inventory-list">
+            <h2 class="h4">Current Inventory</h2>
+            <div class="mb-3">
+                <input type="text" id="search-bar" class="form-control" placeholder="Search by Paint Name or Color...">
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Paint Name</th>
+                            <th>Color</th>
+                            <th>Quantity (L)</th>
+                            <th>Batch No.</th>
+                            <th>Prod. Date</th>
+                            <th>Expiry Date</th>
+                            <th>Unit Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer class="text-center mt-5 text-muted">
+            <p>&copy; 2025 Paint Manufacturing Co. | Client-side application</p>
+        </footer>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ## Application State and DOM Elements ##
+            let inventory = [];
+            const LOW_STOCK_THRESHOLD = 20;
+
+            const addForm = document.getElementById('add-paint-form');
+            const colorCodeInput = document.getElementById('color-code');
+            const colorPicker = document.getElementById('color-picker');
+            const tableBody = document.getElementById('inventory-table-body');
+            const searchBar = document.getElementById('search-bar');
+            
+            // Summary elements
+            const totalProductsEl = document.getElementById('total-products');
+            const totalQuantityEl = document.getElementById('total-quantity');
+            const totalValueEl = document.getElementById('total-value');
+
+            // ## Data Persistence ##
+            const loadInventory = () => {
+                const storedInventory = localStorage.getItem('paintInventory');
+                inventory = storedInventory ? JSON.parse(storedInventory) : [];
+            };
+
+            const saveInventory = () => {
+                localStorage.setItem('paintInventory', JSON.stringify(inventory));
+            };
+            
+            // ## Rendering Logic ##
+            const renderSummary = () => {
+                const totalProducts = inventory.length;
+                const totalQuantity = inventory.reduce((sum, item) => sum + parseFloat(item.quantity), 0);
+                const totalValue = inventory.reduce((sum, item) => sum + (parseFloat(item.quantity) * parseFloat(item.price)), 0);
+
+                totalProductsEl.textContent = totalProducts;
+                totalQuantityEl.textContent = totalQuantity.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                totalValueEl.textContent = totalValue.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+            };
+
+            const renderTable = (items = inventory) => {
+                tableBody.innerHTML = '';
+                if (items.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="8" class="text-center">No inventory found.</td></tr>`;
+                    return;
+                }
+
+                items.forEach(item => {
+                    const isLowStock = item.quantity < LOW_STOCK_THRESHOLD;
+                    const row = document.createElement('tr');
+                    row.dataset.id = item.id;
+                    if (isLowStock) {
+                        row.classList.add('low-stock');
+                        row.title = "Low stock!";
+                    }
+
+                    row.innerHTML = `
+                        <td>${item.name}</td>
+                        <td>
+                            <span class="color-preview" style="background-color: ${item.color};"></span>
+                            ${item.color.toUpperCase()}
+                        </td>
+                        <td>${parseFloat(item.quantity).toFixed(2)}</td>
+                        <td>${item.batch}</td>
+                        <td>${item.prodDate}</td>
+                        <td>${item.expDate}</td>
+                        <td>${parseFloat(item.price).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+                        <td class="action-icons">
+                            <i class="bi bi-pencil-square" title="Edit"></i>
+                            <i class="bi bi-trash" title="Delete"></i>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            };
+
+            const renderAll = () => {
+                renderTable();
+                renderSummary();
+            };
+
+            // ## Core Functionality ##
+            const addPaint = (e) => {
+                e.preventDefault();
+                const newPaint = {
+                    id: Date.now(),
+                    name: document.getElementById('paint-name').value.trim(),
+                    color: colorCodeInput.value.trim(),
+                    quantity: parseFloat(document.getElementById('quantity').value),
+                    batch: document.getElementById('batch-number').value.trim(),
+                    prodDate: document.getElementById('production-date').value,
+                    expDate: document.getElementById('expiry-date').value,
+                    price: parseFloat(document.getElementById('unit-price').value),
+                };
+                inventory.push(newPaint);
+                saveInventory();
+                renderAll();
+                addForm.reset();
+                colorPicker.value = '#FFFFFF'; // Reset color picker
+                // Close the accordion after successful submission
+                const accordionCollapse = document.getElementById('collapseOne');
+                const bsCollapse = bootstrap.Collapse.getInstance(accordionCollapse) || new bootstrap.Collapse(accordionCollapse, { toggle: false });
+                bsCollapse.hide();
+            };
+
+            const handleDelete = (id) => {
+                if (confirm('Are you sure you want to delete this item?')) {
+                    inventory = inventory.filter(item => item.id !== id);
+                    saveInventory();
+                    // Re-filter and render if a search term exists
+                    filterInventory(); 
+                    renderSummary();
+                }
+            };
+            
+            const handleEdit = (id) => {
+                const row = document.querySelector(`tr[data-id='${id}']`);
+                const item = inventory.find(i => i.id === id);
+
+                row.innerHTML = `
+                    <td><input type="text" class="form-control form-control-sm" value="${item.name}"></td>
+                    <td><input type="text" class="form-control form-control-sm" value="${item.color}"></td>
+                    <td><input type="number" class="form-control form-control-sm" value="${item.quantity}" min="0" step="0.01"></td>
+                    <td><input type="text" class="form-control form-control-sm" value="${item.batch}"></td>
+                    <td><input type="date" class="form-control form-control-sm" value="${item.prodDate}"></td>
+                    <td><input type="date" class="form-control form-control-sm" value="${item.expDate}"></td>
+                    <td><input type="number" class="form-control form-control-sm" value="${item.price}" min="0" step="0.01"></td>
+                    <td class="action-icons">
+                        <i class="bi bi-check-circle" title="Save"></i>
+                        <i class="bi bi-x-circle" title="Cancel"></i>
+                    </td>
+                `;
+            };
+            
+            const handleSave = (id) => {
+                const row = document.querySelector(`tr[data-id='${id}']`);
+                const inputs = row.querySelectorAll('input');
+                const updatedItem = {
+                    id: id,
+                    name: inputs[0].value,
+                    color: inputs[1].value,
+                    quantity: parseFloat(inputs[2].value),
+                    batch: inputs[3].value,
+                    prodDate: inputs[4].value,
+                    expDate: inputs[5].value,
+                    price: parseFloat(inputs[6].value),
+                };
+
+                const itemIndex = inventory.findIndex(i => i.id === id);
+                inventory[itemIndex] = updatedItem;
+                saveInventory();
+                filterInventory(); // Re-render table with search filter applied
+                renderSummary();
+            };
+
+            const handleTableClick = (e) => {
+                const target = e.target;
+                const row = target.closest('tr');
+                if (!row) return;
+
+                const id = parseInt(row.dataset.id);
+                if (target.classList.contains('bi-trash')) {
+                    handleDelete(id);
+                } else if (target.classList.contains('bi-pencil-square')) {
+                    handleEdit(id);
+                } else if (target.classList.contains('bi-check-circle')) {
+                    handleSave(id);
+                } else if (target.classList.contains('bi-x-circle')) {
+                    filterInventory(); // Effectively cancels edit by re-rendering
+                }
+            };
+            
+            const filterInventory = () => {
+                const searchTerm = searchBar.value.toLowerCase();
+                const filtered = inventory.filter(item => 
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    item.color.toLowerCase().includes(searchTerm)
+                );
+                renderTable(filtered);
+            };
+
+            // ## Event Listeners ##
+            addForm.addEventListener('submit', addPaint);
+            tableBody.addEventListener('click', handleTableClick);
+            searchBar.addEventListener('input', filterInventory);
+
+            // Sync color picker with text input
+            colorPicker.addEventListener('input', (e) => {
+                colorCodeInput.value = e.target.value.toUpperCase();
+            });
+            colorCodeInput.addEventListener('input', (e) => {
+                if (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(e.target.value)) {
+                    colorPicker.value = e.target.value;
+                }
+            });
+
+            // ## Initialization ##
+            const init = () => {
+                loadInventory();
+                renderAll();
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('production-date').value = today;
+            };
+
+            init();
+        });
+    </script>
+</body>
+</html>

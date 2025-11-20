@@ -53,7 +53,8 @@
         ChevronDown: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>,
         Calendar: () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
         Download: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>,
-        Upload: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        Upload: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>,
+        ExternalLink: () => <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
     };
 
     // --- Persistence Helper ---
@@ -77,6 +78,15 @@
         }
     };
 
+    const ChecklistItems = [
+        { key: 'account', label: 'Portal Account Created' },
+        { key: 'transcripts', label: 'Transcripts Sent' },
+        { key: 'scores', label: 'Test Scores Sent' },
+        { key: 'lor', label: 'LORs Requested/Submitted' },
+        { key: 'sop', label: 'SOP/Essay Drafted' },
+        { key: 'fee', label: 'Application Fee Paid' }
+    ];
+
     // --- Modal Component ---
     const Modal = ({ isOpen, onClose, title, children }) => {
         if (!isOpen) return null;
@@ -89,6 +99,99 @@
                     </div>
                     <div className="p-6">{children}</div>
                 </div>
+            </div>
+        );
+    };
+
+    // --- Application Table Component ---
+    const AppTable = ({ apps, onUpdate, onDelete }) => {
+        const statusColors = {
+            'Not Started': 'bg-gray-100 text-gray-600',
+            'In Progress': 'bg-blue-50 text-blue-600',
+            'Submitted': 'bg-purple-50 text-purple-600',
+            'Decision': 'bg-emerald-50 text-emerald-600',
+        };
+
+        return (
+            <div className="overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-200">
+                <table className="w-full text-sm text-left">
+                    <thead className="bg-gray-50 text-gray-500 font-semibold border-b border-gray-200">
+                        <tr>
+                            <th className="px-6 py-4">University</th>
+                            <th className="px-6 py-4">Deadline</th>
+                            <th className="px-6 py-4">Progress</th>
+                            <th className="px-6 py-4">Status</th>
+                            <th className="px-6 py-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                        {apps.map(app => {
+                            const completed = ChecklistItems.filter(i => app.checklist?.[i.key]).length;
+                            const progress = Math.round((completed / ChecklistItems.length) * 100);
+
+                            return (
+                                <tr key={app.id} className="hover:bg-gray-50/50 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <div className="font-medium text-gray-900">{app.university}</div>
+                                        <div className="text-xs text-gray-500">{app.program}</div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center text-gray-600">
+                                            <Icons.Calendar />
+                                            <span className="ml-2">
+                                                {app.deadline ? new Date(app.deadline).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : "-"}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 w-1/4">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-xs font-medium text-gray-700">{progress}%</span>
+                                            <span className="text-[10px] text-gray-400">({completed}/{ChecklistItems.length})</span>
+                                        </div>
+                                        <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                            <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${progress}%` }}></div>
+                                        </div>
+                                        <div className="mt-2 flex flex-wrap gap-1">
+                                            {ChecklistItems.map(item => (
+                                                <button
+                                                    key={item.key}
+                                                    onClick={() => onUpdate(app.id, { ...app, checklist: { ...app.checklist, [item.key]: !app.checklist[item.key] } })}
+                                                    className={`w-5 h-5 flex items-center justify-center rounded border transition-all ${
+                                                        app.checklist[item.key] 
+                                                        ? 'bg-emerald-50 border-emerald-200 text-emerald-600' 
+                                                        : 'bg-white border-gray-200 text-gray-300 hover:border-gray-300'
+                                                    }`}
+                                                    title={item.label}
+                                                >
+                                                    <div className="scale-75">
+                                                        {app.checklist[item.key] ? <Icons.CheckSquare /> : <Icons.Square />}
+                                                    </div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <select 
+                                            value={app.status}
+                                            onChange={(e) => onUpdate(app.id, { ...app, status: e.target.value })}
+                                            className={`text-xs font-semibold px-2.5 py-1 rounded-full appearance-none cursor-pointer outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 ${statusColors[app.status] || statusColors['Not Started']}`}
+                                        >
+                                            <option value="Not Started">Not Started</option>
+                                            <option value="In Progress">In Progress</option>
+                                            <option value="Submitted">Submitted</option>
+                                            <option value="Decision">Decision</option>
+                                        </select>
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <button onClick={() => onDelete(app.id)} className="text-gray-400 hover:text-red-500 transition-colors p-1">
+                                            <Icons.Trash2 />
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
             </div>
         );
     };
@@ -107,12 +210,8 @@
             'Decision': 'bg-emerald-50 text-emerald-600 border-emerald-200',
         };
 
-        const completedItems = [
-            app.checklist?.scores,
-            app.checklist?.lor,
-            app.checklist?.account
-        ].filter(Boolean).length;
-        const progress = Math.round((completedItems / 3) * 100);
+        const completedItems = ChecklistItems.filter(i => app.checklist?.[i.key]).length;
+        const progress = Math.round((completedItems / ChecklistItems.length) * 100);
 
         const handleAddProf = () => {
             if (!newProfName) return;
@@ -160,9 +259,9 @@
             <div className="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col">
                 <div className="p-5">
                     <div className="flex justify-between items-start mb-2">
-                        <div>
-                            <h3 className="font-bold text-gray-900 text-lg leading-tight">{app.university}</h3>
-                            <p className="text-sm text-gray-500 font-medium">{app.program}</p>
+                        <div className="flex-1 min-w-0 pr-2">
+                            <h3 className="font-bold text-gray-900 text-lg leading-tight truncate" title={app.university}>{app.university}</h3>
+                            <p className="text-sm text-gray-500 font-medium truncate">{app.program}</p>
                         </div>
                         <select 
                             value={app.status} 
@@ -182,11 +281,11 @@
                             <span className="ml-1.5">{app.deadline ? new Date(app.deadline).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : "No Date"}</span>
                             {!app.deadline && <button onClick={searchDeadline} className="ml-2 text-indigo-600 hover:text-indigo-700"><Icons.Search /></button>}
                         </div>
-                         <div className="flex items-center gap-2">
-                             <div className="h-1.5 w-16 bg-gray-100 rounded-full overflow-hidden">
+                         <div className="flex items-center gap-2 flex-1">
+                             <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
                                 <div className="h-full bg-indigo-500 rounded-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
                              </div>
-                             <span className="text-xs text-gray-400">{progress}%</span>
+                             <span className="text-xs text-gray-400 w-8 text-right">{progress}%</span>
                          </div>
                     </div>
 
@@ -205,16 +304,12 @@
                     <div className="border-t border-gray-100 bg-gray-50/50 p-5 space-y-5 animate-in slide-in-from-top-2 duration-200">
                         <div>
                             <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Application Checklist</h4>
-                            <div className="grid grid-cols-1 gap-2">
-                                {[
-                                    { key: 'account', label: 'Portal Account Created' },
-                                    { key: 'scores', label: 'Test Scores Sent' },
-                                    { key: 'lor', label: 'LORs Submitted' }
-                                ].map(item => (
+                            <div className="grid grid-cols-1 gap-1.5">
+                                {ChecklistItems.map(item => (
                                     <div 
                                         key={item.key} 
                                         onClick={() => toggleChecklist(item.key)}
-                                        className="flex items-center gap-3 text-sm text-gray-600 cursor-pointer hover:text-gray-900 group/check"
+                                        className="flex items-center gap-3 text-sm text-gray-600 cursor-pointer hover:text-gray-900 group/check p-1 hover:bg-white rounded transition-colors"
                                     >
                                         {app.checklist[item.key] 
                                             ? <div className="text-emerald-500"><Icons.CheckSquare /></div>
@@ -228,7 +323,7 @@
 
                         <div>
                             <div className="flex justify-between items-center mb-2">
-                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Professors of Interest</h4>
+                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Professors</h4>
                                 <button 
                                     onClick={() => setShowAddProf(!showAddProf)}
                                     className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
@@ -239,13 +334,13 @@
                                 <div className="mb-3 p-2 bg-white rounded-md border border-gray-200 shadow-sm">
                                     <input
                                         className="w-full text-sm p-1.5 border-b border-gray-100 focus:outline-none focus:border-indigo-500 mb-2"
-                                        placeholder="Professor Name"
+                                        placeholder="Name"
                                         value={newProfName}
                                         onChange={e => setNewProfName(e.target.value)}
                                     />
                                     <input
                                         className="w-full text-sm p-1.5 border-b border-gray-100 focus:outline-none focus:border-indigo-500 mb-2"
-                                        placeholder="Email (Optional)"
+                                        placeholder="Email"
                                         value={newProfEmail}
                                         onChange={e => setNewProfEmail(e.target.value)}
                                     />
@@ -264,6 +359,7 @@
                                             <button 
                                                 onClick={() => toggleProfEmail(prof.id)}
                                                 className={`p-1.5 rounded-full transition-colors ${prof.emailed ? "bg-indigo-100 text-indigo-600" : "bg-gray-100 text-gray-400 hover:bg-gray-200"}`}
+                                                title={prof.emailed ? "Mark as not emailed" : "Mark as emailed"}
                                             >
                                                 <Icons.Mail />
                                             </button>
@@ -282,7 +378,7 @@
 
                         <div className="flex justify-end pt-2 border-t border-gray-100">
                             <button onClick={() => onDelete(app.id)} className="text-xs text-red-400 hover:text-red-600 flex items-center gap-1">
-                                <Icons.Trash2 /> Remove Application
+                                <Icons.Trash2 /> Remove
                             </button>
                         </div>
                     </div>
@@ -326,8 +422,11 @@
                 professors: [],
                 checklist: {
                     account: false,
+                    transcripts: false,
                     scores: false,
-                    lor: false
+                    lor: false,
+                    sop: false,
+                    fee: false
                 },
                 createdAt: new Date()
             };
@@ -449,11 +548,23 @@
                             <button onClick={() => setIsModalOpen(true)} className="mt-6 text-indigo-600 font-medium hover:underline">Add your first application</button>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filteredApps.map(app => (
-                                <AppCard key={app.id} app={app} onUpdate={updateApp} onDelete={deleteApp} />
-                            ))}
-                        </div>
+                        <>
+                            {filterStatus === "All" ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {filteredApps.map(app => (
+                                        <AppCard key={app.id} app={app} onUpdate={updateApp} onDelete={deleteApp} />
+                                    ))}
+                                </div>
+                            ) : (
+                                filteredApps.length > 0 ? (
+                                    <AppTable apps={filteredApps} onUpdate={updateApp} onDelete={deleteApp} />
+                                ) : (
+                                    <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-xl">
+                                        <p className="text-gray-500">No applications in "{filterStatus}" status.</p>
+                                    </div>
+                                )
+                            )}
+                        </>
                     )}
                 </main>
 

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GradTrack | Application Manager</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Firebase Configuration
+    const firebaseConfig = JSON.parse(__firebase_config);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+    // React Components
+    const { useState, useEffect, useMemo } = React;
+
+    // --- Icons ---
+    const Icons = {
+        Plus: () => React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }, React.createElement("line", { x1: "12", y1: "5", x2: "12", y2: "19" }), React.createElement("line", { x1: "5", y1: "12", x2: "19", y2: "12" })),
+        Trash2: () => React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }, React.createElement("polyline", { points: "3 6 5 6 21 6" }), React.createElement("path", { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" }), React.createElement("line", { x1: "10", y1: "11", x2: "10", y2: "17" }), React.createElement("line", { x1: "14", y1: "11", x2: "14", y2: "17" })),
+        Search: () => React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }, React.createElement("circle", { cx: "11", cy: "11", r: "8" }), React.createElement("line", { x1: "21", y1: "21", x2: "16.65", y2: "16.65" })),
+        Mail: () => React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }, React.createElement("path", { d: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" }), React.createElement("polyline", { points: "22,6 12,13 2,6" })),
+        CheckSquare: () => React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }, React.createElement("polyline", { points: "9 11 12 14 22 4" }), React.createElement("path", { d: "M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" })),
+        Square: () => React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }, React.createElement("rect", { x: "3", y: "3", width: "18", height: "18", rx: "2", ry: "2" })),
+        ExternalLink: () => React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }, React.createElement("path", { d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" }), React.createElement("polyline", { points: "15 3 21 3 21 9" }), React.createElement("line", { x1: "10", y1: "14", x2: "21", y2: "3" })),
+        ChevronDown: () => React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }, React.createElement("polyline", { points: "6 9 12 15 18 9" })),
+        Calendar: () => React.createElement("svg", { xmlns: "http://www.w3.org/2000/svg", width: "14", height: "14", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }, React.createElement("rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }), React.createElement("line", { x1: "16", y1: "2", x2: "16", y2: "6" }), React.createElement("line", { x1: "8", y1: "2", x2: "8", y2: "6" }), React.createElement("line", { x1: "3", y1: "10", x2: "21", y2: "10" })),
+    };
+
+    // --- Modal Component ---
+    const Modal = ({ isOpen, onClose, title, children }) => {
+        if (!isOpen) return null;
+        return React.createElement("div", { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4" },
+            React.createElement("div", { className: "bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200" },
+                React.createElement("div", { className: "px-6 py-4 border-b border-gray-100 flex justify-between items-center" },
+                    React.createElement("h3", { className: "font-semibold text-lg text-gray-800" }, title),
+                    React.createElement("button", { onClick: onClose, className: "text-gray-400 hover:text-gray-600" }, "✕")
+                ),
+                React.createElement("div", { className: "p-6" }, children)
+            )
+        );
+    };
+
+    // --- Application Card Component ---
+    const AppCard = ({ app, onUpdate, onDelete }) => {
+        const [newProfName, setNewProfName] = useState("");
+        const [newProfEmail, setNewProfEmail] = useState("");
+        const [showAddProf, setShowAddProf] = useState(false);
+        const [expanded, setExpanded] = useState(false);
+
+        const statusColors = {
+            'Not Started': 'bg-gray-100 text-gray-600 border-gray-200',
+            'In Progress': 'bg-blue-50 text-blue-600 border-blue-200',
+            'Submitted': 'bg-purple-50 text-purple-600 border-purple-200',
+            'Decision': 'bg-emerald-50 text-emerald-600 border-emerald-200',
+        };
+
+        // Helper: Calculate checklist progress
+        const completedItems = [
+            app.checklist?.scores,
+            app.checklist?.lor,
+            app.checklist?.account
+        ].filter(Boolean).length;
+        const progress = Math.round((completedItems / 3) * 100);
+
+        const handleAddProf = () => {
+            if (!newProfName) return;
+            const updatedProfs = [...(app.professors || []), { 
+                id: Date.now(), 
+                name: newProfName, 
+                email: newProfEmail, 
+                emailed: false 
+            }];
+            onUpdate(app.id, { professors: updatedProfs });
+            setNewProfName("");
+            setNewProfEmail("");
+            setShowAddProf(false);
+        };
+
+        const toggleProfEmail = (profId) => {
+            const updatedProfs = app.professors.map(p => 
+                p.id === profId ? { ...p, emailed: !p.emailed } : p
+            );
+            onUpdate(app.id, { professors: updatedProfs });
+        };
+
+        const deleteProf = (profId) => {
+            const updatedProfs = app.professors.filter(p => p.id !== profId);
+            onUpdate(app.id, { professors: updatedProfs });
+        };
+
+        const toggleChecklist = (field) => {
+            onUpdate(app.id, { 
+                checklist: { ...app.checklist, [field]: !app.checklist[field] } 
+            });
+        };
+
+        const handleStatusChange = (e) => {
+             onUpdate(app.id, { status: e.target.value });
+        }
+
+        const searchDeadline = () => {
+            const query = encodeURIComponent(`${app.university} ${app.program} application deadline 2025`);
+            window.open(`https://www.google.com/search?q=${query}`, '_blank');
+        };
+
+        return React.createElement("div", { className: "group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col" },
+            // Header Section
+            React.createElement("div", { className: "p-5" },
+                React.createElement("div", { className: "flex justify-between items-start mb-2" },
+                    React.createElement("div", null,
+                        React.createElement("h3", { className: "font-bold text-gray-900 text-lg leading-tight" }, app.university),
+                        React.createElement("p", { className: "text-sm text-gray-500 font-medium" }, app.program)
+                    ),
+                    React.createElement("select", { 
+                        value: app.status, 
+                        onChange: handleStatusChange,
+                        className: `text-xs font-semibold px-2.5 py-1 rounded-full border appearance-none cursor-pointer outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 ${statusColors[app.status] || statusColors['Not Started']}`
+                    },
+                        React.createElement("option", { value: "Not Started" }, "Not Started"),
+                        React.createElement("option", { value: "In Progress" }, "In Progress"),
+                        React.createElement("option", { value: "Submitted" }, "Submitted"),
+                        React.createElement("option", { value: "Decision" }, "Decision")
+                    )
+                ),
+                
+                // Deadline & Progress
+                React.createElement("div", { className: "flex items-center gap-4 text-sm mt-3" },
+                    React.createElement("div", { className: "flex items-center text-gray-500 bg-gray-50 px-2 py-1 rounded-md border border-gray-100" },
+                        React.createElement(Icons.Calendar, { className: "w-3.5 h-3.5 mr-1.5 text-gray-400" }),
+                        React.createElement("span", null, app.deadline ? new Date(app.deadline).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : "No Date"),
+                        !app.deadline && React.createElement("button", { onClick: searchDeadline, className: "ml-2 text-indigo-600 hover:text-indigo-700" }, React.createElement(Icons.Search, { className: "w-3 h-3" }))
+                    ),
+                     React.createElement("div", { className: "flex items-center gap-2" },
+                         React.createElement("div", { className: "h-1.5 w-16 bg-gray-100 rounded-full overflow-hidden" },
+                            React.createElement("div", { className: "h-full bg-indigo-500 rounded-full transition-all duration-500", style: { width: `${progress}%` } })
+                         ),
+                         React.createElement("span", { className: "text-xs text-gray-400" }, `${progress}%`)
+                     )
+                ),
+
+                 // Quick Actions (Expand Toggle)
+                React.createElement("button", { 
+                    onClick: () => setExpanded(!expanded),
+                    className: "w-full mt-4 flex items-center justify-center gap-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors py-1" 
+                },
+                    expanded ? "Collapse Details" : "View Details & Professors",
+                    React.createElement("div", { className: `transform transition-transform duration-200 ${expanded ? "rotate-180" : ""}` },
+                        React.createElement(Icons.ChevronDown, null)
+                    )
+                )
+            ),
+
+            // Expanded Details
+            expanded && React.createElement("div", { className: "border-t border-gray-100 bg-gray-50/50 p-5 space-y-5 animate-in slide-in-from-top-2 duration-200" },
+                
+                // Checklist
+                React.createElement("div", null,
+                    React.createElement("h4", { className: "text-xs font-bold text-gray-400 uppercase tracking-wider mb-2" }, "Application Checklist"),
+                    React.createElement("div", { className: "grid grid-cols-1 gap-2" },
+                        [
+                            { key: 'account', label: 'Portal Account Created' },
+                            { key: 'scores', label: 'Test Scores Sent' },
+                            { key: 'lor', label: 'LORs Submitted' }
+                        ].map(item => 
+                            React.createElement("div", { 
+                                key: item.key, 
+                                onClick: () => toggleChecklist(item.key),
+                                className: "flex items-center gap-3 text-sm text-gray-600 cursor-pointer hover:text-gray-900 group/check"
+                            },
+                                app.checklist[item.key] 
+                                    ? React.createElement("div", { className: "text-emerald-500" }, React.createElement(Icons.CheckSquare, null))
+                                    : React.createElement("div", { className: "text-gray-300 group-hover/check:text-gray-400" }, React.createElement(Icons.Square, null)),
+                                React.createElement("span", { className: app.checklist[item.key] ? "line-through opacity-50" : "" }, item.label)
+                            )
+                        )
+                    )
+                ),
+
+                // Professors
+                React.createElement("div", null,
+                    React.createElement("div", { className: "flex justify-between items-center mb-2" },
+                        React.createElement("h4", { className: "text-xs font-bold text-gray-400 uppercase tracking-wider" }, "Professors of Interest"),
+                        React.createElement("button", { 
+                            onClick: () => setShowAddProf(!showAddProf),
+                            className: "text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                        }, "+ Add")
+                    ),
+                    
+                    // Add Prof Input
+                    showAddProf && React.createElement("div", { className: "mb-3 p-2 bg-white rounded-md border border-gray-200 shadow-sm" },
+                        React.createElement("input", {
+                            className: "w-full text-sm p-1.5 border-b border-gray-100 focus:outline-none focus:border-indigo-500 mb-2",
+                            placeholder: "Professor Name",
+                            value: newProfName,
+                            onChange: e => setNewProfName(e.target.value)
+                        }),
+                        React.createElement("input", {
+                            className: "w-full text-sm p-1.5 border-b border-gray-100 focus:outline-none focus:border-indigo-500 mb-2",
+                            placeholder: "Email (Optional)",
+                            value: newProfEmail,
+                            onChange: e => setNewProfEmail(e.target.value)
+                        }),
+                        React.createElement("div", { className: "flex justify-end gap-2 mt-2" },
+                            React.createElement("button", { onClick: () => setShowAddProf(false), className: "text-xs text-gray-400 hover:text-gray-600" }, "Cancel"),
+                            React.createElement("button", { onClick: handleAddProf, className: "text-xs bg-gray-900 text-white px-2 py-1 rounded hover:bg-black" }, "Save")
+                        )
+                    ),
+
+                    // Prof List
+                    React.createElement("div", { className: "space-y-2" },
+                        (app.professors || []).length === 0 && !showAddProf && React.createElement("p", { className: "text-xs text-gray-400 italic" }, "No professors listed."),
+                        (app.professors || []).map(prof => 
+                            React.createElement("div", { key: prof.id, className: "flex items-center justify-between bg-white p-2 rounded border border-gray-100" },
+                                React.createElement("div", { className: "flex items-center gap-3 overflow-hidden" },
+                                    React.createElement("button", { 
+                                        onClick: () => toggleProfEmail(prof.id),
+                                        className: `p-1.5 rounded-full transition-colors ${prof.emailed ? "bg-indigo-100 text-indigo-600" : "bg-gray-100 text-gray-400 hover:bg-gray-200"}`
+                                    }, React.createElement(Icons.Mail, { className: "w-3.5 h-3.5" })),
+                                    React.createElement("div", { className: "truncate" },
+                                        React.createElement("div", { className: `text-sm font-medium ${prof.emailed ? "text-gray-500 line-through" : "text-gray-700"}` }, prof.name),
+                                        prof.email && React.createElement("div", { className: "text-xs text-gray-400 truncate" }, prof.email)
+                                    )
+                                ),
+                                React.createElement("button", { onClick: () => deleteProf(prof.id), className: "text-gray-300 hover:text-red-500 ml-2" }, 
+                                    React.createElement(Icons.Trash2, { className: "w-3.5 h-3.5" })
+                                )
+                            )
+                        )
+                    )
+                ),
+
+                // Delete Card
+                 React.createElement("div", { className: "flex justify-end pt-2 border-t border-gray-100" },
+                    React.createElement("button", { onClick: () => onDelete(app.id), className: "text-xs text-red-400 hover:text-red-600 flex items-center gap-1" },
+                        React.createElement(Icons.Trash2, { className: "w-3 h-3" }), "Remove Application"
+                    )
+                )
+            )
+        );
+    };
+
+    // --- Main App Component ---
+    const App = () => {
+        const [user, setUser] = useState(null);
+        const [apps, setApps] = useState([]);
+        const [isModalOpen, setIsModalOpen] = useState(false);
+        const [filterStatus, setFilterStatus] = useState("All");
+        const [loading, setLoading] = useState(true);
+
+        // Form State
+        const [uniName, setUniName] = useState("");
+        const [programName, setProgramName] = useState("");
+        const [deadline, setDeadline] = useState("");
+
+        // Auth & Data Fetching
+        useEffect(() => {
+            const initAuth = async () => {
+                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                 } else {
+                    await signInAnonymously(auth);
+                 }
+            };
+            initAuth();
+            
+            const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                setUser(currentUser);
+                if (currentUser) {
+                    const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'applications'), orderBy('deadline', 'asc'));
+                    const unsubDocs = onSnapshot(q, (snapshot) => {
+                        const loadedApps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        setApps(loadedApps);
+                        setLoading(false);
+                    }, (error) => console.error("Data fetch error:", error));
+                    return () => unsubDocs();
+                } else {
+                    setLoading(false);
+                }
+            });
+            return () => unsubscribe();
+        }, []);
+
+        const handleAddApp = async () => {
+            if (!user || !uniName || !programName) return;
+            
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'users', user.uid, 'applications'), {
+                    university: uniName,
+                    program: programName,
+                    deadline: deadline || null, // Allow null deadline
+                    status: "Not Started",
+                    professors: [],
+                    checklist: {
+                        account: false,
+                        scores: false,
+                        lor: false
+                    },
+                    createdAt: new Date()
+                });
+                setUniName("");
+                setProgramName("");
+                setDeadline("");
+                setIsModalOpen(false);
+            } catch (err) {
+                console.error("Error adding doc:", err);
+            }
+        };
+
+        const updateApp = async (id, updates) => {
+            if (!user) return;
+            const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'applications', id);
+            await updateDoc(docRef, updates);
+        };
+
+        const deleteApp = async (id) => {
+            if (!user) return;
+            const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'applications', id);
+            await deleteDoc(docRef);
+        };
+
+        const searchDeadlineForForm = () => {
+             if(!uniName) return;
+             const query = encodeURIComponent(`${uniName} ${programName} application deadline 2025`);
+             window.open(`https://www.google.com/search?q=${query}`, '_blank');
+        }
+
+        const filteredApps = useMemo(() => {
+            if (filterStatus === "All") return apps;
+            return apps.filter(a => a.status === filterStatus);
+        }, [apps, filterStatus]);
+
+        if (loading) return React.createElement("div", { className: "min-h-screen flex items-center justify-center text-gray-400" }, "Loading your workspace...");
+
+        return React.createElement("div", { className: "min-h-screen text-gray-800 pb-20" },
+            
+            // Navbar
+            React.createElement("nav", { className: "sticky top-0 z-30 glass-panel border-b border-gray-200" },
+                React.createElement("div", { className: "max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between" },
+                    React.createElement("div", { className: "flex items-center gap-2" },
+                         React.createElement("div", { className: "w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-200" }, "G"),
+                         React.createElement("span", { className: "font-bold text-xl tracking-tight text-gray-900" }, "GradTrack")
+                    ),
+                    React.createElement("div", { className: "flex items-center gap-4" },
+                        React.createElement("span", { className: "text-xs font-mono text-gray-400 hidden sm:inline" }, user ? `ID: ${user.uid.slice(0,6)}...` : ""),
+                         React.createElement("button", { 
+                            onClick: () => setIsModalOpen(true),
+                            className: "bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 shadow-xl shadow-gray-200"
+                        }, React.createElement(Icons.Plus, { className: "w-4 h-4" }), "Add Application")
+                    )
+                )
+            ),
+
+            // Main Content
+            React.createElement("main", { className: "max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8" },
+                
+                // Filters
+                React.createElement("div", { className: "flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide" },
+                    ["All", "Not Started", "In Progress", "Submitted", "Decision"].map(status => 
+                        React.createElement("button", {
+                            key: status,
+                            onClick: () => setFilterStatus(status),
+                            className: `px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
+                                filterStatus === status 
+                                ? "bg-gray-900 text-white shadow-lg shadow-gray-200" 
+                                : "bg-white text-gray-500 hover:bg-gray-50 border border-gray-200"
+                            }`
+                        }, status)
+                    )
+                ),
+
+                // Grid
+                apps.length === 0 
+                    ? React.createElement("div", { className: "text-center py-20" },
+                        React.createElement("div", { className: "w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4" },
+                            React.createElement(Icons.Calendar, { className: "text-gray-400 w-8 h-8" })
+                        ),
+                        React.createElement("h3", { className: "text-gray-900 font-semibold text-lg" }, "No applications yet"),
+                        React.createElement("p", { className: "text-gray-500 mt-1 max-w-xs mx-auto" }, "Start by adding your dream universities."),
+                        React.createElement("button", { onClick: () => setIsModalOpen(true), className: "mt-6 text-indigo-600 font-medium hover:underline" }, "Add your first application")
+                    )
+                    : React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" },
+                        filteredApps.map(app => 
+                            React.createElement(AppCard, { key: app.id, app: app, onUpdate: updateApp, onDelete: deleteApp })
+                        )
+                    )
+            ),
+
+            // Add Application Modal
+            React.createElement(Modal, { 
+                isOpen: isModalOpen, 
+                onClose: () => setIsModalOpen(false),
+                title: "New Application" 
+            },
+                React.createElement("div", { className: "space-y-4" },
+                    React.createElement("div", null,
+                        React.createElement("label", { className: "block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1" }, "University"),
+                        React.createElement("input", { 
+                            value: uniName,
+                            onChange: e => setUniName(e.target.value),
+                            className: "w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all",
+                            placeholder: "e.g. Stanford University"
+                        })
+                    ),
+                    React.createElement("div", null,
+                        React.createElement("label", { className: "block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1" }, "Program / Major"),
+                        React.createElement("input", { 
+                            value: programName,
+                            onChange: e => setProgramName(e.target.value),
+                            className: "w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all",
+                            placeholder: "e.g. MS in Computer Science"
+                        })
+                    ),
+                    React.createElement("div", null,
+                        React.createElement("label", { className: "block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1" }, "Application Deadline"),
+                        React.createElement("div", { className: "flex gap-2" },
+                            React.createElement("input", { 
+                                type: "date",
+                                value: deadline,
+                                onChange: e => setDeadline(e.target.value),
+                                className: "w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
+                            }),
+                            React.createElement("button", {
+                                onClick: searchDeadlineForForm,
+                                title: "Search for deadline on Google",
+                                className: "bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 rounded-lg border border-gray-200 transition-colors"
+                            }, React.createElement(Icons.Search, { className: "w-4 h-4" }))
+                        ),
+                         React.createElement("p", { className: "text-[10px] text-gray-400 mt-1.5" }, "Tip: Use the search button if you don't know the deadline.")
+                    ),
+                    React.createElement("div", { className: "pt-4 flex justify-end gap-3" },
+                         React.createElement("button", { onClick: () => setIsModalOpen(false), className: "text-gray-500 text-sm hover:text-gray-700 font-medium px-3 py-2" }, "Cancel"),
+                         React.createElement("button", { 
+                            onClick: handleAddApp,
+                            disabled: !uniName || !programName,
+                            className: "bg-gray-900 hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium px-5 py-2 rounded-lg shadow-lg shadow-gray-200 transition-all" 
+                        }, "Create Tracker")
+                    )
+                )
+            )
+        );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(App));
+</script>
+</body>
+</html>

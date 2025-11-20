@@ -1,798 +1,698 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Prince Kumar | Experimental HEP & ML</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        :root {
-            --bg-main: #f4f7f9;
-            --bg-dark: #1a202c;
-            --bg-light: #ffffff;
-            --text-dark: #2d3748;
-            --text-light: #e2e8f0;
-            --accent-primary: #3498db; /* Blue */
-            --accent-secondary: #e74c3c; /* Red */
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --border-radius: 12px;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prince Kumar | Experimental HEP & ML</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a192f;
+            --bg-light: #112240;
+            --text-main: #ccd6f6;
+            --text-muted: #8892b0;
+            --accent: #64ffda;
+            --accent-dim: rgba(100, 255, 218, 0.1);
+            --white: #e6f1ff;
+            --transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
 
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-main);
-            color: var(--text-dark);
-            line-height: 1.7;
-        }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-        /* --- Header --- */
-        header {
-            background: var(--bg-dark);
-            color: var(--text-light);
-            text-align: center;
-            padding: 5rem 1.5rem;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
-        }
-        .header-content {
-            max-width: 800px;
-        }
-        .profile-pic {
-            width: 150px; /* Adjusted size */
-            height: 150px;
-            object-fit: cover; /* Ensures the image covers the area without distortion */
-            border-radius: 50%;
-            border: 5px solid var(--accent-primary);
-            margin-bottom: 1.5rem;
-            box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
-            transition: transform 0.3s ease;
-        }
-        .profile-pic:hover {
-            transform: scale(1.05);
-        }
-        header h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 3rem;
-            margin: 0 0 0.5rem;
-            font-weight: 700;
-        }
-        header p {
-            font-size: 1.2rem;
-            margin: 0.2rem 0 1.5rem;
-            color: #a0aec0;
-            max-width: 600px;
-        }
-        .social-links a {
-            color: var(--text-light);
-            font-size: 1.5rem;
-            margin: 0 1rem;
-            transition: color 0.3s ease, transform 0.3s ease;
-        }
-        .social-links a:hover {
-            color: var(--accent-primary);
-            transform: translateY(-3px);
-        }
-        .btn-cv {
-            display: inline-block;
-            background-color: var(--accent-primary);
-            color: var(--bg-light);
-            padding: 12px 30px;
-            margin-top: 1.5rem;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 700;
-            font-family: 'Montserrat', sans-serif;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
-        }
-        .btn-cv:hover {
-            background-color: #2980b9;
-            transform: translateY(-3px);
-            box-shadow: 0 7px 20px rgba(52, 152, 219, 0.6);
-        }
+        /* --- Typography & Utilities --- */
+        h1, h2, h3, h4 {
+            color: var(--white);
+            font-weight: 700;
+        }
 
-        /* --- Navigation --- */
-        nav {
-            background: var(--bg-light);
-            padding: 1rem;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        nav a {
-            color: var(--text-dark);
-            text-decoration: none;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        nav a:hover {
-            background-color: var(--accent-primary);
-            color: var(--bg-light);
-        }
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
 
-        /* --- General Section Styling --- */
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 2.5rem 1.5rem;
-        }
-        section {
-            margin-bottom: 4rem;
-            padding-top: 4rem; /* For scroll-margin */
-            margin-top: -4rem; /* Negative margin to compensate for padding */
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-        }
-        section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        h2 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 2.5rem;
-            position: relative;
-        }
-        h2::after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 4px;
-            background: var(--accent-primary);
-            margin: 0.5rem auto 0;
-            border-radius: 2px;
-        }
+        h2::after {
+            content: "";
+            display: block;
+            width: 100%; /* Fills remaining space */
+            height: 1px;
+            background-color: var(--text-muted);
+            margin-left: 20px;
+            opacity: 0.3;
+        }
 
-        /* --- About Me Section --- */
-        #about .about-container {
-            background: var(--bg-light);
-            padding: 3rem;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-        }
-        #about p {
-            margin: 0;
-            font-size: 1.1rem;
-            text-align: justify;
-        }
+        h2::before {
+            content: "0" counter(section) ".";
+            margin-right: 10px;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+        
+        body { counter-reset: section; }
+        section { counter-increment: section; }
 
-        /* --- Card Layout for Experience & Projects --- */
-        .card-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.5rem;
-        }
-        .card {
-            background: var(--bg-light);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.1);
-        }
-        .card h3 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.3rem;
-            margin-top: 0;
-            color: var(--accent-primary);
-        }
-        .card .duration {
-            font-size: 0.9rem;
-            color: #718096;
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-        .card ul {
-            list-style-type: none;
-            padding-left: 0;
-            margin: 0 0 1.5rem 0;
-            flex-grow: 1;
-        }
-        .card ul li {
-            position: relative;
-            padding-left: 1.5rem;
-            margin-bottom: 0.6rem;
-        }
-        .card ul li::before {
-            content: "\f105"; /* Font Awesome right arrow */
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
-            color: var(--accent-secondary);
-            position: absolute;
-            left: 0;
-            top: 1px;
-        }
-        .project-learn-more {
-            display: inline-block;
-            background-color: transparent;
-            color: var(--accent-primary);
-            padding: 8px 16px;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 700;
-            font-family: 'Montserrat', sans-serif;
-            transition: all 0.3s ease;
-            border: 2px solid var(--accent-primary);
-            margin-top: auto;
-            cursor: pointer;
-        }
-        .project-learn-more:hover {
-            background-color: var(--accent-primary);
-            color: var(--bg-light);
-        }
+        .highlight { color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+        
+        a { text-decoration: none; color: inherit; transition: var(--transition); }
+        
+        .btn {
+            display: inline-block;
+            color: var(--accent);
+            background-color: transparent;
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            padding: 1rem 1.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1;
+            cursor: pointer;
+            transition: var(--transition);
+        }
 
-        /* --- Publications Section --- */
-        .pub-list { list-style: none; padding: 0; }
-        .pub-item {
-            background: var(--bg-light);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border-radius: var(--border-radius);
-            border-left: 5px solid var(--accent-secondary);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            line-height: 1.5;
-        }
-        .pub-item .pub-title { font-weight: 700; color: var(--text-dark); }
-        .pub-item .pub-venue { font-style: italic; color: #718096; font-size: 0.9em; }
+        .btn:hover {
+            background-color: var(--accent-dim);
+        }
 
-        /* --- Skills Section --- */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            text-align: center;
-        }
-        .skill-category h3 {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--accent-primary);
-            margin-bottom: 1rem;
-        }
-        .skills-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.75rem;
-        }
-        .skill-badge {
-            background: #e2e8f0;
-            color: var(--text-dark);
-            padding: 0.7rem 1.2rem;
-            border-radius: 50px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-        .skill-badge:hover {
-            transform: translateY(-3px);
-            background-color: var(--accent-primary);
-            color: var(--bg-light);
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
-        }
-        
-        /* --- Gallery Section (New) --- */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-        .gallery-item {
-            background: var(--bg-light);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: zoom-in;
-            display: flex;
-            flex-direction: column;
-            height: 100%; /* Important for grid item alignment */
-        }
-        .gallery-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 25px -5px rgba(0,0,0,0.15);
-        }
-        .gallery-item img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
-        }
-        .gallery-caption {
-            padding: 1rem;
-            background: var(--bg-light);
-            flex-grow: 1;
-            border-top: 1px solid #f0f0f0;
-        }
-        .gallery-caption p {
-            margin: 0;
-            font-size: 0.9rem;
-            color: #525f7f;
-            font-weight: 500;
-        }
+        /* --- Particle Background --- */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+        }
 
-        /* --- Footer --- */
-        footer {
-            background: var(--bg-dark);
-            color: var(--text-light);
-            text-align: center;
-            padding: 3rem 1.5rem;
-            clip-path: polygon(0 10%, 100% 0, 100% 100%, 0% 100%);
-            margin-top: 3rem;
-        }
-        footer p { margin: 0.5rem 0; }
-        footer .social-links { margin-bottom: 1rem; }
-        
-        /* --- Project Modal --- (Unchanged) */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .modal.show {
-            display: block;
-            opacity: 1;
-        }
-        .modal-content {
-            background-color: var(--bg-main);
-            margin: 5% auto;
-            padding: 2.5rem;
-            border-radius: var(--border-radius);
-            width: 80%;
-            max-width: 900px;
-            position: relative;
-            transform: translateY(-50px);
-            transition: transform 0.3s ease;
-        }
-        .modal.show .modal-content {
-            transform: translateY(0);
-        }
-        .modal-close {
-            color: #aaa;
-            position: absolute;
-            top: 1rem;
-            right: 1.5rem;
-            font-size: 2rem;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-        .modal-close:hover, .modal-close:focus {
-            color: var(--text-dark);
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .modal-body {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-        }
-        .modal-body img {
-            width: 100%;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-        }
-        .modal-body h3 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 2rem;
-            color: var(--accent-primary);
-            margin-top: 0;
-        }
-        .modal-body p {
-            line-height: 1.8;
-            font-size: 1.05rem;
-        }
-        .modal-tech { font-weight: bold; color: var(--text-dark); }
-        .modal-link { margin-top: 1.5rem; }
-        .modal-link a {
-            display: inline-block;
-            background-color: var(--accent-secondary);
-            color: var(--bg-light);
-            padding: 10px 25px;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 700;
-            transition: all 0.3s ease;
-        }
-        .modal-link a:hover {
-            background-color: #c0392b;
-            transform: translateY(-2px);
-        }
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 25, 47, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            box-shadow: 0 10px 30px -10px rgba(2, 12, 27, 0.7);
+        }
 
-        /* --- Responsive Design --- */
-        @media (min-width: 769px) {
-            .modal-body {
-                grid-template-columns: 1fr 1fr;
-                align-items: flex-start;
-            }
-        }
-        @media (max-width: 768px) {
-            header { padding: 4rem 1rem; clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%); }
-            header h1 { font-size: 2.2rem; }
-            nav { flex-direction: column; text-align: center; gap: 0.5rem; }
-            .container { padding: 2rem 1rem; }
-            h2 { font-size: 2rem; }
-            section { margin-top: -2rem; padding-top: 2rem; }
-            .modal-content { width: 90%; padding: 2rem; margin: 10% auto; }
-            .modal-body h3 { font-size: 1.5rem; }
-        }
-    </style>
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            color: var(--accent);
+            font-weight: 800;
+            border: 2px solid var(--accent);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--white);
+        }
+
+        .nav-links a:hover { color: var(--accent); }
+
+        .nav-links li::before {
+            content: "0" counter(item) ".";
+            margin-right: 5px;
+            color: var(--accent);
+            font-size: 0.8rem;
+        }
+        .nav-links { counter-reset: item; }
+        .nav-links li { counter-increment: item; }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Hero Section --- */
+        #hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 0;
+        }
+
+        #hero h1 {
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+        }
+
+        #hero h2 {
+            font-size: 4.5rem;
+            line-height: 1.1;
+            margin-bottom: 10px;
+            color: var(--white);
+        }
+
+        #hero h2::before, #hero h2::after { content: none; } /* Reset section counter styles */
+
+        #hero h3 {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        #hero p {
+            max-width: 540px;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 3rem;
+            margin-bottom: 3rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .stat-item { border-left: 2px solid var(--accent); padding-left: 1rem; }
+        .stat-val { display: block; font-size: 1.5rem; color: var(--white); font-weight: 700; }
+        .stat-label { font-size: 0.85rem; color: var(--accent); }
+
+        /* --- Cards & Grid --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background-color: var(--bg-light);
+            padding: 2rem;
+            border-radius: 4px;
+            transition: var(--transition);
+            cursor: default;
+            position: relative;
+            top: 0;
+        }
+
+        .card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 20px 30px -15px rgba(2, 12, 27, 0.7);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .folder-icon { font-size: 2.5rem; color: var(--accent); }
+        
+        .card h3 { font-size: 1.4rem; margin-bottom: 1rem; color: var(--white); transition: var(--transition); }
+        .card:hover h3 { color: var(--accent); }
+
+        .card p { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+        .card-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* --- Timeline (Experience) --- */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 50px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: 2px solid var(--accent);
+            z-index: 2;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 20px;
+            bottom: -40px;
+            width: 2px;
+            background: var(--bg-light);
+        }
+
+        .timeline-item:last-child::after { display: none; }
+
+        .role { font-size: 1.3rem; color: var(--white); }
+        .company { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 1rem;}
+        .date { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; display: block;}
+
+        /* --- Gallery --- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+            cursor: pointer;
+            height: 200px;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            filter: grayscale(100%);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+            filter: grayscale(0%);
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(10, 25, 47, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .gallery-item:hover .gallery-overlay { opacity: 1; }
+        .gallery-text { color: var(--accent); font-family: 'JetBrains Mono'; font-weight: bold; }
+
+        /* --- Modal --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(10, 25, 47, 0.95);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .modal img { max-width: 80%; max-height: 80vh; border: 2px solid var(--accent); border-radius: 4px;}
+        .modal-caption { margin-top: 1rem; color: var(--white); font-family: 'JetBrains Mono'; }
+        .close { position: absolute; top: 2rem; right: 3rem; color: var(--white); font-size: 3rem; cursor: pointer; }
+
+        /* --- Footer --- */
+        footer {
+            padding: 2rem;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .socials { margin-bottom: 1rem; }
+        .socials a { font-size: 1.5rem; margin: 0 10px; color: var(--text-muted); }
+        .socials a:hover { color: var(--accent); transform: translateY(-3px); display: inline-block; }
+
+        /* --- Animations --- */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            #hero h2 { font-size: 3rem; }
+            #hero h3 { font-size: 2rem; }
+            .nav-links { display: none; } /* Simplified for brevity, normally strictly mobile menu */
+            .stats-row { flex-direction: column; gap: 1rem; }
+            .container { padding: 0 25px; }
+        }
+    </style>
 </head>
-
 <body>
 
-<header>
-    <div class="header-content">
-        <img src="https://raw.githubusercontent.com/princek880/princek880.github.io/main/Prince_workshop.JPG" alt="Prince Kumar" class="profile-pic">
-        
-        <h1>Prince Kumar</h1>
-        <p>B.Tech Engineering Physics, IIT Madras<br>Experimental High-Energy Physics & Machine Learning Specialist</p>
-        <div class="social-links">
-            <a href="mailto:ep22b045@smail.iitm.ac.in" aria-label="Email"><i class="fas fa-envelope"></i></a>
-            <a href="https://github.com/princek880" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
-            <a href="https://linkedin.com/in/prince-kumar-3a11391b1" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-        </div>
-        <a class="btn-cv" href="CV_Prince_PhD.pdf" download="Prince_Kumar_CV.pdf">DOWNLOAD CV</a>
-    </div>
-</header>
+<canvas id="canvas-container"></canvas>
 
-<nav id="navbar">
-    <a href="#about">About</a>
-    <a href="#research">Research</a>
-    <a href="#publications">Publications</a>
-    <a href="#projects">Projects</a>
-    <a href="#gallery">Gallery</a>     <a href="#skills">Skills</a>
-    <a href="#achievements">Awards</a>
+<nav>
+    <div class="logo">PK.</div>
+    <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#projects">Work</a></li>
+        <li><a href="#gallery">Lab</a></li>
+    </ul>
 </nav>
 
 <div class="container">
+    
+    <section id="hero">
+        <h1>Hi, my name is</h1>
+        <h2 id="typewriter"></h2>
+        <h3>I build things for physics.</h3>
+        <p>
+            I am a final-year undergraduate at <strong>IIT Madras</strong> specializing in Experimental High-Energy Physics, Hardware, and Machine Learning. Currently focused on GNN vertexing for CMS and FPGA readout for ATLAS.
+        </p>
+        
+        <div class="stats-row">
+            <div class="stat-item">
+                <span class="stat-val">990/990</span>
+                <span class="stat-label">Physics GRE</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">9.09/10</span>
+                <span class="stat-label">CGPA @ IITM</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val">Fellow</span>
+                <span class="stat-label">RPIT (École Polytechnique)</span>
+            </div>
+        </div>
 
-    <section id="about">
-        <h2>About Me</h2>
-        <div class="about-container">
-            <p>Undergraduate, Indian Institute of Technology Madras, B.Tech Engineering Physics with minors in Mathematics and Computing. Research focuses on the intersection of **Experimental High-Energy Physics (HEP)** and **Machine Learning (ML)**. Expertise includes developing **Graph Neural Networks (GNN)** for physics object reconstruction in the **CMS experiment** at CERN and contributing to **ATLAS detector** firmware development. Driven by fundamental scientific inquiry and advanced computational methods to derive novel insights from large-scale particle collider data.</p>
-        </div>
-    </section>
+        <a href="CV_Prince_PhD.pdf" class="btn">Download CV</a>
+    </section>
 
-    <section id="research">
-        <h2>Research Experience</h2>
-        <div class="card-container">
-            <div class="card">
-                <h3>HEP & Semi-Supervised ML</h3>
-                <p class="duration">Jun 2025 - Aug 2025 | LLR, École Polytecnique, France</p>
-                <ul>
-                    <li>Developed a novel GNN-based semi-supervised clustering algorithm for **primary interaction vertex grouping** in high-pileup proton-proton collisions (CMS).</li>
-                    <li>Goal: improve vertex reconstruction efficiency and purity, crucial for downstream physics analysis.</li>
-                    <li>Evaluated model performance against benchmarks using **t-SNE visualization** and **Adjusted Rand Index (ARI)**.</li>
-                </ul>
-            </div>
-            <div class="card">
-                <h3>HEP & Supervised ML</h3>
-                <p class="duration">Jun 2024 - May 2025 | Young Research Fellow, EHEP Lab, IIT Madras</p>
-                <ul>
-                    <li>Investigated the **"dead cone effect"** in QCD by classifying tracks originating from b-hadron decays within b-jets.</li>
-                    <li>Engineered a custom **Graph Neural Network (GNN)** classifier, treating jet constituents as a point cloud for relational data capture.</li>
-                    <li>Managed an end-to-end deep learning pipeline: large-scale **CMSSW data processing**, feature engineering, and **distributed training**.</li>
-                </ul>
-            </div>
-            <div class="card">
-                <h3>Firmware Development</h3>
-                <p class="duration">Nov 2024 - May 2025 | HEP Lab, IIT Madras</p>
-                <ul>
-                    <li>Contributed to the hardware R&D for the next-generation **ATLAS experiment's** readout chain.</li>
-                    <li>Developed firmware for high-speed communication between the **MALTA pixel sensor** and an **FPGA**.</li>
-                    <li>Successfully ported and validated existing firmware from a Xilinx KC705 board to an advanced **AXKU040 (Kintex Ultrascale)** board using the **Vivado Design Suite**.</li>
-                </ul>
-            </div>
-            <div class="card">
-                <h3>Heavy Ion Physics Analysis</h3>
-                <p class="duration">Sep 2024 - Jan 2025 | EHEP Lab, IIT Madras</p>
-                <ul>
-                    <li>Feasibility study for measuring the $\Lambda_{b}$ baryon in heavy-ion collisions, key to understanding **quark-gluon plasma**.</li>
-                    <li>Developed a custom **Pythia8 generator fragment** to simulate the $\Lambda_{b}\rightarrow\Lambda^{0}(p\pi^{-})+J/\psi(\mu^{+}\mu^{-})$ decay channel within **CMSSW**.</li>
-                    <li>Executed large-scale Monte Carlo production, generating over 1 million rare signal events on the **Grid** using **CRAB3**.</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-    
-    <section id="publications">
-        <h2>Posters and Publications</h2>
-        <ul class="pub-list">
-             <li class="pub-item">
-                <p class="pub-title">[1] A novel track finding algorithm to identify b-hadrons in b-jets using FusionNet: a geometric deep learning model.</p>
-                <p class="pub-venue">CMS Collaboration, CMS-DP-2025-035, 2025. (Link placeholder)</p>
-            </li>
-            <li class="pub-item">
-                <p class="pub-title">[2] B-hadron identification in b-jets using a novel deep learning technique in pp and PbPb collisions in CMS.</p>
-                <p class="pub-venue">Poster at European Committee for Al in Fundamental Physics (EuCAIF) Conference, Sardinia, Italy, 2025.</p>
-            </li>
-            <li class="pub-item">
-                <p class="pub-title">[3] B-hadron identification in b-jets using a novel deep learning technique in pp and PbPb collisions in CMS.</p>
-                <p class="pub-venue">Poster at All India Research Scholars Summit (AIRSS), IIT Madras, India, 2025.</p>
-            </li>
-            <li class="pub-item">
-                <p class="pub-title">[4] Galaxy Collision Simulation with Adaptive N-body Integration.</p>
-                <p class="pub-venue">Poster at CFI Open House 2024, IIT Madras, India.</p>
-            </li>
-        </ul>
-    </section>
+    <section id="about" class="fade-in">
+        <h2>About Me</h2>
+        <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 50px; align-items: center;">
+            <div>
+                <p style="margin-bottom: 15px; color: var(--text-muted);">
+                    My journey began with a fascination for the fundamental building blocks of the universe. As an Engineering Physics major at <span class="highlight">IIT Madras</span>, I've dedicated my academic career to the intersection of hardware acceleration and deep learning in high-energy physics.
+                </p>
+                <p style="margin-bottom: 15px; color: var(--text-muted);">
+                    I am currently working on <span class="highlight">FusionNet</span> (a Geometric DL model) and preparing for the launch of the <span class="highlight">SPEED Payload</span> on the IITMSAT satellite (Dec 2025).
+                </p>
+                <p style="color: var(--text-muted);">Here are a few technologies I've been working with recently:</p>
+                <ul style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; list-style: none; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-muted);">
+                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> C++ / Python</li>
+                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> ROOT / Geant4</li>
+                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> PyTorch (GNNs)</li>
+                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> FPGA (Vivado)</li>
+                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> CMSSW</li>
+                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> Verilog</li>
+                </ul>
+            </div>
+            <div style="position: relative;">
+                <img src="https://raw.githubusercontent.com/princek880/princek880.github.io/main/Prince_workshop.JPG" alt="Prince Kumar" style="width: 100%; border-radius: 4px; filter: grayscale(100%); transition: var(--transition); border: 2px solid var(--accent);">
+            </div>
+        </div>
+    </section>
 
-    <section id="projects">
-        <h2>Notable Projects</h2>
-        <div class="card-container">
-            <div class="card">
-                <h3>AstroStellar (N-Body Simulation)</h3>
-                <p class="duration">Jun 2023 - Mar 2024 | Centre for Innovation (CFI), IIT Madras</p>
-                <ul>
-                    <li>Developed a high-performance **C++ application** to model gravitational **N-body interactions**.</li>
-                    <li>Implemented numerical integrators (**Leapfrog, Runge-Kutta**) for accuracy comparison.</li>
-                    <li>Parallelized codebase using **OpenMP**, enabling simulations of over **1 Million particles**.</li>
-                </ul>
-                <button class="project-learn-more" data-modal-id="modal-nbody">Learn More</button>
-            </div>
-            <div class="card">
-                <h3>Speaker and LED Composite System</h3>
-                <p class="duration">Jan 2024 - May 2024 | Analog Systems Course Project, IIT Madras</p>
-                <ul>
-                    <li>Designed and simulated an analog system to synchronize an **LED light show** with audio input.</li>
-                    <li>Integrated sub-circuits: active filters, peak detector, and a **Class-D audio amplifier**.</li>
-                    <li>Design, validation, and performance achieved **top class marks** in **LTSpice** simulation.</li>
-                </ul>
-                <button class="project-learn-more" data-modal-id="modal-analog">Learn More</button>
-            </div>
-        </div>
-    </section>
+    <section id="experience" class="fade-in" style="margin-top: 100px;">
+        <h2>Where I've Worked</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <h3 class="role">RPIT Research Fellow</h3>
+                <span class="company">@ LLR, École Polytechnique (France)</span>
+                <span class="date">Jun 2025 - Aug 2025</span>
+                <p style="color: var(--text-muted);">Developed semi-supervised GNN clustering algorithms for primary vertexing in CMS. Optimized reconstruction purity and benchmarked against standard algorithms using ARI metrics.</p>
+            </div>
+            <div class="timeline-item">
+                <h3 class="role">Young Research Fellow</h3>
+                <span class="company">@ EHEP Lab, IIT Madras</span>
+                <span class="date">Jun 2024 - Present</span>
+                <p style="color: var(--text-muted);">Investigating the QCD dead cone effect. Built an end-to-end Deep Learning pipeline processing TB-scale CMSSW data on the grid. Member of CMS Collaboration.</p>
+            </div>
+            <div class="timeline-item">
+                <h3 class="role">Firmware Developer</h3>
+                <span class="company">@ HEP Lab, IIT Madras</span>
+                <span class="date">Nov 2024 - May 2025</span>
+                <p style="color: var(--text-muted);">Hardware R&D for ATLAS. Ported readout firmware for MALTA pixel sensors to Kintex Ultrascale (AXKU040) FPGAs.</p>
+            </div>
+        </div>
+    </section>
 
-        <section id="gallery">
-        <h2>Research Gallery & Visuals</h2>
-        <div class="gallery-grid">
-            <div class="gallery-item">
-                <img src="https://via.placeholder.com/600x400?text=LLR+Ecole+Polytechnique+Internship+Photo" alt="LLR Internship Lab Photo">
-                <div class="gallery-caption">
-                    <p>LLR, École Polytechnique, France. Focus on GNN development for CMS vertexing (Summer 2025).</p>
-                </div>
-            </div>
-            <div class="gallery-item">
-                <img src="https://via.placeholder.com/600x450?text=ATLAS+Kintex+Ultrascale+FPGA+Setup" alt="FPGA Firmware Setup">
-                <div class="gallery-caption">
-                    <p>ATLAS Firmware R&D: AXKU040 Kintex Ultrascale FPGA setup for MALTA pixel sensor readout chain.</p>
-                </div>
-            </div>
-            <div class="gallery-item">
-                <img src="https://via.placeholder.com/600x350?text=Dead+Cone+Effect+GNN+Input+Visualization" alt="Dead Cone GNN Visualization">
-                <div class="gallery-caption">
-                    <p>Visualization of jet constituents as a point cloud, input for the GNN classifier used in b-hadron identification.</p>
-                </div>
-            </div>
-            <div class="gallery-item">
-                <img src="https://via.placeholder.com/600x500?text=IITM+EHEP+Lab+Experiment+Setup" alt="IITM EHEP Lab Setup">
-                <div class="gallery-caption">
-                    <p>Experimental setup within the EHEP Lab at IIT Madras, relevant to detector simulation and testing.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-        <section id="skills">
-        <h2>Technical Skills</h2>
-        <div class="skills-grid">
-            <div class="skill-category">
-                <h3>Languages & Frameworks</h3>
-                <div class="skills-container">
-                    <span class="skill-badge">C/C++</span><span class="skill-badge">Python</span><span class="skill-badge">MATLAB</span>
-                    <span class="skill-badge">Bash/zsh</span><span class="skill-badge">LATEX</span><span class="skill-badge">VHDL</span>
-                </div>
-            </div>
-            <div class="skill-category">
-                <h3>HEP & Data Science</h3>
-                <div class="skills-container">
-                     <span class="skill-badge">PyTorch</span><span class="skill-badge">Keras</span><span class="skill-badge">Scikit-Learn</span>
-                     <span class="skill-badge">Pandas</span><span class="skill-badge">Numpy</span><span class="skill-badge">ROOT</span>
-                     <span class="skill-badge">uproot</span><span class="skill-badge">CMSSW</span>
-                </div>
-            </div>
-            <div class="skill-category">
-                <h3>Hardware & Tools</h3>
-                <div class="skills-container">
-                    <span class="skill-badge">FPGA</span><span class="skill-badge">Vivado</span><span class="skill-badge">LTSpice</span>
-                    <span class="skill-badge">KiCAD</span><span class="skill-badge">Git & GitHub</span><span class="skill-badge">Linux</span>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section id="certifications">
-    <h2>Licenses & Certifications</h2>
-    <div class="card-container">
+    <section id="projects" class="fade-in" style="margin-top: 100px;">
+        <h2>Notable Projects</h2>
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">
+                    <i class="far fa-folder folder-icon"></i>
+                    <a href="#" target="_blank"><i class="fas fa-external-link-alt" style="color: var(--text-main); font-size: 1.2rem;"></i></a>
+                </div>
+                <h3>FusionNet (CMS-DP-2025-035)</h3>
+                <p>A novel geometric deep learning model for track finding in b-jets. Published as a Detector Performance Summary and presented at EuCAIF 2025.</p>
+                <div class="card-tech">
+                    <span>PyTorch</span>
+                    <span>GNN</span>
+                    <span>Latex</span>
+                </div>
+            </div>
 
-        <div class="card">
-            <h3>Machine Learning Specialization</h3>
-            <p class="duration">Issued Dec 2023 | Stanford Online</p>
-            <ul>
-                <li>Credential ID: 63ZDD4NQ68HL</li>
-                <li>Skills: Machine Learning, Supervised Learning, Neural Networks, Unsupervised Learning</li>
-            </ul>
-            <a class="project-learn-more" href="https://www.coursera.org/account/accomplishments/specialization/63ZDD4NQ68HL" target="_blank" rel="noopener noreferrer">Show Credential</a>
-        </div>
+            <div class="card">
+                <div class="card-header">
+                    <i class="far fa-folder folder-icon"></i>
+                    <a href="#" target="_blank"><i class="fab fa-github" style="color: var(--text-main); font-size: 1.2rem;"></i></a>
+                </div>
+                <h3>AstroStellar N-Body</h3>
+                <p>High-performance C++ simulation of gravitational interactions. Parallelized using OpenMP to handle 1M+ particles with Runge-Kutta integration.</p>
+                <div class="card-tech">
+                    <span>C++</span>
+                    <span>OpenMP</span>
+                    <span>HPC</span>
+                </div>
+            </div>
 
-        <div class="card">
-            <h3>Introduction to Aerospace Engineering: Astronautics and Human Spaceflight</h3>
-            <p class="duration">Issued Dec 2021 | MITx Courses</p>
-            <ul>
-                <li>Skills: Astrophysics, Rocket Technology, Aeronautics, Propulsion, Astronautics</li>
-            </ul>
-        </div>
+            <div class="card">
+                <div class="card-header">
+                    <i class="far fa-folder folder-icon"></i>
+                </div>
+                <h3>SPEED Payload (IITMSAT)</h3>
+                <p>Calibration and data acquisition for the Space-based Proton Electron Energy Detector. Satellite launch scheduled for Dec 2025.</p>
+                <div class="card-tech">
+                    <span>Geant4</span>
+                    <span>Calibration</span>
+                    <span>Hardware</span>
+                </div>
+            </div>
 
-        <div class="card">
-            <h3>CS50: Introduction to Computer Science</h3>
-            <p class="duration">Issued Sep 2021 | Harvard University</p>
-            <ul>
-                <li>Skills: C, Python, CSS, HTML5, JavaScript, Java, Scratch, Visual Studio</li>
-            </ul>
-        </div>
+             <div class="card">
+                <div class="card-header">
+                    <i class="far fa-folder folder-icon"></i>
+                </div>
+                <h3>Audio-Analog System</h3>
+                <p>Designed active filters and Class-D amplifiers for sound-reactive LED arrays. Simulated in LTSpice with high fidelity.</p>
+                <div class="card-tech">
+                    <span>LTSpice</span>
+                    <span>KiCad</span>
+                    <span>Analog</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        <div class="card">
-            <h3>The Fundamentals of Digital Marketing</h3>
-            <p class="duration">Google Digital Garage</p>
-            <ul>
-                <li>Credential ID: ZMS ZMK KY2</li>
-                <li>Skills: Digital Marketing, Social Media Marketing, Online Marketing, Strategy</li>
-            </ul>
-            <a class="project-learn-more" href="https://learndigital.withgoogle.com/digitalgarage/validate-certificate-code" target="_blank" rel="noopener noreferrer">Show Credential</a>
-        </div>
+    <section id="gallery" class="fade-in" style="margin-top: 100px;">
+        <h2>Research Gallery</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item" onclick="openModal(this)">
+                <img src="https://via.placeholder.com/600x400?text=LLR+France+Lab" alt="LLR Lab France">
+                <div class="gallery-overlay"><span class="gallery-text">LLR Internship</span></div>
+                <p style="display:none">Working at LLR, École Polytechnique on CMS vertexing algorithms.</p>
+            </div>
+            <div class="gallery-item" onclick="openModal(this)">
+                <img src="https://via.placeholder.com/600x400?text=FPGA+Setup" alt="FPGA Setup">
+                <div class="gallery-overlay"><span class="gallery-text">ATLAS Firmware</span></div>
+                <p style="display:none">Kintex Ultrascale FPGA setup for MALTA sensor readout.</p>
+            </div>
+            <div class="gallery-item" onclick="openModal(this)">
+                <img src="https://via.placeholder.com/600x400?text=GNN+Viz" alt="GNN Visualization">
+                <div class="gallery-overlay"><span class="gallery-text">FusionNet Viz</span></div>
+                <p style="display:none">Point cloud visualization of jet constituents for b-tagging.</p>
+            </div>
+             <div class="gallery-item" onclick="openModal(this)">
+                <img src="https://via.placeholder.com/600x400?text=SPEED+Payload" alt="SPEED Payload">
+                <div class="gallery-overlay"><span class="gallery-text">SPEED Payload</span></div>
+                <p style="display:none">Pre-launch calibration of the IITMSAT particle detector.</p>
+            </div>
+        </div>
+    </section>
 
-    </div>
-</section>
-
-
-    <section id="achievements">
-        <h2>Awards & Accomplishments</h2>
-        <div class="card-container">
-            <div class="card"><h3>RPIT Fellowship</h3><p>Awarded a competitive, fully-funded 3-month research internship at LLR, École Polytechnique, France.</p></div>
-            <div class="card"><h3>Young Research Fellow</h3><p>Selected as one of only 17 fellows from a pool of 300+ students for funded undergraduate research at IIT Madras.</p></div>
-            <div class="card"><h3>Top 5 Department Rank</h3><p>Consistently maintained a position in the top 5 of the Engineering Physics Department at IIT Madras based on academic performance.</p></div>
-            <div class="card"><h3>JEE Advanced Rank</h3><p>Secured a rank in the top 5% nationally among 150,000 candidates in the highly competitive JEE Advanced examination.</p></div>
-            <div class="card"><h3>JEE Mains Rank</h3><p>Ranked in the top 1% nationally among over 1 million candidates in the JEE Mains examination.</p></div>
-            <div class="card"><h3>CMS Member</h3><p>Inducted as an official member of the Compact Muon Solenoid (CMS) Collaboration at CERN since 2024.</p></div>
-        </div>
-    </section>
-
+    <footer>
+        <div class="socials">
+            <a href="https://github.com/princek880"><i class="fab fa-github"></i></a>
+            <a href="https://linkedin.com/in/prince-kumar-3a11391b1"><i class="fab fa-linkedin"></i></a>
+            <a href="mailto:ep22b045@smail.iitm.ac.in"><i class="fas fa-envelope"></i></a>
+        </div>
+        <p>Designed & Built by Prince Kumar</p>
+    </footer>
 </div>
 
-<div id="modal-nbody" class="modal">
-    <div class="modal-content">
-        <span class="modal-close">&times;</span>
-        <div class="modal-body">
-            <div class="modal-text">
-                <h3>AstroStellar (N-Body Simulation)</h3>
-                <p>
-                    High-performance C++ application modeling N-body gravitational interactions for galaxy collision simulation. Implemented and benchmarked numerical integrators (Leapfrog, Runge-Kutta) for solving Hamiltonian dynamics. **Parallelized force calculation via OpenMP**, achieving scalability to over one million particles. Presented at the CFI Open House.
-                </p>
-                <p><span class="modal-tech">Technologies:</span> C++, OpenMP, Gnuplot, Python (for visualization), Git</p>
-                <div class="modal-link">
-                    <a href="#" target="_blank" rel="noopener noreferrer">View on GitHub</a>
-                </div>
-            </div>
-            <div class="modal-image">
-                <img src="https://via.placeholder.com/800x600?text=Galaxy+Collision+Snapshot" alt="N-Body Simulation">
-            </div>
-        </div>
-    </div>
+<div id="imgModal" class="modal" onclick="closeModal()">
+    <span class="close">&times;</span>
+    <img id="modalImg" src="">
+    <div id="modalCaption" class="modal-caption"></div>
 </div>
-
-<div id="modal-analog" class="modal">
-    <div class="modal-content">
-        <span class="modal-close">&times;</span>
-        <div class="modal-body">
-            <div class="modal-text">
-                <h3>Speaker and LED Composite System</h3>
-                <p>
-                    Designed a sound-reactive light show system for the Analog Systems course. The circuit processes an audio signal to drive both a speaker and synchronized LEDs. Implemented a DC-DC buck converter, active band-pass filters (bass, mid, treble), peak detectors, and a high-efficiency Class-D audio amplifier. All stages were rigorously simulated in **LTSpice** and achieved the highest project grade.
-                </p>
-                <p><span class="modal-tech">Technologies:</span> LTSpice, Circuit Design, PCB Layout (KiCAD), Class-D Amplifiers, Active Filters</p>
-                 <div class="modal-link">
-                    <a href="#" target="_blank" rel="noopener noreferrer">View Report</a>
-                </div>
-            </div>
-            <div class="modal-image">
-                <img src="https://via.placeholder.com/800x600?text=LTSpice+Circuit+Diagram" alt="Analog System Diagram">
-            </div>
-        </div>
-    </div>
-</div>
-<footer>
-    <div class="social-links">
-        <a href="mailto:ep22b045@smail.iitm.ac.in" aria-label="Email"><i class="fas fa-envelope"></i></a>
-        <a href="https://github.com/princek880" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
-        <a href="https://linkedin.com/in/prince-kumar-3a11391b1" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-    </div>
-    <p>&copy; 2025 Prince Kumar. All rights reserved.</p>
-</footer>
 
 <script>
-    // --- Scroll Animations ---
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, {
-        threshold: 0.1
-    });
+    // --- Typewriter Effect ---
+    const text = "Prince Kumar.";
+    let i = 0;
+    function typeWriter() {
+        if (i < text.length) {
+            document.getElementById("typewriter").innerHTML += text.charAt(i);
+            i++;
+            setTimeout(typeWriter, 100);
+        }
+    }
+    window.onload = typeWriter;
 
-    const sections = document.querySelectorAll('section');
-    sections.forEach(section => {
-        observer.observe(section);
-    });
+    // --- Scroll Animation ---
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
 
-    // --- Modal Logic ---
-    document.addEventListener('DOMContentLoaded', () => {
-        // Get all learn more buttons
-        const learnMoreButtons = document.querySelectorAll('.project-learn-more');
-        
-        learnMoreButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const modalId = button.getAttribute('data-modal-id');
-                const modal = document.getElementById(modalId);
-                if (modal) {
-                    modal.classList.add('show');
-                }
-            });
-        });
+    document.querySelectorAll('.fade-in').forEach(section => {
+        observer.observe(section);
+    });
 
-        // Get all close buttons
-        const closeButtons = document.querySelectorAll('.modal-close');
-        
-        closeButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const modal = button.closest('.modal');
-                if (modal) {
-                    modal.classList.remove('show');
-                }
-            });
-        });
+    // --- Modal Logic ---
+    function openModal(element) {
+        const modal = document.getElementById('imgModal');
+        const img = document.getElementById('modalImg');
+        const caption = document.getElementById('modalCaption');
+        const srcImg = element.querySelector('img');
+        const srcText = element.querySelector('p').innerText;
+        
+        modal.style.display = "flex";
+        img.src = srcImg.src;
+        caption.innerText = srcText;
+    }
 
-        // Close modal on outside click
-        window.addEventListener('click', (event) => {
-            if (event.target.classList.contains('modal')) {
-                event.target.classList.remove('show');
-            }
-        });
-    });
+    function closeModal() {
+        document.getElementById('imgModal').style.display = "none";
+    }
+
+    // --- Particle Background Script (Custom Lightweight) ---
+    const canvas = document.getElementById('canvas-container');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particlesArray;
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.directionX = (Math.random() * 2) - 1; // Speed adjustment
+            this.directionY = (Math.random() * 2) - 1;
+            this.size = (Math.random() * 2) + 1; // Size variation
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+            ctx.fillStyle = 'rgba(100, 255, 218, 0.6)'; // Accent color
+            ctx.fill();
+        }
+        update() {
+            if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+            if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+            this.x += this.directionX * 0.2; // Velocity factor
+            this.y += this.directionY * 0.2;
+            this.draw();
+        }
+    }
+
+    function init() {
+        particlesArray = [];
+        let numberOfParticles = (canvas.height * canvas.width) / 15000; // Density
+        for (let i = 0; i < numberOfParticles; i++) {
+            particlesArray.push(new Particle());
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update();
+        }
+        connect();
+    }
+
+    function connect() {
+        let opacityValue = 1;
+        for (let a = 0; a < particlesArray.length; a++) {
+            for (let b = a; b < particlesArray.length; b++) {
+                let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) + 
+                               ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                if (distance < (canvas.width/7) * (canvas.height/7)) {
+                    opacityValue = 1 - (distance/10000);
+                    ctx.strokeStyle = 'rgba(100, 255, 218,' + opacityValue + ')';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                    ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+
+    window.addEventListener('resize', function(){
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        init();
+    });
+
+    init();
+    animate();
 </script>
 
 </body>

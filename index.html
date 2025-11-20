@@ -1,734 +1,798 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Prince Kumar | Experimental HEP & ML</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        :root {
-            --bg-main: #f4f7f9;
-            --bg-dark: #1a202c;
-            --bg-light: #ffffff;
-            --text-dark: #2d3748;
-            --text-light: #e2e8f0;
-            --accent-primary: #3498db; /* Blue */
-            --accent-secondary: #e74c3c; /* Red */
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --border-radius: 12px;
-        }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prince Kumar | Experimental HEP & ML</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #f4f7f9;
+            --bg-dark: #1a202c;
+            --bg-light: #ffffff;
+            --text-dark: #2d3748;
+            --text-light: #e2e8f0;
+            --accent-primary: #3498db; /* Blue */
+            --accent-secondary: #e74c3c; /* Red */
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --border-radius: 12px;
+        }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        html {
+            scroll-behavior: smooth;
+        }
 
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-main);
-            color: var(--text-dark);
-            line-height: 1.7;
-        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            line-height: 1.7;
+        }
 
-        /* --- Header --- */
-        header {
-            background: var(--bg-dark);
-            color: var(--text-light);
-            text-align: center;
-            padding: 5rem 1.5rem;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
-        }
-        .header-content {
-            max-width: 800px;
-        }
-        .profile-pic {
-            width: 150px; /* Adjusted size */
-            height: 150px;
-            object-fit: cover; /* Ensures the image covers the area without distortion */
-            border-radius: 50%;
-            border: 5px solid var(--accent-primary);
-            margin-bottom: 1.5rem;
-            box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
-            transition: transform 0.3s ease;
-        }
-        .profile-pic:hover {
-            transform: scale(1.05);
-        }
-        header h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 3rem;
-            margin: 0 0 0.5rem;
-            font-weight: 700;
-        }
-        header p {
-            font-size: 1.2rem;
-            margin: 0.2rem 0 1.5rem;
-            color: #a0aec0;
-            max-width: 600px;
-        }
-        .social-links a {
-            color: var(--text-light);
-            font-size: 1.5rem;
-            margin: 0 1rem;
-            transition: color 0.3s ease, transform 0.3s ease;
-        }
-        .social-links a:hover {
-            color: var(--accent-primary);
-            transform: translateY(-3px);
-        }
-        .btn-cv {
-            display: inline-block;
-            background-color: var(--accent-primary);
-            color: var(--bg-light);
-            padding: 12px 30px;
-            margin-top: 1.5rem;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 700;
-            font-family: 'Montserrat', sans-serif;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
-        }
-        .btn-cv:hover {
-            background-color: #2980b9;
-            transform: translateY(-3px);
-            box-shadow: 0 7px 20px rgba(52, 152, 219, 0.6);
-        }
+        /* --- Header --- */
+        header {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            text-align: center;
+            padding: 5rem 1.5rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+        }
+        .header-content {
+            max-width: 800px;
+        }
+        .profile-pic {
+            width: 150px; /* Adjusted size */
+            height: 150px;
+            object-fit: cover; /* Ensures the image covers the area without distortion */
+            border-radius: 50%;
+            border: 5px solid var(--accent-primary);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
+            transition: transform 0.3s ease;
+        }
+        .profile-pic:hover {
+            transform: scale(1.05);
+        }
+        header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3rem;
+            margin: 0 0 0.5rem;
+            font-weight: 700;
+        }
+        header p {
+            font-size: 1.2rem;
+            margin: 0.2rem 0 1.5rem;
+            color: #a0aec0;
+            max-width: 600px;
+        }
+        .social-links a {
+            color: var(--text-light);
+            font-size: 1.5rem;
+            margin: 0 1rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .social-links a:hover {
+            color: var(--accent-primary);
+            transform: translateY(-3px);
+        }
+        .btn-cv {
+            display: inline-block;
+            background-color: var(--accent-primary);
+            color: var(--bg-light);
+            padding: 12px 30px;
+            margin-top: 1.5rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+        .btn-cv:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(52, 152, 219, 0.6);
+        }
 
-        /* --- Navigation --- */
-        nav {
-            background: var(--bg-light);
-            padding: 1rem;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        nav a {
-            color: var(--text-dark);
-            text-decoration: none;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        nav a:hover {
-            background-color: var(--accent-primary);
-            color: var(--bg-light);
-        }
+        /* --- Navigation --- */
+        nav {
+            background: var(--bg-light);
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        nav a {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        nav a:hover {
+            background-color: var(--accent-primary);
+            color: var(--bg-light);
+        }
 
-        /* --- General Section Styling --- */
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 2.5rem 1.5rem;
-        }
-        section {
-            margin-bottom: 4rem;
-            padding-top: 4rem; /* For scroll-margin */
-            margin-top: -4rem; /* Negative margin to compensate for padding */
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-        }
-        section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        h2 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 2.5rem;
-            position: relative;
-        }
-        h2::after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 4px;
-            background: var(--accent-primary);
-            margin: 0.5rem auto 0;
-            border-radius: 2px;
-        }
+        /* --- General Section Styling --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+        }
+        section {
+            margin-bottom: 4rem;
+            padding-top: 4rem; /* For scroll-margin */
+            margin-top: -4rem; /* Negative margin to compensate for padding */
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+        h2::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--accent-primary);
+            margin: 0.5rem auto 0;
+            border-radius: 2px;
+        }
 
-        /* --- About Me Section --- */
-        #about .about-container {
-            background: var(--bg-light);
-            padding: 3rem;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-        }
-        #about p {
-            margin: 0;
-            font-size: 1.1rem;
-            text-align: justify;
-        }
+        /* --- About Me Section --- */
+        #about .about-container {
+            background: var(--bg-light);
+            padding: 3rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        #about p {
+            margin: 0;
+            font-size: 1.1rem;
+            text-align: justify;
+        }
 
-        /* --- Card Layout for Experience & Projects --- */
-        .card-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.5rem;
-        }
-        .card {
-            background: var(--bg-light);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.1);
-        }
-        .card h3 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.3rem;
-            margin-top: 0;
-            color: var(--accent-primary);
-        }
-        .card .duration {
-            font-size: 0.9rem;
-            color: #718096;
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-        .card ul {
-            list-style-type: none;
-            padding-left: 0;
-            margin: 0 0 1.5rem 0;
-            flex-grow: 1;
-        }
-        .card ul li {
-            position: relative;
-            padding-left: 1.5rem;
-            margin-bottom: 0.6rem;
-        }
-        .card ul li::before {
-            content: "\f105"; /* Font Awesome right arrow */
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
-            color: var(--accent-secondary);
-            position: absolute;
-            left: 0;
-            top: 1px;
-        }
-        .project-learn-more {
-            display: inline-block;
-            background-color: transparent;
-            color: var(--accent-primary);
-            padding: 8px 16px;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 700;
-            font-family: 'Montserrat', sans-serif;
-            transition: all 0.3s ease;
-            border: 2px solid var(--accent-primary);
-            margin-top: auto;
-            cursor: pointer;
-        }
-        .project-learn-more:hover {
-            background-color: var(--accent-primary);
-            color: var(--bg-light);
-        }
+        /* --- Card Layout for Experience & Projects --- */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .card {
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 30px -10px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            margin-top: 0;
+            color: var(--accent-primary);
+        }
+        .card .duration {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        .card ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0 0 1.5rem 0;
+            flex-grow: 1;
+        }
+        .card ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.6rem;
+        }
+        .card ul li::before {
+            content: "\f105"; /* Font Awesome right arrow */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--accent-secondary);
+            position: absolute;
+            left: 0;
+            top: 1px;
+        }
+        .project-learn-more {
+            display: inline-block;
+            background-color: transparent;
+            color: var(--accent-primary);
+            padding: 8px 16px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+            border: 2px solid var(--accent-primary);
+            margin-top: auto;
+            cursor: pointer;
+        }
+        .project-learn-more:hover {
+            background-color: var(--accent-primary);
+            color: var(--bg-light);
+        }
 
-        /* --- Publications Section --- */
-        .pub-list { list-style: none; padding: 0; }
-        .pub-item {
-            background: var(--bg-light);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border-radius: var(--border-radius);
-            border-left: 5px solid var(--accent-secondary);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            line-height: 1.5;
-        }
-        .pub-item .pub-title { font-weight: 700; color: var(--text-dark); }
-        .pub-item .pub-venue { font-style: italic; color: #718096; font-size: 0.9em; }
+        /* --- Publications Section --- */
+        .pub-list { list-style: none; padding: 0; }
+        .pub-item {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: var(--border-radius);
+            border-left: 5px solid var(--accent-secondary);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            line-height: 1.5;
+        }
+        .pub-item .pub-title { font-weight: 700; color: var(--text-dark); }
+        .pub-item .pub-venue { font-style: italic; color: #718096; font-size: 0.9em; }
 
-        /* --- Skills Section --- */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            text-align: center;
-        }
-        .skill-category h3 {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--accent-primary);
-            margin-bottom: 1rem;
-        }
-        .skills-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.75rem;
-        }
-        .skill-badge {
-            background: #e2e8f0;
-            color: var(--text-dark);
-            padding: 0.7rem 1.2rem;
-            border-radius: 50px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-        .skill-badge:hover {
-            transform: translateY(-3px);
-            background-color: var(--accent-primary);
-            color: var(--bg-light);
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
-        }
-        
-        /* --- Footer --- */
-        footer {
-            background: var(--bg-dark);
-            color: var(--text-light);
-            text-align: center;
-            padding: 3rem 1.5rem;
-            clip-path: polygon(0 10%, 100% 0, 100% 100%, 0% 100%);
-            margin-top: 3rem;
-        }
-        footer p { margin: 0.5rem 0; }
-        footer .social-links { margin-bottom: 1rem; }
-        
-        /* --- Project Modal --- */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .modal.show {
-            display: block;
-            opacity: 1;
-        }
-        .modal-content {
-            background-color: var(--bg-main);
-            margin: 5% auto;
-            padding: 2.5rem;
-            border-radius: var(--border-radius);
-            width: 80%;
-            max-width: 900px;
-            position: relative;
-            transform: translateY(-50px);
-            transition: transform 0.3s ease;
-        }
-        .modal.show .modal-content {
-            transform: translateY(0);
-        }
-        .modal-close {
-            color: #aaa;
-            position: absolute;
-            top: 1rem;
-            right: 1.5rem;
-            font-size: 2rem;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-        .modal-close:hover, .modal-close:focus {
-            color: var(--text-dark);
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .modal-body {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-        }
-        .modal-body img {
-            width: 100%;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-        }
-        .modal-body h3 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 2rem;
-            color: var(--accent-primary);
-            margin-top: 0;
-        }
-        .modal-body p {
-            line-height: 1.8;
-            font-size: 1.05rem;
-        }
-        .modal-tech { font-weight: bold; color: var(--text-dark); }
-        .modal-link { margin-top: 1.5rem; }
-        .modal-link a {
-            display: inline-block;
-            background-color: var(--accent-secondary);
-            color: var(--bg-light);
-            padding: 10px 25px;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 700;
-            transition: all 0.3s ease;
-        }
-        .modal-link a:hover {
-            background-color: #c0392b;
-            transform: translateY(-2px);
-        }
+        /* --- Skills Section --- */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+        .skill-category h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+        }
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        .skill-badge {
+            background: #e2e8f0;
+            color: var(--text-dark);
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        .skill-badge:hover {
+            transform: translateY(-3px);
+            background-color: var(--accent-primary);
+            color: var(--bg-light);
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+        }
+        
+        /* --- Gallery Section (New) --- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .gallery-item {
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: zoom-in;
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Important for grid item alignment */
+        }
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px -5px rgba(0,0,0,0.15);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+        .gallery-caption {
+            padding: 1rem;
+            background: var(--bg-light);
+            flex-grow: 1;
+            border-top: 1px solid #f0f0f0;
+        }
+        .gallery-caption p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #525f7f;
+            font-weight: 500;
+        }
 
-        /* --- Responsive Design --- */
-        @media (min-width: 769px) {
-            .modal-body {
-                grid-template-columns: 1fr 1fr;
-                align-items: flex-start;
-            }
-        }
-        @media (max-width: 768px) {
-            header { padding: 4rem 1rem; clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%); }
-            header h1 { font-size: 2.2rem; }
-            nav { flex-direction: column; text-align: center; gap: 0.5rem; }
-            .container { padding: 2rem 1rem; }
-            h2 { font-size: 2rem; }
-            section { margin-top: -2rem; padding-top: 2rem; }
-            .modal-content { width: 90%; padding: 2rem; margin: 10% auto; }
-            .modal-body h3 { font-size: 1.5rem; }
-        }
-    </style>
+        /* --- Footer --- */
+        footer {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            text-align: center;
+            padding: 3rem 1.5rem;
+            clip-path: polygon(0 10%, 100% 0, 100% 100%, 0% 100%);
+            margin-top: 3rem;
+        }
+        footer p { margin: 0.5rem 0; }
+        footer .social-links { margin-bottom: 1rem; }
+        
+        /* --- Project Modal --- (Unchanged) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.show {
+            display: block;
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: var(--bg-main);
+            margin: 5% auto;
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            width: 80%;
+            max-width: 900px;
+            position: relative;
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+        }
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+        .modal-close {
+            color: #aaa;
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        .modal-close:hover, .modal-close:focus {
+            color: var(--text-dark);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        .modal-body img {
+            width: 100%;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        .modal-body h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            color: var(--accent-primary);
+            margin-top: 0;
+        }
+        .modal-body p {
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+        .modal-tech { font-weight: bold; color: var(--text-dark); }
+        .modal-link { margin-top: 1.5rem; }
+        .modal-link a {
+            display: inline-block;
+            background-color: var(--accent-secondary);
+            color: var(--bg-light);
+            padding: 10px 25px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        .modal-link a:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* --- Responsive Design --- */
+        @media (min-width: 769px) {
+            .modal-body {
+                grid-template-columns: 1fr 1fr;
+                align-items: flex-start;
+            }
+        }
+        @media (max-width: 768px) {
+            header { padding: 4rem 1rem; clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%); }
+            header h1 { font-size: 2.2rem; }
+            nav { flex-direction: column; text-align: center; gap: 0.5rem; }
+            .container { padding: 2rem 1rem; }
+            h2 { font-size: 2rem; }
+            section { margin-top: -2rem; padding-top: 2rem; }
+            .modal-content { width: 90%; padding: 2rem; margin: 10% auto; }
+            .modal-body h3 { font-size: 1.5rem; }
+        }
+    </style>
 </head>
 
 <body>
 
 <header>
-    <div class="header-content">
-        <img src="https://raw.githubusercontent.com/princek880/princek880.github.io/main/Prince_workshop.JPG" alt="Prince Kumar" class="profile-pic">
-        
-        <h1>Prince Kumar</h1>
-        <p>B.Tech Engineering Physics, IIT Madras<br>Exploring the frontiers of Experimental High-Energy Physics & Machine Learning</p>
-        <div class="social-links">
-            <a href="mailto:ep22b045@smail.iitm.ac.in" aria-label="Email"><i class="fas fa-envelope"></i></a>
-            <a href="https://github.com/princek880" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
-            <a href="https://linkedin.com/in/prince-kumar-3a11391b1" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-        </div>
-        <a class="btn-cv" href="CV_Prince_PhD.pdf" download="Prince_Kumar_CV.pdf">DOWNLOAD CV</a>
-    </div>
+    <div class="header-content">
+        <img src="https://raw.githubusercontent.com/princek880/princek880.github.io/main/Prince_workshop.JPG" alt="Prince Kumar" class="profile-pic">
+        
+        <h1>Prince Kumar</h1>
+        <p>B.Tech Engineering Physics, IIT Madras<br>Experimental High-Energy Physics & Machine Learning Specialist</p>
+        <div class="social-links">
+            <a href="mailto:ep22b045@smail.iitm.ac.in" aria-label="Email"><i class="fas fa-envelope"></i></a>
+            <a href="https://github.com/princek880" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            <a href="https://linkedin.com/in/prince-kumar-3a11391b1" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <a class="btn-cv" href="CV_Prince_PhD.pdf" download="Prince_Kumar_CV.pdf">DOWNLOAD CV</a>
+    </div>
 </header>
 
 <nav id="navbar">
-    <a href="#about">About</a>
-    <a href="#research">Research</a>
-    <a href="#publications">Publications</a>
-    <a href="#projects">Projects</a>
-    <a href="#skills">Skills</a>
-    <a href="#achievements">Achievements</a>
+    <a href="#about">About</a>
+    <a href="#research">Research</a>
+    <a href="#publications">Publications</a>
+    <a href="#projects">Projects</a>
+    <a href="#gallery">Gallery</a>     <a href="#skills">Skills</a>
+    <a href="#achievements">Awards</a>
 </nav>
 
 <div class="container">
 
-    <section id="about">
-        <h2>About Me</h2>
-        <div class="about-container">
-            <p>I am an undergraduate at the Indian Institute of Technology Madras, pursuing a B.Tech in Engineering Physics with minors in Mathematics and Computing. My core passion lies at the dynamic intersection of experimental high-energy physics and machine learning, where I seek to leverage advanced computational techniques to unravel the fundamental mysteries of our universe. My research portfolio, which includes developing Graph Neural Networks for the CMS experiment at CERN and contributing to firmware for the ATLAS detector, reflects my commitment to this field. I am driven by a profound intellectual curiosity and a desire to contribute to groundbreaking scientific discoveries, constantly seeking new challenges that push the boundaries of technology and physics.</p>
-        </div>
-    </section>
+    <section id="about">
+        <h2>About Me</h2>
+        <div class="about-container">
+            <p>Undergraduate, Indian Institute of Technology Madras, B.Tech Engineering Physics with minors in Mathematics and Computing. Research focuses on the intersection of **Experimental High-Energy Physics (HEP)** and **Machine Learning (ML)**. Expertise includes developing **Graph Neural Networks (GNN)** for physics object reconstruction in the **CMS experiment** at CERN and contributing to **ATLAS detector** firmware development. Driven by fundamental scientific inquiry and advanced computational methods to derive novel insights from large-scale particle collider data.</p>
+        </div>
+    </section>
 
-    <section id="research">
-        <h2>Research Experience</h2>
-        <div class="card-container">
-            <div class="card">
-                <h3>HEP & Semi-Supervised ML</h3>
-                <p class="duration">Jun 2025 - Aug 2025 | LLR, École Polytecnique, France</p>
-                <ul>
-                    <li>Spearheading the development of a novel GNN-based semi-supervised clustering algorithm for grouping primary interaction vertices in high-pileup proton-proton collisions.</li>
-                    <li>The goal is to improve vertex reconstruction efficiency and purity, which is critical for many physics analyses at the CMS experiment.</li>
-                    <li>Employing advanced visualization techniques like t-SNE and quantitative metrics such as the Adjusted Rand Index (ARI) to rigorously evaluate model performance against established benchmarks.</li>
-                </ul>
-            </div>
-            <div class="card">
-                <h3>HEP & Supervised ML</h3>
-                <p class="duration">Jun 2024 - May 2025 | Young Research Fellow, EHEP Lab, IIT Madras</p>
-                <ul>
-                    <li>Investigating the "dead cone effect"—a key prediction of QCD—by classifying tracks originating from b-hadron decays within b-jets.</li>
-                    <li>Engineered a novel Graph Neural Network (GNN) classifier, treating jet constituents as a point cloud to capture complex relational information.</li>
-                    <li>Built and managed an end-to-end deep learning pipeline, handling large-scale CMSSW data processing, feature engineering, and distributed training.</li>
-                </ul>
-            </div>
-            <div class="card">
-                <h3>Firmware Development</h3>
-                <p class="duration">Nov 2024 - May 2025 | HEP Lab, IIT Madras</p>
-                <ul>
-                    <li>Contributed to the hardware R&D for the next-generation ATLAS experiment's readout chain by developing critical firmware.</li>
-                    <li>Focused on establishing robust, high-speed communication between the MALTA pixel sensor and an FPGA, a key component of the data acquisition system.</li>
-                    <li>Successfully ported and validated the existing firmware from a Xilinx KC705 board to a more advanced AXKU040 (Kintex Ultrascale) board using the Vivado Design Suite.</li>
-                </ul>
-            </div>
-            <div class="card">
-                <h3>Heavy Ion Physics Analysis</h3>
-                <p class="duration">Sep 2024 - Jan 2025 | EHEP Lab, IIT Madras</p>
-                <ul>
-                    <li>Advanced the feasibility study for measuring the $\Lambda_{b}$ baryon in heavy-ion collisions, a challenging but crucial measurement for understanding quark-gluon plasma.</li>
-                    <li>Developed a custom Pythia8 generator fragment to simulate the $\Lambda_{b}\rightarrow\Lambda^{0}(p\pi^{-})+J/\psi(\mu^{+}\mu^{-})$ decay channel within the official CMSSW framework.</li>
-                    <li>Executed a large-scale Monte Carlo production, generating over 1 million rare signal events on the Grid using an optimized CRAB3 configuration.</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-    
-    <section id="publications">
-        <h2>Posters and Publications</h2>
-        <ul class="pub-list">
-             <li class="pub-item">
-                <p class="pub-title">[1] A novel track finding algorithm to identify b-hadrons in b-jets using FusionNet: a geometric deep learning model.</p>
-                <p class="pub-venue">CMS Collaboration, CMS-DP-2025-035, 2025. (Link placeholder)</p>
-            </li>
-            <li class="pub-item">
-                <p class="pub-title">[2] B-hadron identification in b-jets using a novel deep learning technique in pp and PbPb collisions in CMS.</p>
-                <p class="pub-venue">Poster at European Committee for Al in Fundamental Physics (EuCAIF) Conference, Sardinia, Italy, 2025.</p>
-            </li>
-            <li class="pub-item">
-                <p class="pub-title">[3] B-hadron identification in b-jets using a novel deep learning technique in pp and PbPb collisions in CMS.</p>
-                <p class="pub-venue">Poster at All India Research Scholars Summit (AIRSS), IIT Madras, India, 2025.</p>
-            </li>
-            <li class="pub-item">
-                <p class="pub-title">[4] Galaxy Collision Simulation with Adaptive N-body Integration.</p>
-                <p class="pub-venue">Poster at CFI Open House 2024, IIT Madras, India.</p>
-            </li>
-        </ul>
-    </section>
+    <section id="research">
+        <h2>Research Experience</h2>
+        <div class="card-container">
+            <div class="card">
+                <h3>HEP & Semi-Supervised ML</h3>
+                <p class="duration">Jun 2025 - Aug 2025 | LLR, École Polytecnique, France</p>
+                <ul>
+                    <li>Developed a novel GNN-based semi-supervised clustering algorithm for **primary interaction vertex grouping** in high-pileup proton-proton collisions (CMS).</li>
+                    <li>Goal: improve vertex reconstruction efficiency and purity, crucial for downstream physics analysis.</li>
+                    <li>Evaluated model performance against benchmarks using **t-SNE visualization** and **Adjusted Rand Index (ARI)**.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>HEP & Supervised ML</h3>
+                <p class="duration">Jun 2024 - May 2025 | Young Research Fellow, EHEP Lab, IIT Madras</p>
+                <ul>
+                    <li>Investigated the **"dead cone effect"** in QCD by classifying tracks originating from b-hadron decays within b-jets.</li>
+                    <li>Engineered a custom **Graph Neural Network (GNN)** classifier, treating jet constituents as a point cloud for relational data capture.</li>
+                    <li>Managed an end-to-end deep learning pipeline: large-scale **CMSSW data processing**, feature engineering, and **distributed training**.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Firmware Development</h3>
+                <p class="duration">Nov 2024 - May 2025 | HEP Lab, IIT Madras</p>
+                <ul>
+                    <li>Contributed to the hardware R&D for the next-generation **ATLAS experiment's** readout chain.</li>
+                    <li>Developed firmware for high-speed communication between the **MALTA pixel sensor** and an **FPGA**.</li>
+                    <li>Successfully ported and validated existing firmware from a Xilinx KC705 board to an advanced **AXKU040 (Kintex Ultrascale)** board using the **Vivado Design Suite**.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Heavy Ion Physics Analysis</h3>
+                <p class="duration">Sep 2024 - Jan 2025 | EHEP Lab, IIT Madras</p>
+                <ul>
+                    <li>Feasibility study for measuring the $\Lambda_{b}$ baryon in heavy-ion collisions, key to understanding **quark-gluon plasma**.</li>
+                    <li>Developed a custom **Pythia8 generator fragment** to simulate the $\Lambda_{b}\rightarrow\Lambda^{0}(p\pi^{-})+J/\psi(\mu^{+}\mu^{-})$ decay channel within **CMSSW**.</li>
+                    <li>Executed large-scale Monte Carlo production, generating over 1 million rare signal events on the **Grid** using **CRAB3**.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <section id="publications">
+        <h2>Posters and Publications</h2>
+        <ul class="pub-list">
+             <li class="pub-item">
+                <p class="pub-title">[1] A novel track finding algorithm to identify b-hadrons in b-jets using FusionNet: a geometric deep learning model.</p>
+                <p class="pub-venue">CMS Collaboration, CMS-DP-2025-035, 2025. (Link placeholder)</p>
+            </li>
+            <li class="pub-item">
+                <p class="pub-title">[2] B-hadron identification in b-jets using a novel deep learning technique in pp and PbPb collisions in CMS.</p>
+                <p class="pub-venue">Poster at European Committee for Al in Fundamental Physics (EuCAIF) Conference, Sardinia, Italy, 2025.</p>
+            </li>
+            <li class="pub-item">
+                <p class="pub-title">[3] B-hadron identification in b-jets using a novel deep learning technique in pp and PbPb collisions in CMS.</p>
+                <p class="pub-venue">Poster at All India Research Scholars Summit (AIRSS), IIT Madras, India, 2025.</p>
+            </li>
+            <li class="pub-item">
+                <p class="pub-title">[4] Galaxy Collision Simulation with Adaptive N-body Integration.</p>
+                <p class="pub-venue">Poster at CFI Open House 2024, IIT Madras, India.</p>
+            </li>
+        </ul>
+    </section>
 
-    <section id="projects">
-        <h2>Notable Projects</h2>
-        <div class="card-container">
-            <div class="card">
-                <h3>AstroStellar (N-Body Simulation)</h3>
-                <p class="duration">Jun 2023 - Mar 2024 | Centre for Innovation (CFI), IIT Madras</p>
-                <ul>
-                    <li>Developed a high-performance C++ application to model gravitational N-body interactions.</li>
-                    <li>Implemented and compared numerical integrators (Leapfrog, Runge-Kutta) for accuracy and efficiency.</li>
-                    <li>Significantly boosted performance by parallelizing the codebase, enabling simulations of over 1 Million particles.</li>
-                </ul>
-                <button class="project-learn-more" data-modal-id="modal-nbody">Learn More</button>
-            </div>
-            <div class="card">
-                <h3>Speaker and LED Composite System</h3>
-                <p class="duration">Jan 2024 - May 2024 | Analog Systems Course Project, IIT Madras</p>
-                <ul>
-                    <li>Designed and simulated a complex analog system to synchronize an LED light show with an audio input.</li>
-                    <li>Integrated multiple analog sub-circuits, including filters, a peak detector, and a Class-D audio amplifier.</li>
-                    <li>Achieved top marks for system design, validation, and performance in LTSpice simulation.</li>
-                </ul>
-                <button class="project-learn-more" data-modal-id="modal-analog">Learn More</button>
-            </div>
-        </div>
-    </section>
+    <section id="projects">
+        <h2>Notable Projects</h2>
+        <div class="card-container">
+            <div class="card">
+                <h3>AstroStellar (N-Body Simulation)</h3>
+                <p class="duration">Jun 2023 - Mar 2024 | Centre for Innovation (CFI), IIT Madras</p>
+                <ul>
+                    <li>Developed a high-performance **C++ application** to model gravitational **N-body interactions**.</li>
+                    <li>Implemented numerical integrators (**Leapfrog, Runge-Kutta**) for accuracy comparison.</li>
+                    <li>Parallelized codebase using **OpenMP**, enabling simulations of over **1 Million particles**.</li>
+                </ul>
+                <button class="project-learn-more" data-modal-id="modal-nbody">Learn More</button>
+            </div>
+            <div class="card">
+                <h3>Speaker and LED Composite System</h3>
+                <p class="duration">Jan 2024 - May 2024 | Analog Systems Course Project, IIT Madras</p>
+                <ul>
+                    <li>Designed and simulated an analog system to synchronize an **LED light show** with audio input.</li>
+                    <li>Integrated sub-circuits: active filters, peak detector, and a **Class-D audio amplifier**.</li>
+                    <li>Design, validation, and performance achieved **top class marks** in **LTSpice** simulation.</li>
+                </ul>
+                <button class="project-learn-more" data-modal-id="modal-analog">Learn More</button>
+            </div>
+        </div>
+    </section>
 
-    <section id="skills">
-        <h2>Technical Skills</h2>
-        <div class="skills-grid">
-            <div class="skill-category">
-                <h3>Languages & Frameworks</h3>
-                <div class="skills-container">
-                    <span class="skill-badge">C/C++</span><span class="skill-badge">Python</span><span class="skill-badge">MATLAB</span>
-                    <span class="skill-badge">Bash/zsh</span><span class="skill-badge">LATEX</span><span class="skill-badge">VHDL</span>
-                </div>
-            </div>
-            <div class="skill-category">
-                <h3>HEP & Data Science</h3>
-                <div class="skills-container">
-                     <span class="skill-badge">PyTorch</span><span class="skill-badge">Keras</span><span class="skill-badge">Scikit-Learn</span>
-                     <span class="skill-badge">Pandas</span><span class="skill-badge">Numpy</span><span class="skill-badge">ROOT</span>
-                     <span class="skill-badge">uproot</span><span class="skill-badge">CMSSW</span>
-                </div>
-            </div>
-            <div class="skill-category">
-                <h3>Hardware & Tools</h3>
-                <div class="skills-container">
-                    <span class="skill-badge">FPGA</span><span class="skill-badge">Vivado</span><span class="skill-badge">LTSpice</span>
-                    <span class="skill-badge">KiCAD</span><span class="skill-badge">Git & GitHub</span><span class="skill-badge">Linux</span>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section id="certifications">
-    <h2>Licenses & Certifications</h2>
-    <div class="card-container">
+        <section id="gallery">
+        <h2>Research Gallery & Visuals</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item">
+                <img src="https://via.placeholder.com/600x400?text=LLR+Ecole+Polytechnique+Internship+Photo" alt="LLR Internship Lab Photo">
+                <div class="gallery-caption">
+                    <p>LLR, École Polytechnique, France. Focus on GNN development for CMS vertexing (Summer 2025).</p>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://via.placeholder.com/600x450?text=ATLAS+Kintex+Ultrascale+FPGA+Setup" alt="FPGA Firmware Setup">
+                <div class="gallery-caption">
+                    <p>ATLAS Firmware R&D: AXKU040 Kintex Ultrascale FPGA setup for MALTA pixel sensor readout chain.</p>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://via.placeholder.com/600x350?text=Dead+Cone+Effect+GNN+Input+Visualization" alt="Dead Cone GNN Visualization">
+                <div class="gallery-caption">
+                    <p>Visualization of jet constituents as a point cloud, input for the GNN classifier used in b-hadron identification.</p>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="https://via.placeholder.com/600x500?text=IITM+EHEP+Lab+Experiment+Setup" alt="IITM EHEP Lab Setup">
+                <div class="gallery-caption">
+                    <p>Experimental setup within the EHEP Lab at IIT Madras, relevant to detector simulation and testing.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+        <section id="skills">
+        <h2>Technical Skills</h2>
+        <div class="skills-grid">
+            <div class="skill-category">
+                <h3>Languages & Frameworks</h3>
+                <div class="skills-container">
+                    <span class="skill-badge">C/C++</span><span class="skill-badge">Python</span><span class="skill-badge">MATLAB</span>
+                    <span class="skill-badge">Bash/zsh</span><span class="skill-badge">LATEX</span><span class="skill-badge">VHDL</span>
+                </div>
+            </div>
+            <div class="skill-category">
+                <h3>HEP & Data Science</h3>
+                <div class="skills-container">
+                     <span class="skill-badge">PyTorch</span><span class="skill-badge">Keras</span><span class="skill-badge">Scikit-Learn</span>
+                     <span class="skill-badge">Pandas</span><span class="skill-badge">Numpy</span><span class="skill-badge">ROOT</span>
+                     <span class="skill-badge">uproot</span><span class="skill-badge">CMSSW</span>
+                </div>
+            </div>
+            <div class="skill-category">
+                <h3>Hardware & Tools</h3>
+                <div class="skills-container">
+                    <span class="skill-badge">FPGA</span><span class="skill-badge">Vivado</span><span class="skill-badge">LTSpice</span>
+                    <span class="skill-badge">KiCAD</span><span class="skill-badge">Git & GitHub</span><span class="skill-badge">Linux</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="certifications">
+    <h2>Licenses & Certifications</h2>
+    <div class="card-container">
 
-        <div class="card">
-            <h3>Machine Learning Specialization</h3>
-            <p class="duration">Issued Dec 2023 | Stanford Online</p>
-            <ul>
-                <li>Credential ID: 63ZDD4NQ68HL</li>
-                <li>Skills: Machine Learning, Supervised Learning, Neural Networks, Unsupervised Learning</li>
-            </ul>
-            <a class="project-learn-more" href="https://www.coursera.org/account/accomplishments/specialization/63ZDD4NQ68HL" target="_blank" rel="noopener noreferrer">Show Credential</a>
-        </div>
+        <div class="card">
+            <h3>Machine Learning Specialization</h3>
+            <p class="duration">Issued Dec 2023 | Stanford Online</p>
+            <ul>
+                <li>Credential ID: 63ZDD4NQ68HL</li>
+                <li>Skills: Machine Learning, Supervised Learning, Neural Networks, Unsupervised Learning</li>
+            </ul>
+            <a class="project-learn-more" href="https://www.coursera.org/account/accomplishments/specialization/63ZDD4NQ68HL" target="_blank" rel="noopener noreferrer">Show Credential</a>
+        </div>
 
-        <div class="card">
-            <h3>Introduction to Aerospace Engineering: Astronautics and Human Spaceflight</h3>
-            <p class="duration">Issued Dec 2021 | MITx Courses</p>
-            <ul>
-                <li>Skills: Astrophysics, Rocket Technology, Aeronautics, Propulsion, Astronautics</li>
-            </ul>
-        </div>
+        <div class="card">
+            <h3>Introduction to Aerospace Engineering: Astronautics and Human Spaceflight</h3>
+            <p class="duration">Issued Dec 2021 | MITx Courses</p>
+            <ul>
+                <li>Skills: Astrophysics, Rocket Technology, Aeronautics, Propulsion, Astronautics</li>
+            </ul>
+        </div>
 
-        <div class="card">
-            <h3>CS50: Introduction to Computer Science</h3>
-            <p class="duration">Issued Sep 2021 | Harvard University</p>
-            <ul>
-                <li>Skills: C, Python, CSS, HTML5, JavaScript, Java, Scratch, Visual Studio</li>
-            </ul>
-        </div>
+        <div class="card">
+            <h3>CS50: Introduction to Computer Science</h3>
+            <p class="duration">Issued Sep 2021 | Harvard University</p>
+            <ul>
+                <li>Skills: C, Python, CSS, HTML5, JavaScript, Java, Scratch, Visual Studio</li>
+            </ul>
+        </div>
 
-        <div class="card">
-            <h3>The Fundamentals of Digital Marketing</h3>
-            <p class="duration">Google Digital Garage</p>
-            <ul>
-                <li>Credential ID: ZMS ZMK KY2</li>
-                <li>Skills: Digital Marketing, Social Media Marketing, Online Marketing, Strategy</li>
-            </ul>
-            <a class="project-learn-more" href="https://learndigital.withgoogle.com/digitalgarage/validate-certificate-code" target="_blank" rel="noopener noreferrer">Show Credential</a>
-        </div>
+        <div class="card">
+            <h3>The Fundamentals of Digital Marketing</h3>
+            <p class="duration">Google Digital Garage</p>
+            <ul>
+                <li>Credential ID: ZMS ZMK KY2</li>
+                <li>Skills: Digital Marketing, Social Media Marketing, Online Marketing, Strategy</li>
+            </ul>
+            <a class="project-learn-more" href="https://learndigital.withgoogle.com/digitalgarage/validate-certificate-code" target="_blank" rel="noopener noreferrer">Show Credential</a>
+        </div>
 
-    </div>
+    </div>
 </section>
 
 
-    <section id="achievements">
-        <h2>Awards & Accomplishments</h2>
-        <div class="card-container">
-            <div class="card"><h3>RPIT Fellowship</h3><p>Awarded a competitive, fully-funded 3-month research internship at LLR, École Polytechnique, France.</p></div>
-            <div class="card"><h3>Young Research Fellow</h3><p>Selected as one of only 17 fellows from a pool of 300+ students for funded undergraduate research at IIT Madras.</p></div>
-            <div class="card"><h3>Top 5 Department Rank</h3><p>Consistently maintained a position in the top 5 of the Engineering Physics Department at IIT Madras based on academic performance.</p></div>
-            <div class="card"><h3>JEE Advanced Rank</h3><p>Secured a rank in the top 5% nationally among 150,000 candidates in the highly competitive JEE Advanced examination.</p></div>
-            <div class="card"><h3>JEE Mains Rank</h3><p>Ranked in the top 1% nationally among over 1 million candidates in the JEE Mains examination.</p></div>
-            <div class="card"><h3>CMS Member</h3><p>Inducted as an official member of the Compact Muon Solenoid (CMS) Collaboration at CERN since 2024.</p></div>
-        </div>
-    </section>
+    <section id="achievements">
+        <h2>Awards & Accomplishments</h2>
+        <div class="card-container">
+            <div class="card"><h3>RPIT Fellowship</h3><p>Awarded a competitive, fully-funded 3-month research internship at LLR, École Polytechnique, France.</p></div>
+            <div class="card"><h3>Young Research Fellow</h3><p>Selected as one of only 17 fellows from a pool of 300+ students for funded undergraduate research at IIT Madras.</p></div>
+            <div class="card"><h3>Top 5 Department Rank</h3><p>Consistently maintained a position in the top 5 of the Engineering Physics Department at IIT Madras based on academic performance.</p></div>
+            <div class="card"><h3>JEE Advanced Rank</h3><p>Secured a rank in the top 5% nationally among 150,000 candidates in the highly competitive JEE Advanced examination.</p></div>
+            <div class="card"><h3>JEE Mains Rank</h3><p>Ranked in the top 1% nationally among over 1 million candidates in the JEE Mains examination.</p></div>
+            <div class="card"><h3>CMS Member</h3><p>Inducted as an official member of the Compact Muon Solenoid (CMS) Collaboration at CERN since 2024.</p></div>
+        </div>
+    </section>
 
 </div>
 
 <div id="modal-nbody" class="modal">
-    <div class="modal-content">
-        <span class="modal-close">&times;</span>
-        <div class="modal-body">
-            <div class="modal-text">
-                <h3>AstroStellar (N-Body Simulation)</h3>
-                <p>
-                    This project involved creating a high-performance simulation of N-body gravitational interactions, primarily aimed at modeling galaxy collisions. The core of the simulation was built in C++ for maximum performance. I implemented and tested several numerical integration schemes, including the energy-conserving Leapfrog method and the higher-accuracy Runge-Kutta (RK4) method, to solve the Hamiltonian dynamics of the system.
-                    <br><br>
-                    A key achievement was the parallelization of the force calculation algorithm, which is the primary computational bottleneck ($O(N^2)$ complexity). By leveraging multi-threading, the simulation could scale to handle over one million particles, allowing for detailed and visually compelling astrophysical scenarios. The project was presented at the CFI Open House, showcasing a simulated collision between two galaxy-like structures.
-                </p>
-                <p><span class="modal-tech">Technologies:</span> C++, OpenMP, Gnuplot, Python (for visualization), Git</p>
-                <div class="modal-link">
-                    <a href="#" target="_blank" rel="noopener noreferrer">View on GitHub</a>
-                </div>
-            </div>
-            <div class="modal-image">
-                <img src="https://via.placeholder.com/800x600?text=Galaxy+Collision+Snapshot" alt="N-Body Simulation">
-            </div>
-        </div>
-    </div>
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <div class="modal-body">
+            <div class="modal-text">
+                <h3>AstroStellar (N-Body Simulation)</h3>
+                <p>
+                    High-performance C++ application modeling N-body gravitational interactions for galaxy collision simulation. Implemented and benchmarked numerical integrators (Leapfrog, Runge-Kutta) for solving Hamiltonian dynamics. **Parallelized force calculation via OpenMP**, achieving scalability to over one million particles. Presented at the CFI Open House.
+                </p>
+                <p><span class="modal-tech">Technologies:</span> C++, OpenMP, Gnuplot, Python (for visualization), Git</p>
+                <div class="modal-link">
+                    <a href="#" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+                </div>
+            </div>
+            <div class="modal-image">
+                <img src="https://via.placeholder.com/800x600?text=Galaxy+Collision+Snapshot" alt="N-Body Simulation">
+            </div>
+        </div>
+    </div>
 </div>
 
 <div id="modal-analog" class="modal">
-    <div class="modal-content">
-        <span class="modal-close">&times;</span>
-        <div class="modal-body">
-            <div class="modal-text">
-                <h3>Speaker and LED Composite System</h3>
-                <p>
-                    As a final project for my Analog Systems course, I designed a complete system to create a sound-reactive light show. The system takes an audio signal as input and processes it to drive both a speaker and a synchronized array of LEDs.
-                    <br><br>
-                    The design involved several stages: a DC-DC buck converter for efficient power management, active band-pass filters to separate the audio into different frequency channels (bass, mid, treble), peak detectors to measure the amplitude of each channel, and a high-efficiency Class-D audio amplifier to drive the main speaker. The entire circuit was designed, laid out, and rigorously tested within the LTSpice simulation environment, demonstrating robust and accurate performance, which earned the highest grade in the class.
-                </p>
-                <p><span class="modal-tech">Technologies:</span> LTSpice, Circuit Design, PCB Layout (KiCAD), Class-D Amplifiers, Active Filters</p>
-                 <div class="modal-link">
-                    <a href="#" target="_blank" rel="noopener noreferrer">View Report</a>
-                </div>
-            </div>
-            <div class="modal-image">
-                <img src="https://via.placeholder.com/800x600?text=LTSpice+Circuit+Diagram" alt="Analog System Diagram">
-            </div>
-        </div>
-    </div>
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <div class="modal-body">
+            <div class="modal-text">
+                <h3>Speaker and LED Composite System</h3>
+                <p>
+                    Designed a sound-reactive light show system for the Analog Systems course. The circuit processes an audio signal to drive both a speaker and synchronized LEDs. Implemented a DC-DC buck converter, active band-pass filters (bass, mid, treble), peak detectors, and a high-efficiency Class-D audio amplifier. All stages were rigorously simulated in **LTSpice** and achieved the highest project grade.
+                </p>
+                <p><span class="modal-tech">Technologies:</span> LTSpice, Circuit Design, PCB Layout (KiCAD), Class-D Amplifiers, Active Filters</p>
+                 <div class="modal-link">
+                    <a href="#" target="_blank" rel="noopener noreferrer">View Report</a>
+                </div>
+            </div>
+            <div class="modal-image">
+                <img src="https://via.placeholder.com/800x600?text=LTSpice+Circuit+Diagram" alt="Analog System Diagram">
+            </div>
+        </div>
+    </div>
 </div>
 <footer>
-    <div class="social-links">
-        <a href="mailto:ep22b045@smail.iitm.ac.in" aria-label="Email"><i class="fas fa-envelope"></i></a>
-        <a href="https://github.com/princek880" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
-        <a href="https://linkedin.com/in/prince-kumar-3a11391b1" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-    </div>
-    <p>&copy; 2025 Prince Kumar. All rights reserved.</p>
-    <p>Designed with passion and AI.</p>
+    <div class="social-links">
+        <a href="mailto:ep22b045@smail.iitm.ac.in" aria-label="Email"><i class="fas fa-envelope"></i></a>
+        <a href="https://github.com/princek880" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        <a href="https://linkedin.com/in/prince-kumar-3a11391b1" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+    </div>
+    <p>&copy; 2025 Prince Kumar. All rights reserved.</p>
 </footer>
 
 <script>
-    // --- Scroll Animations ---
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, {
-        threshold: 0.1
-    });
+    // --- Scroll Animations ---
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
 
-    const sections = document.querySelectorAll('section');
-    sections.forEach(section => {
-        observer.observe(section);
-    });
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => {
+        observer.observe(section);
+    });
 
-    // --- Modal Logic ---
-    document.addEventListener('DOMContentLoaded', () => {
-        // Get all learn more buttons
-        const learnMoreButtons = document.querySelectorAll('.project-learn-more');
-        
-        learnMoreButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const modalId = button.getAttribute('data-modal-id');
-                const modal = document.getElementById(modalId);
-                if (modal) {
-                    modal.classList.add('show');
-                }
-            });
-        });
+    // --- Modal Logic ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Get all learn more buttons
+        const learnMoreButtons = document.querySelectorAll('.project-learn-more');
+        
+        learnMoreButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const modalId = button.getAttribute('data-modal-id');
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.add('show');
+                }
+            });
+        });
 
-        // Get all close buttons
-        const closeButtons = document.querySelectorAll('.modal-close');
-        
-        closeButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const modal = button.closest('.modal');
-                if (modal) {
-                    modal.classList.remove('show');
-                }
-            });
-        });
+        // Get all close buttons
+        const closeButtons = document.querySelectorAll('.modal-close');
+        
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const modal = button.closest('.modal');
+                if (modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        });
 
-        // Close modal on outside click
-        window.addEventListener('click', (event) => {
-            if (event.target.classList.contains('modal')) {
-                event.target.classList.remove('show');
-            }
-        });
-    });
+        // Close modal on outside click
+        window.addEventListener('click', (event) => {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+            }
+        });
+    });
 </script>
 
 </body>

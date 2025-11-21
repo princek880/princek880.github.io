@@ -64,6 +64,7 @@
     // --- Persistence Helper ---
     const STORAGE_KEY = 'gradtrack_data';
     const TODO_KEY = 'gradtrack_todos';
+    const RECS_KEY = 'gradtrack_recommenders';
 
     const DefaultChecklist = [
         { id: 'account', text: 'Portal Account', completed: false },
@@ -79,10 +80,7 @@
             const data = localStorage.getItem(STORAGE_KEY);
             if (!data) return [];
             let parsed = JSON.parse(data);
-            
-            // Data Migration Logic
             return parsed.map(app => {
-                // Convert old object checklist to new array format if needed
                 if (app.checklist && !Array.isArray(app.checklist)) {
                     const newChecklist = DefaultChecklist.map(item => ({
                         ...item,
@@ -90,10 +88,7 @@
                     }));
                     return { ...app, checklist: newChecklist };
                 }
-                // Ensure checklist exists if missing
-                if (!app.checklist) {
-                    return { ...app, checklist: [...DefaultChecklist] };
-                }
+                if (!app.checklist) return { ...app, checklist: [...DefaultChecklist] };
                 return app;
             });
         } catch (e) {
@@ -102,13 +97,106 @@
         }
     };
 
-    const saveData = (data) => {
+    const loadRecs = () => {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        } catch (e) {
-            console.error("Failed to save data", e);
-        }
-    };
+            const data = localStorage.getItem(RECS_KEY);
+            return data ? JSON.parse(data) : [];
+        } catch(e) { return []; }
+    }
+
+    const saveData = (data) => localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    const saveRecs = (data) => localStorage.setItem(RECS_KEY, JSON.stringify(data));
+
+    // --- LOR Matrix Table ---
+    const LORTable = ({ apps, recommenders, onAddRecommender, onDeleteRecommender, onUpdateApp }) => {
+        const [newRecName, setNewRecName] = useState("");
+
+        const handleAdd = () => {
+            if (newRecName.trim()) {
+                onAddRecommender(newRecName.trim());
+                setNewRecName("");
+            }
+        };
+
+        return (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-in fade-in duration-300">
+                <div className="p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gradient-to-r from-gray-50 to-white">
+                    <div>
+                        <h3 className="font-bold text-gray-800 text-lg">Recommendation Matrix</h3>
+                        <p className="text-xs text-gray-500 mt-1">Track which professor has submitted for which university.</p>
+                    </div>
+                    <div className="flex gap-2 w-full sm:w-auto">
+                        <input 
+                            value={newRecName} 
+                            onChange={e => setNewRecName(e.target.value)} 
+                            placeholder="Professor Name"
+                            className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex-1"
+                            onKeyDown={e => e.key === 'Enter' && handleAdd()}
+                        />
+                        <button onClick={handleAdd} className="bg-gray-900 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-black transition-colors">
+                            Add Prof
+                        </button>
+                    </div>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                        <thead>
+                            <tr className="bg-gray-50 border-b border-gray-200">
+                                <th className="px-6 py-4 font-semibold text-gray-600 w-1/3">University</th>
+                                {recommenders.length === 0 && <th className="px-6 py-4 text-gray-400 italic font-normal text-center">No professors added yet</th>}
+                                {recommenders.map(rec => (
+                                    <th key={rec.id} className="px-6 py-4 font-semibold text-gray-700 text-center relative group min-w-[120px] border-l border-gray-100">
+                                        <div className="flex flex-col items-center">
+                                            <span>{rec.name}</span>
+                                            <button 
+                                                onClick={() => onDeleteRecommender(rec.id)}
+                                                className="text-gray-300 hover:text-red-500 absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                title="Remove Professor"
+                                            >
+                                                <Icons.X />
+                                            </button>
+                                        </div>
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {apps.length === 0 && (
+                                <tr><td colSpan={recommenders.length + 1} className="px-6 py-8 text-center text-gray-400">No universities added yet. Go to "All" to add one.</td></tr>
+                            )}
+                            {apps.map(app => (
+                                <tr key={app.id} className="hover:bg-gray-50 transition-colors">
+                                    <td className="px-6 py-4">
+                                        <div className="font-medium text-gray-900">{app.university}</div>
+                                        <div className="text-xs text-gray-500">{app.program}</div>
+                                    </td>
+                                    {recommenders.map(rec => (
+                                        <td key={rec.id} className="px-6 py-4 text-center border-l border-gray-100">
+                                            <label className="inline-flex items-center cursor-pointer justify-center w-full h-full">
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={app.lor_status?.[rec.id] || false}
+                                                    onChange={() => {
+                                                        const currentStatus = app.lor_status || {};
+                                                        const newStatus = { ...currentStatus, [rec.id]: !currentStatus[rec.id] };
+                                                        onUpdateApp(app.id, { ...app, lor_status: newStatus });
+                                                    }}
+                                                    className="hidden peer"
+                                                />
+                                                <div className="w-6 h-6 rounded border-2 border-gray-200 peer-checked:border-emerald-500 peer-checked:bg-emerald-500 text-white flex items-center justify-center transition-all">
+                                                    {app.lor_status?.[rec.id] && <Icons.CheckSquare />} 
+                                                </div>
+                                            </label>
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        )
+    }
 
     // --- Daily To-Do Component ---
     const DailyToDo = () => {
@@ -618,6 +706,7 @@
     // --- Main App Component ---
     const App = () => {
         const [apps, setApps] = useState([]);
+        const [recommenders, setRecommenders] = useState([]);
         const [isModalOpen, setIsModalOpen] = useState(false);
         const [filterStatus, setFilterStatus] = useState("All");
         const [sortBy, setSortBy] = useState("deadline"); // deadline, progress, name
@@ -629,8 +718,8 @@
 
         // Load data on mount
         useEffect(() => {
-            const storedApps = loadData();
-            setApps(storedApps);
+            setApps(loadData());
+            setRecommenders(loadRecs());
         }, []);
 
         // Helper to update state and localStorage
@@ -638,6 +727,11 @@
             setApps(newApps);
             saveData(newApps);
         };
+
+        const updateRecommendersState = (newRecs) => {
+            setRecommenders(newRecs);
+            saveRecs(newRecs);
+        }
 
         const handleAddApp = () => {
             if (!uniName || !programName) return;
@@ -650,6 +744,7 @@
                 status: "Not Started",
                 professors: [],
                 checklist: [...DefaultChecklist],
+                lor_status: {},
                 createdAt: new Date()
             };
 
@@ -659,6 +754,17 @@
             setDeadline("");
             setIsModalOpen(false);
         };
+
+        const handleAddRecommender = (name) => {
+            const newRec = { id: Date.now(), name };
+            updateRecommendersState([...recommenders, newRec]);
+        }
+
+        const handleDeleteRecommender = (id) => {
+            if(confirm("Remove this professor? This will delete tracking for all universities.")) {
+                updateRecommendersState(recommenders.filter(r => r.id !== id));
+            }
+        }
 
         const updateApp = (id, updatedApp) => {
             const newApps = apps.map(app => app.id === id ? updatedApp : app);
@@ -725,7 +831,7 @@
                 });
             }
 
-            if (filterStatus === "All") return sorted;
+            if (filterStatus === "All" || filterStatus === "LOR") return sorted;
             return sorted.filter(a => a.status === filterStatus);
         }, [apps, filterStatus, sortBy]);
 
@@ -758,7 +864,7 @@
                 <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full sm:w-auto">
-                            {["All", "Not Started", "In Progress", "Submitted", "Decision"].map(status => (
+                            {["All", "Not Started", "In Progress", "Submitted", "Decision", "LOR"].map(status => (
                                 <button
                                     key={status}
                                     onClick={() => setFilterStatus(status)}
@@ -773,19 +879,21 @@
                             ))}
                         </div>
                         
-                        <div className="flex items-center gap-2 text-sm text-gray-500 bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm">
-                            <Icons.SortAsc />
-                            <span className="hidden sm:inline">Sort by:</span>
-                            <select 
-                                value={sortBy} 
-                                onChange={(e) => setSortBy(e.target.value)}
-                                className="bg-transparent outline-none font-medium text-gray-700 cursor-pointer"
-                            >
-                                <option value="deadline">Deadline</option>
-                                <option value="progress">Progress</option>
-                                <option value="name">Name (A-Z)</option>
-                            </select>
-                        </div>
+                        {filterStatus !== "LOR" && (
+                            <div className="flex items-center gap-2 text-sm text-gray-500 bg-white px-3 py-1.5 rounded-full border border-gray-200 shadow-sm">
+                                <Icons.SortAsc />
+                                <span className="hidden sm:inline">Sort by:</span>
+                                <select 
+                                    value={sortBy} 
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="bg-transparent outline-none font-medium text-gray-700 cursor-pointer"
+                                >
+                                    <option value="deadline">Deadline</option>
+                                    <option value="progress">Progress</option>
+                                    <option value="name">Name (A-Z)</option>
+                                </select>
+                            </div>
+                        )}
                     </div>
 
                     {apps.length === 0 ? (
@@ -799,7 +907,15 @@
                         </div>
                     ) : (
                         <>
-                            {filterStatus === "All" ? (
+                            {filterStatus === "LOR" ? (
+                                <LORTable 
+                                    apps={apps} 
+                                    recommenders={recommenders}
+                                    onAddRecommender={handleAddRecommender}
+                                    onDeleteRecommender={handleDeleteRecommender}
+                                    onUpdateApp={updateApp}
+                                />
+                            ) : filterStatus === "All" ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {filteredApps.map(app => (
                                         <AppCard key={app.id} app={app} onUpdate={updateApp} onDelete={deleteApp} />

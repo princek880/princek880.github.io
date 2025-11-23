@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MaterialMaster - Local Storage Edition</title>
+    <title>MaterialMaster - Percentage Formula Edition</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -193,51 +193,83 @@
         );
 
         const FormulasView = ({ materials, products, isAdding, setIsAdding, newProd, setNewProd, handleAdd, handleDelete }) => {
-            const [tempIngredient, setTempIngredient] = useState({ materialId: '', qty: 1 });
+            const [tempIngredient, setTempIngredient] = useState({ materialId: '', percentage: 10 });
+            
+            const currentTotal = newProd.ingredients.reduce((acc, ing) => acc + Number(ing.percentage), 0);
+            const isValid = Math.abs(currentTotal - 100) < 0.1 && newProd.name && newProd.unitSize > 0;
+
             const addIngredientToProduct = () => {
-                if (!tempIngredient.materialId) return;
+                if (!tempIngredient.materialId || tempIngredient.percentage <= 0) return;
                 const mat = materials.find(m => m.id === tempIngredient.materialId);
+                // Prevent going over 100
+                if (currentTotal + Number(tempIngredient.percentage) > 100) {
+                    alert(`Cannot add ${tempIngredient.percentage}%. Remaining capacity is ${100 - currentTotal}%.`);
+                    return;
+                }
                 setNewProd(prev => ({ ...prev, ingredients: [...prev.ingredients, { ...tempIngredient, name: mat.name, unit: mat.unit }] }));
-                setTempIngredient({ materialId: '', qty: 1 });
+                setTempIngredient({ materialId: '', percentage: 10 });
             };
+
             return (
                 <div className="space-y-6">
-                    <div className="flex justify-between items-end no-print"><div><h2 className="text-2xl font-bold text-slate-800">Products</h2><p className="text-slate-500">Recipes & Pricing</p></div><Button onClick={() => setIsAdding(true)} icon={Plus}>Create Product</Button></div>
+                    <div className="flex justify-between items-end no-print"><div><h2 className="text-2xl font-bold text-slate-800">Products</h2><p className="text-slate-500">Recipes (Percentages) & Pricing</p></div><Button onClick={() => setIsAdding(true)} icon={Plus}>Create Product</Button></div>
                     {isAdding && (
                         <Card title="New Product">
                             <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="block text-sm font-medium mb-1">Name</label><input className="w-full border p-2 rounded" value={newProd.name} onChange={e => setNewProd({...newProd, name: e.target.value})} placeholder="Product Name" /></div>
-                                    <div><label className="block text-sm font-medium mb-1">Price</label><input type="number" className="w-full border p-2 rounded" value={newProd.sellingPrice} onChange={e => setNewProd({...newProd, sellingPrice: e.target.value})} /></div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div><label className="block text-sm font-medium mb-1">Product Name</label><input className="w-full border p-2 rounded" value={newProd.name} onChange={e => setNewProd({...newProd, name: e.target.value})} placeholder="e.g. Concrete Mix" /></div>
+                                    <div><label className="block text-sm font-medium mb-1">Selling Price</label><input type="number" className="w-full border p-2 rounded" value={newProd.sellingPrice} onChange={e => setNewProd({...newProd, sellingPrice: e.target.value})} placeholder="0.00" /></div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Total Material / Unit</label>
+                                        <input type="number" className="w-full border p-2 rounded" value={newProd.unitSize} onChange={e => setNewProd({...newProd, unitSize: e.target.value})} placeholder="e.g. 10 (for 10kg/unit)" />
+                                        <p className="text-xs text-slate-400 mt-1">Total weight/volume of raw material to make 1 product unit.</p>
+                                    </div>
                                 </div>
                                 <div className="p-4 bg-slate-50 rounded border">
-                                    <h4 className="text-sm font-bold uppercase mb-2">Recipe</h4>
-                                    <div className="flex gap-2 mb-2">
-                                        <select className="flex-1 border p-2 rounded" value={tempIngredient.materialId} onChange={e => setTempIngredient({...tempIngredient, materialId: e.target.value})}>
-                                            <option value="">Select Material...</option>
-                                            {materials.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                                        </select>
-                                        <input type="number" className="w-20 border p-2 rounded" value={tempIngredient.qty} onChange={e => setTempIngredient({...tempIngredient, qty: e.target.value})} placeholder="Qty" />
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h4 className="text-sm font-bold uppercase">Recipe Mix</h4>
+                                        <span className={`text-sm font-bold ${currentTotal === 100 ? 'text-emerald-600' : 'text-orange-600'}`}>Total: {currentTotal}% / 100%</span>
+                                    </div>
+                                    <div className="w-full bg-slate-200 rounded-full h-2 mb-4">
+                                        <div className="bg-indigo-600 h-2 rounded-full transition-all duration-300" style={{ width: `${currentTotal}%` }}></div>
+                                    </div>
+                                    <div className="flex gap-2 mb-2 items-end">
+                                        <div className="flex-1">
+                                            <label className="block text-xs text-slate-500 mb-1">Material</label>
+                                            <select className="w-full border p-2 rounded" value={tempIngredient.materialId} onChange={e => setTempIngredient({...tempIngredient, materialId: e.target.value})}>
+                                                <option value="">Select Material...</option>
+                                                {materials.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="w-24">
+                                            <label className="block text-xs text-slate-500 mb-1">Percentage %</label>
+                                            <input type="number" className="w-full border p-2 rounded" value={tempIngredient.percentage} onChange={e => setTempIngredient({...tempIngredient, percentage: e.target.value})} placeholder="%" />
+                                        </div>
                                         <Button onClick={addIngredientToProduct} variant="secondary" icon={Plus}>Add</Button>
                                     </div>
                                     {newProd.ingredients.map((ing, i) => (
                                         <div key={i} className="flex justify-between bg-white p-2 rounded border mb-1 text-sm">
-                                            <span>{ing.qty} {ing.unit} of {ing.name}</span>
+                                            <span><strong>{ing.percentage}%</strong> {ing.name}</span>
                                             <button onClick={() => setNewProd(prev => ({...prev, ingredients: prev.ingredients.filter((_, idx) => idx !== i)}))} className="text-red-500">&times;</button>
                                         </div>
                                     ))}
                                 </div>
-                                <div className="flex justify-end gap-2"><Button variant="secondary" onClick={() => setIsAdding(false)}>Cancel</Button><Button onClick={handleAdd} icon={Save}>Save</Button></div>
+                                <div className="flex justify-end gap-2">
+                                    <Button variant="secondary" onClick={() => setIsAdding(false)}>Cancel</Button>
+                                    <Button onClick={handleAdd} icon={Save} disabled={!isValid}>Save Product</Button>
+                                </div>
+                                {!isValid && <p className="text-right text-xs text-red-500">Ensure total is 100% and Unit Size is set.</p>}
                             </div>
                         </Card>
                     )}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{products.map(prod => (
                         <Card key={prod.id} title={prod.name} action={<button onClick={() => handleDelete(prod.id)} className="text-slate-400 hover:text-red-600 no-print"><Trash2 size={16}/></button>}>
                             <div className="space-y-2">
+                                <div className="flex justify-between border-b pb-2"><span className="text-slate-500 text-sm">Unit Size</span><span className="font-bold text-slate-700">{prod.unitSize || 1} units</span></div>
                                 <div className="flex justify-between border-b pb-2"><span className="text-slate-500 text-sm">Price</span><span className="font-bold text-emerald-600">{formatCurrency(prod.sellingPrice)}</span></div>
-                                <div className="flex justify-between border-b pb-2"><span className="text-slate-500 text-sm">Stock</span><span className="font-bold text-slate-800">{prod.stock || 0} units</span></div>
-                                <p className="text-xs text-slate-400 uppercase font-bold mt-2">Ingredients</p>
-                                <ul className="text-sm text-slate-600 space-y-1">{prod.ingredients.map((ing, i) => <li key={i}>{ing.qty} {ing.unit} {ing.name}</li>)}</ul>
+                                <div className="flex justify-between border-b pb-2"><span className="text-slate-500 text-sm">Stock</span><span className="font-bold text-slate-800">{prod.stock || 0}</span></div>
+                                <p className="text-xs text-slate-400 uppercase font-bold mt-2">Mix Ratio</p>
+                                <ul className="text-sm text-slate-600 space-y-1">{prod.ingredients.map((ing, i) => <li key={i}>{ing.percentage}% {ing.name}</li>)}</ul>
                             </div>
                         </Card>
                     ))}</div>
@@ -258,23 +290,33 @@
                                     <option value="">Select...</option>
                                     {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                                 </select>
-                                <label className="block text-sm font-medium mb-1">Qty</label>
+                                <label className="block text-sm font-medium mb-1">Quantity to Produce</label>
                                 <input type="number" className="w-full border p-2 rounded mb-4" value={target.quantity} onChange={e => setTarget({...target, quantity: e.target.value})} />
+                                <div className="bg-slate-50 p-3 rounded text-sm text-slate-600 mb-4">
+                                    <p>Est. Output: <strong>{target.quantity} units</strong></p>
+                                    <p>Total Material: <strong>{target.quantity * (selectedProd?.unitSize || 0)} units</strong></p>
+                                </div>
                                 <Button onClick={execute} variant="success" icon={Factory} disabled={!selectedProd} className="w-full">Run</Button>
                             </Card>
                         </div>
                         <div className="lg:col-span-2">
                             {selectedProd && (
-                                <Card title="Requirements">
+                                <Card title="Material Requirements">
                                     <table className="w-full text-sm text-left">
-                                        <thead className="bg-slate-50 text-slate-500"><tr><th className="p-2">Material</th><th className="p-2">Req</th><th className="p-2">Avail</th><th className="p-2">Status</th></tr></thead>
+                                        <thead className="bg-slate-50 text-slate-500"><tr><th className="p-2">Material</th><th className="p-2">Mix %</th><th className="p-2">Req</th><th className="p-2">Avail</th><th className="p-2">Status</th></tr></thead>
                                         <tbody>{selectedProd.ingredients.map((ing, i) => {
                                             const mat = materials.find(m => m.id === ing.materialId);
-                                            const req = ing.qty * target.quantity;
+                                            // Formula: (Target Qty * Unit Size) * (Percentage / 100)
+                                            const totalMaterialNeeded = target.quantity * (selectedProd.unitSize || 1);
+                                            const req = totalMaterialNeeded * (ing.percentage / 100);
+                                            
                                             const avail = mat ? mat.stock : 0;
                                             return (
                                                 <tr key={i} className="border-b">
-                                                    <td className="p-2">{mat?.name}</td><td className="p-2">{req} {mat?.unit}</td><td className="p-2">{avail} {mat?.unit}</td>
+                                                    <td className="p-2">{mat?.name}</td>
+                                                    <td className="p-2">{ing.percentage}%</td>
+                                                    <td className="p-2">{req.toFixed(2)} {mat?.unit}</td>
+                                                    <td className="p-2">{avail} {mat?.unit}</td>
                                                     <td className="p-2 font-bold">{avail >= req ? <span className="text-emerald-600">OK</span> : <span className="text-red-600">Low</span>}</td>
                                                 </tr>
                                             )
@@ -490,7 +532,8 @@
 
             // Form States
             const [newMaterial, setNewMaterial] = useState({ name: '', unit: 'kg', stock: 0, cost: 0 });
-            const [newProduct, setNewProduct] = useState({ name: '', ingredients: [], sellingPrice: 0, stock: 0 });
+            // Added unitSize default 1, ingredients will now hold percentage
+            const [newProduct, setNewProduct] = useState({ name: '', ingredients: [], sellingPrice: 0, stock: 0, unitSize: 1 });
             const [productionTarget, setProductionTarget] = useState({ productId: '', quantity: 1 });
             const [newContact, setNewContact] = useState({ name: '', type: 'buyer', address: '', contactPerson: '', phone: '' });
 
@@ -518,7 +561,8 @@
             const handleAddProduct = () => {
                 if (!newProduct.name) return;
                 setProducts([...products, { ...newProduct, id: generateId(), sellingPrice: Number(newProduct.sellingPrice), stock: 0, createdAt: new Date().toISOString() }]);
-                setNewProduct({ name: '', ingredients: [], sellingPrice: 0, stock: 0 });
+                // Reset with unitSize 1
+                setNewProduct({ name: '', ingredients: [], sellingPrice: 0, stock: 0, unitSize: 1 });
                 setIsAddingProduct(false);
             };
 
@@ -537,18 +581,38 @@
                 if (confirm('Delete contact?')) setContacts(contacts.filter(c => c.id !== id));
             };
 
-            // Complex Logic: Production
+            // Complex Logic: Production (Percentage Based)
             const executeProduction = () => {
                 const product = products.find(p => p.id === productionTarget.productId);
                 const qty = Number(productionTarget.quantity);
                 if (!product || qty <= 0) return;
 
                 // 1. Update Materials
+                // Logic: Req = (BatchQty * UnitSize) * (Percentage/100)
                 const newMaterials = [...materials];
+                const totalMassNeeded = qty * (product.unitSize || 1);
+
+                let insufficient = false;
+                
+                // Pre-check stock
+                product.ingredients.forEach(ing => {
+                    const mat = materials.find(m => m.id === ing.materialId);
+                    if(mat) {
+                         const req = totalMassNeeded * (ing.percentage / 100);
+                         if(mat.stock < req) insufficient = true;
+                    }
+                });
+
+                if(insufficient) {
+                    alert("Insufficient stock for this batch.");
+                    return;
+                }
+
                 product.ingredients.forEach(ing => {
                     const matIndex = newMaterials.findIndex(m => m.id === ing.materialId);
                     if (matIndex > -1) {
-                        newMaterials[matIndex].stock -= (ing.qty * qty);
+                        const req = totalMassNeeded * (ing.percentage / 100);
+                        newMaterials[matIndex].stock -= req;
                     }
                 });
                 setMaterials(newMaterials);

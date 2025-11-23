@@ -43,8 +43,7 @@
         import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Configuration ---
-        const apiKey = ""; // Set by environment
-        // Use global variables if available (in the preview environment), otherwise placeholders
+        const apiKey = ""; 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
@@ -55,17 +54,15 @@
             auth = getAuth(app);
             db = getFirestore(app);
         } catch (e) {
-            console.error("Firebase Init Error (Check configuration):", e);
+            console.error("Firebase Init Error:", e);
         }
 
         const { useState, useEffect } = React;
 
-        // --- Icon Components (Mapping FontAwesome) ---
+        // --- Icons ---
         const Icon = ({ name, size = 16, className = "" }) => (
             <i className={`fas fa-${name} ${className}`} style={{ fontSize: size }}></i>
         );
-        
-        // Icon Mappings to match previous Lucide usage
         const Package = (p) => <Icon name="box" {...p} />;
         const FlaskConical = (p) => <Icon name="flask" {...p} />;
         const Factory = (p) => <Icon name="industry" {...p} />;
@@ -73,8 +70,6 @@
         const Plus = (p) => <Icon name="plus" {...p} />;
         const Trash2 = (p) => <Icon name="trash" {...p} />;
         const Save = (p) => <Icon name="floppy-disk" {...p} />;
-        const AlertCircle = (p) => <Icon name="circle-exclamation" {...p} />;
-        const CheckCircle2 = (p) => <Icon name="circle-check" {...p} />;
         const LayoutDashboard = (p) => <Icon name="chart-line" {...p} />;
         const Boxes = (p) => <Icon name="cubes" {...p} />;
         const Users = (p) => <Icon name="users" {...p} />;
@@ -83,17 +78,11 @@
         const Printer = (p) => <Icon name="print" {...p} />;
         const ArrowLeft = (p) => <Icon name="arrow-left" {...p} />;
 
-        // --- Utility Functions ---
-        const formatCurrency = (amount) => {
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0);
-        };
+        // --- Utilities ---
+        const formatCurrency = (amount) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0);
+        const formatDate = (isoString) => !isoString ? '' : new Date(isoString).toLocaleDateString();
 
-        const formatDate = (isoString) => {
-            if (!isoString) return '';
-            return new Date(isoString).toLocaleDateString();
-        };
-
-        // --- UI Components ---
+        // --- Shared Components ---
         const LoadingScreen = () => (
             <div className="flex items-center justify-center h-screen bg-slate-50 text-slate-600 font-medium">
                 <div className="flex flex-col items-center gap-4">
@@ -112,13 +101,8 @@
                 success: "bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500",
                 ghost: "bg-transparent text-slate-600 hover:bg-slate-100 focus:ring-slate-300"
             };
-
             return (
-                <button 
-                    onClick={onClick} 
-                    disabled={disabled} 
-                    className={`${baseStyle} ${variants[variant]} ${className}`}
-                >
+                <button onClick={onClick} disabled={disabled} className={`${baseStyle} ${variants[variant]} ${className}`}>
                     {IconComp && <span className="mr-2"><IconComp size={16} /></span>}
                     {children}
                 </button>
@@ -137,13 +121,395 @@
             </div>
         );
 
-        // --- Main App Component ---
+        // --- Feature Views (Defined OUTSIDE Main Component to fix focus bug) ---
+
+        const DashboardView = ({ materials, products, transactions }) => {
+            const totalMaterialValue = materials.reduce((acc, m) => acc + (m.stock * m.cost), 0);
+            const totalProductValue = products.reduce((acc, p) => acc + ((p.stock || 0) * p.sellingPrice), 0);
+            const lowStockMaterials = materials.filter(m => m.stock < 10);
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
+            const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
+            const netProfit = totalIncome - totalExpenses;
+
+            return (
+                <div className="space-y-6">
+                    <h2 className="text-2xl font-bold text-slate-800">Dashboard</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <Card title="Net Profit" className={netProfit >= 0 ? "border-l-4 border-l-emerald-500" : "border-l-4 border-l-red-500"}>
+                            <div className={`text-3xl font-bold ${netProfit >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>{formatCurrency(netProfit)}</div>
+                            <p className="text-sm text-slate-500 mt-1">Income - Expenses</p>
+                        </Card>
+                        <Card title="Inventory Value" className="border-l-4 border-l-indigo-500">
+                            <div className="text-3xl font-bold text-slate-800">{formatCurrency(totalMaterialValue + totalProductValue)}</div>
+                            <p className="text-sm text-slate-500 mt-1">Total Assets</p>
+                        </Card>
+                        <Card title="Expenses" className="border-l-4 border-l-orange-500">
+                            <div className="text-3xl font-bold text-slate-800">{formatCurrency(totalExpenses)}</div>
+                            <p className="text-sm text-slate-500 mt-1">Total Material Cost</p>
+                        </Card>
+                        <Card title="Sales" className="border-l-4 border-l-blue-500">
+                            <div className="text-3xl font-bold text-slate-800">{formatCurrency(totalIncome)}</div>
+                            <p className="text-sm text-slate-500 mt-1">Total Invoiced</p>
+                        </Card>
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <Card title="Low Stock Alerts">
+                            {lowStockMaterials.length > 0 ? (
+                                <ul className="divide-y divide-slate-100">
+                                    {lowStockMaterials.map(m => (
+                                        <li key={m.id} className="py-3 flex justify-between items-center">
+                                            <span className="font-medium text-slate-700">{m.name}</span>
+                                            <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">{m.stock} {m.unit}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : <p className="text-slate-400 italic">Stock levels healthy.</p>}
+                        </Card>
+                        <Card title="Recent Transactions">
+                            <ul className="divide-y divide-slate-100">
+                                {transactions.slice(0, 5).map(t => (
+                                    <li key={t.id} className="py-3 flex justify-between items-center">
+                                        <div>
+                                            <p className="font-medium text-slate-800 truncate max-w-[200px]">{t.description}</p>
+                                            <p className="text-xs text-slate-400">{formatDate(t.date)}</p>
+                                        </div>
+                                        <span className={`font-mono font-bold ${t.type === 'income' ? 'text-emerald-600' : 'text-red-600'}`}>
+                                            {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </Card>
+                    </div>
+                </div>
+            );
+        };
+
+        const InventoryView = ({ materials, isAdding, setIsAdding, newMat, setNewMat, handleAdd, handleUpdate, handleDelete }) => (
+            <div className="space-y-6">
+                <div className="flex justify-between items-end no-print">
+                    <div><h2 className="text-2xl font-bold text-slate-800">Raw Materials</h2><p className="text-slate-500">Inventory and Cost Management</p></div>
+                    <Button onClick={() => setIsAdding(true)} icon={Plus}>Add Material</Button>
+                </div>
+                {isAdding && (
+                    <Card title="New Material" action={<Button variant="secondary" onClick={() => setIsAdding(false)} className="!py-1 !px-2 text-sm">Cancel</Button>}>
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                            <div className="md:col-span-2"><label className="block text-sm font-medium mb-1">Name</label><input className="w-full border p-2 rounded" value={newMat.name} onChange={e => setNewMat({...newMat, name: e.target.value})} /></div>
+                            <div><label className="block text-sm font-medium mb-1">Unit</label><select className="w-full border p-2 rounded" value={newMat.unit} onChange={e => setNewMat({...newMat, unit: e.target.value})}>{['kg', 'g', 'l', 'ml', 'pcs', 'm', 'ft'].map(u => <option key={u} value={u}>{u}</option>)}</select></div>
+                            <div><label className="block text-sm font-medium mb-1">Cost/Unit</label><input type="number" className="w-full border p-2 rounded" value={newMat.cost} onChange={e => setNewMat({...newMat, cost: e.target.value})} /></div>
+                            <div><label className="block text-sm font-medium mb-1">Stock</label><input type="number" className="w-full border p-2 rounded" value={newMat.stock} onChange={e => setNewMat({...newMat, stock: e.target.value})} /></div>
+                            <Button onClick={handleAdd} icon={Save} className="md:col-span-5">Save</Button>
+                        </div>
+                    </Card>
+                )}
+                <div className="bg-white rounded-xl shadow border overflow-hidden">
+                    <table className="w-full text-left">
+                        <thead className="bg-slate-50 border-b text-slate-600"><tr><th className="p-4">Name</th><th className="p-4">Stock</th><th className="p-4">Unit Cost</th><th className="p-4">Total Value</th><th className="p-4 text-right no-print">Actions</th></tr></thead>
+                        <tbody className="divide-y">{materials.map(mat => (
+                            <tr key={mat.id} className="hover:bg-slate-50">
+                                <td className="p-4 font-medium">{mat.name}</td>
+                                <td className="p-4"><span className={`px-2 py-1 rounded text-sm font-bold ${mat.stock < 10 ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'}`}>{mat.stock} {mat.unit}</span></td>
+                                <td className="p-4"><div className="flex items-center gap-1"><span className="text-slate-400">$</span><input type="number" className="w-20 bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-500 outline-none" value={mat.cost} onChange={(e) => handleUpdate(mat.id, 'cost', Number(e.target.value))} /></div></td>
+                                <td className="p-4 text-slate-500 font-mono">{formatCurrency(mat.stock * mat.cost)}</td>
+                                <td className="p-4 text-right no-print"><button onClick={() => handleDelete(mat.id)} className="text-slate-400 hover:text-red-600"><Trash2 size={16}/></button></td>
+                            </tr>
+                        ))}</tbody>
+                    </table>
+                </div>
+            </div>
+        );
+
+        const FormulasView = ({ materials, products, isAdding, setIsAdding, newProd, setNewProd, handleAdd, handleDelete }) => {
+            const [tempIngredient, setTempIngredient] = useState({ materialId: '', qty: 1 });
+            const addIngredientToProduct = () => {
+                if (!tempIngredient.materialId) return;
+                const mat = materials.find(m => m.id === tempIngredient.materialId);
+                setNewProd(prev => ({ ...prev, ingredients: [...prev.ingredients, { ...tempIngredient, name: mat.name, unit: mat.unit }] }));
+                setTempIngredient({ materialId: '', qty: 1 });
+            };
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-end no-print"><div><h2 className="text-2xl font-bold text-slate-800">Products</h2><p className="text-slate-500">Recipes & Pricing</p></div><Button onClick={() => setIsAdding(true)} icon={Plus}>Create Product</Button></div>
+                    {isAdding && (
+                        <Card title="New Product">
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><label className="block text-sm font-medium mb-1">Name</label><input className="w-full border p-2 rounded" value={newProd.name} onChange={e => setNewProd({...newProd, name: e.target.value})} /></div>
+                                    <div><label className="block text-sm font-medium mb-1">Price</label><input type="number" className="w-full border p-2 rounded" value={newProd.sellingPrice} onChange={e => setNewProd({...newProd, sellingPrice: e.target.value})} /></div>
+                                </div>
+                                <div className="p-4 bg-slate-50 rounded border">
+                                    <h4 className="text-sm font-bold uppercase mb-2">Recipe</h4>
+                                    <div className="flex gap-2 mb-2">
+                                        <select className="flex-1 border p-2 rounded" value={tempIngredient.materialId} onChange={e => setTempIngredient({...tempIngredient, materialId: e.target.value})}>
+                                            <option value="">Select Material...</option>
+                                            {materials.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                                        </select>
+                                        <input type="number" className="w-20 border p-2 rounded" value={tempIngredient.qty} onChange={e => setTempIngredient({...tempIngredient, qty: e.target.value})} placeholder="Qty" />
+                                        <Button onClick={addIngredientToProduct} variant="secondary" icon={Plus}>Add</Button>
+                                    </div>
+                                    {newProd.ingredients.map((ing, i) => (
+                                        <div key={i} className="flex justify-between bg-white p-2 rounded border mb-1 text-sm">
+                                            <span>{ing.qty} {ing.unit} of {ing.name}</span>
+                                            <button onClick={() => setNewProd(prev => ({...prev, ingredients: prev.ingredients.filter((_, idx) => idx !== i)}))} className="text-red-500">&times;</button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="flex justify-end gap-2"><Button variant="secondary" onClick={() => setIsAdding(false)}>Cancel</Button><Button onClick={handleAdd} icon={Save}>Save</Button></div>
+                            </div>
+                        </Card>
+                    )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{products.map(prod => (
+                        <Card key={prod.id} title={prod.name} action={<button onClick={() => handleDelete(prod.id)} className="text-slate-400 hover:text-red-600 no-print"><Trash2 size={16}/></button>}>
+                            <div className="space-y-2">
+                                <div className="flex justify-between border-b pb-2"><span className="text-slate-500 text-sm">Price</span><span className="font-bold text-emerald-600">{formatCurrency(prod.sellingPrice)}</span></div>
+                                <div className="flex justify-between border-b pb-2"><span className="text-slate-500 text-sm">Stock</span><span className="font-bold text-slate-800">{prod.stock || 0} units</span></div>
+                                <p className="text-xs text-slate-400 uppercase font-bold mt-2">Ingredients</p>
+                                <ul className="text-sm text-slate-600 space-y-1">{prod.ingredients.map((ing, i) => <li key={i}>{ing.qty} {ing.unit} {ing.name}</li>)}</ul>
+                            </div>
+                        </Card>
+                    ))}</div>
+                </div>
+            );
+        };
+
+        const ProductionView = ({ products, materials, target, setTarget, execute }) => {
+            const selectedProd = products.find(p => p.id === target.productId);
+            return (
+                <div className="space-y-6">
+                    <div><h2 className="text-2xl font-bold text-slate-800">Production</h2><p className="text-slate-500">Run batches</p></div>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-1">
+                            <Card title="Start Batch">
+                                <label className="block text-sm font-medium mb-1">Product</label>
+                                <select className="w-full border p-2 rounded mb-3" value={target.productId} onChange={e => setTarget({...target, productId: e.target.value})}>
+                                    <option value="">Select...</option>
+                                    {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                </select>
+                                <label className="block text-sm font-medium mb-1">Qty</label>
+                                <input type="number" className="w-full border p-2 rounded mb-4" value={target.quantity} onChange={e => setTarget({...target, quantity: e.target.value})} />
+                                <Button onClick={execute} variant="success" icon={Factory} disabled={!selectedProd} className="w-full">Run</Button>
+                            </Card>
+                        </div>
+                        <div className="lg:col-span-2">
+                            {selectedProd && (
+                                <Card title="Requirements">
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="bg-slate-50 text-slate-500"><tr><th className="p-2">Material</th><th className="p-2">Req</th><th className="p-2">Avail</th><th className="p-2">Status</th></tr></thead>
+                                        <tbody>{selectedProd.ingredients.map((ing, i) => {
+                                            const mat = materials.find(m => m.id === ing.materialId);
+                                            const req = ing.qty * target.quantity;
+                                            const avail = mat ? mat.stock : 0;
+                                            return (
+                                                <tr key={i} className="border-b">
+                                                    <td className="p-2">{mat?.name}</td><td className="p-2">{req} {mat?.unit}</td><td className="p-2">{avail} {mat?.unit}</td>
+                                                    <td className="p-2 font-bold">{avail >= req ? <span className="text-emerald-600">OK</span> : <span className="text-red-600">Low</span>}</td>
+                                                </tr>
+                                            )
+                                        })}</tbody>
+                                    </table>
+                                </Card>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ContactsView = ({ contacts, isAdding, setIsAdding, newContact, setNewContact, handleAdd, handleDelete }) => (
+            <div className="space-y-6">
+                <div className="flex justify-between items-end no-print"><div><h2 className="text-2xl font-bold text-slate-800">Contacts</h2><p className="text-slate-500">Buyers & Sellers</p></div><Button onClick={() => setIsAdding(true)} icon={Plus}>Add Contact</Button></div>
+                {isAdding && (
+                    <Card title="New Contact">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label className="text-sm font-medium block mb-1">Name</label><input className="border p-2 rounded w-full" value={newContact.name} onChange={e => setNewContact({...newContact, name: e.target.value})} /></div>
+                            <div><label className="text-sm font-medium block mb-1">Type</label><select className="border p-2 rounded w-full" value={newContact.type} onChange={e => setNewContact({...newContact, type: e.target.value})}><option value="buyer">Buyer</option><option value="seller">Seller</option></select></div>
+                            <div><label className="text-sm font-medium block mb-1">Person</label><input className="border p-2 rounded w-full" value={newContact.contactPerson} onChange={e => setNewContact({...newContact, contactPerson: e.target.value})} /></div>
+                            <div><label className="text-sm font-medium block mb-1">Phone</label><input className="border p-2 rounded w-full" value={newContact.phone} onChange={e => setNewContact({...newContact, phone: e.target.value})} /></div>
+                            <div className="md:col-span-2"><label className="text-sm font-medium block mb-1">Address</label><input className="border p-2 rounded w-full" value={newContact.address} onChange={e => setNewContact({...newContact, address: e.target.value})} /></div>
+                            <div className="md:col-span-2 flex justify-end gap-2"><Button variant="secondary" onClick={() => setIsAdding(false)}>Cancel</Button><Button onClick={handleAdd} icon={Save}>Save</Button></div>
+                        </div>
+                    </Card>
+                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{contacts.map(c => (
+                    <Card key={c.id} title={c.name} action={<button onClick={() => handleDelete(c.id)} className="text-slate-400 hover:text-red-500 no-print"><Trash2 size={16}/></button>}>
+                        <div className="text-sm text-slate-600 space-y-1">
+                            <div className="flex justify-between"><span className="text-slate-400">Type</span><span className="uppercase font-bold text-xs bg-slate-100 px-2 rounded">{c.type}</span></div>
+                            <div className="flex justify-between"><span className="text-slate-400">Person</span><span>{c.contactPerson}</span></div>
+                            <div className="flex justify-between"><span className="text-slate-400">Phone</span><span>{c.phone}</span></div>
+                            <div className="pt-2 border-t mt-2 text-xs">{c.address}</div>
+                        </div>
+                    </Card>
+                ))}</div>
+            </div>
+        );
+
+        const InvoiceView = ({ invoices, contacts, products, appId }) => {
+            const [mode, setMode] = useState('list');
+            const [currentInvoice, setCurrentInvoice] = useState(null);
+            const [invBuyerId, setInvBuyerId] = useState('');
+            const [invItems, setInvItems] = useState([]);
+            const [invTempItem, setInvTempItem] = useState({ prodId: '', qty: 1 });
+
+            const addItem = () => {
+                if(!invTempItem.prodId) return;
+                const prod = products.find(p => p.id === invTempItem.prodId);
+                setInvItems([...invItems, { prodId: prod.id, qty: Number(invTempItem.qty), price: prod.sellingPrice, name: prod.name }]);
+                setInvTempItem({ prodId: '', qty: 1 });
+            };
+
+            const generateInvoice = async () => {
+                if(!invBuyerId || invItems.length === 0) return;
+                const buyer = contacts.find(c => c.id === invBuyerId);
+                const total = invItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
+                const batch = writeBatch(db);
+
+                invItems.forEach(item => {
+                    const prod = products.find(p => p.id === item.prodId);
+                    if(prod) {
+                        const ref = doc(db, 'artifacts', appId, 'public', 'data', 'products', prod.id);
+                        batch.update(ref, { stock: (prod.stock || 0) - item.qty });
+                    }
+                });
+
+                const invRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'invoices'));
+                const invData = {
+                    invoiceNumber: `INV-${Date.now().toString().slice(-6)}`,
+                    buyerId: invBuyerId,
+                    buyerName: buyer.name,
+                    buyerAddress: buyer.address,
+                    buyerPhone: buyer.phone,
+                    items: invItems,
+                    total: total,
+                    date: new Date().toISOString(),
+                };
+                batch.set(invRef, invData);
+
+                const transRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'transactions'));
+                batch.set(transRef, { type: 'income', amount: total, date: new Date().toISOString(), description: `Invoice ${invData.invoiceNumber} to ${buyer.name}`, relatedId: invRef.id });
+
+                await batch.commit();
+                setMode('list');
+                setInvItems([]);
+            };
+
+            if (mode === 'view' && currentInvoice) {
+                return (
+                    <div className="bg-white min-h-screen">
+                        <div className="no-print p-4 border-b flex justify-between bg-slate-50">
+                            <Button onClick={() => setMode('list')} variant="secondary" icon={ArrowLeft}>Back</Button>
+                            <Button onClick={() => window.print()} icon={Printer}>Print</Button>
+                        </div>
+                        <div className="max-w-3xl mx-auto p-12 print:p-0 print:max-w-none">
+                            <div className="flex justify-between items-start mb-12">
+                                <div><h1 className="text-4xl font-bold text-slate-900 mb-2">INVOICE</h1><p className="text-slate-500 font-mono">#{currentInvoice.invoiceNumber}</p></div>
+                                <div className="text-right"><h3 className="font-bold text-xl text-indigo-600">XYZ Company</h3><p>123 Random Business Park</p><p>Innovation City, IN 45000</p></div>
+                            </div>
+                            <div className="mb-12 flex justify-between">
+                                <div><h4 className="text-xs font-bold uppercase text-slate-400 mb-2">Bill To</h4><p className="font-bold text-lg">{currentInvoice.buyerName}</p><p className="whitespace-pre-line">{currentInvoice.buyerAddress}</p><p>{currentInvoice.buyerPhone}</p></div>
+                                <div className="text-right"><div><span className="text-slate-400 text-xs font-bold uppercase mr-4">Date</span><span className="font-medium">{formatDate(currentInvoice.date)}</span></div><div><span className="text-slate-400 text-xs font-bold uppercase mr-4">Total</span><span className="font-bold text-xl text-emerald-600">{formatCurrency(currentInvoice.total)}</span></div></div>
+                            </div>
+                            <table className="w-full mb-12"><thead className="border-b-2 border-slate-900"><tr><th className="text-left py-3">Description</th><th className="text-right py-3">Qty</th><th className="text-right py-3">Price</th><th className="text-right py-3">Amount</th></tr></thead><tbody className="divide-y divide-slate-100">{currentInvoice.items.map((item, i) => (<tr key={i}><td className="py-4">{item.name}</td><td className="py-4 text-right">{item.qty}</td><td className="py-4 text-right">{formatCurrency(item.price)}</td><td className="py-4 text-right font-bold">{formatCurrency(item.qty * item.price)}</td></tr>))}</tbody></table>
+                            <div className="border-t-2 border-slate-100 pt-8 flex justify-end"><div className="w-1/2 flex justify-between py-2 border-t border-slate-200"><span className="font-bold text-lg">Total</span><span className="font-bold text-2xl text-indigo-600">{formatCurrency(currentInvoice.total)}</span></div></div>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (mode === 'create') {
+                return (
+                    <div className="max-w-4xl mx-auto space-y-6">
+                        <div className="flex items-center gap-4"><Button onClick={() => setMode('list')} variant="secondary" icon={ArrowLeft}>Back</Button><h2 className="text-2xl font-bold">New Invoice</h2></div>
+                        <Card title="Customer">
+                            <select className="w-full border p-2 rounded" value={invBuyerId} onChange={e => setInvBuyerId(e.target.value)}>
+                                <option value="">Select Buyer...</option>
+                                {contacts.filter(c => c.type !== 'seller').map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                            </select>
+                        </Card>
+                        <Card title="Items">
+                            <div className="flex gap-2 mb-4">
+                                <select className="flex-1 border p-2 rounded" value={invTempItem.prodId} onChange={e => setInvTempItem({...invTempItem, prodId: e.target.value})}>
+                                    <option value="">Add Product...</option>
+                                    {products.map(p => <option key={p.id} value={p.id}>{p.name} ({formatCurrency(p.sellingPrice)})</option>)}
+                                </select>
+                                <input type="number" className="w-24 border p-2 rounded" value={invTempItem.qty} onChange={e => setInvTempItem({...invTempItem, qty: e.target.value})} />
+                                <Button onClick={addItem} variant="secondary">Add</Button>
+                            </div>
+                            <table className="w-full text-left"><thead className="bg-slate-50"><tr><th className="p-2">Item</th><th className="p-2">Qty</th><th className="p-2">Total</th><th></th></tr></thead><tbody>{invItems.map((item, i) => (<tr key={i}><td className="p-2">{item.name}</td><td className="p-2">{item.qty}</td><td className="p-2">{formatCurrency(item.qty * item.price)}</td><td className="p-2"><button onClick={() => setInvItems(invItems.filter((_, idx) => idx !== i))} className="text-red-500">&times;</button></td></tr>))}</tbody></table>
+                        </Card>
+                        <div className="flex justify-end"><Button onClick={generateInvoice} variant="success" icon={FileText} disabled={!invBuyerId || invItems.length === 0}>Generate</Button></div>
+                    </div>
+                )
+            }
+
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-end no-print"><div><h2 className="text-2xl font-bold text-slate-800">Invoices</h2><p className="text-slate-500">Billing Records</p></div><Button onClick={() => setMode('create')} icon={Plus}>New Invoice</Button></div>
+                    <div className="bg-white rounded-xl shadow border overflow-hidden">
+                        <table className="w-full text-left">
+                            <thead className="bg-slate-50 text-slate-500"><tr><th className="p-4">#</th><th className="p-4">Date</th><th className="p-4">Customer</th><th className="p-4">Total</th><th className="p-4"></th></tr></thead>
+                            <tbody className="divide-y">{invoices.map(inv => (<tr key={inv.id}><td className="p-4 font-mono text-slate-600">{inv.invoiceNumber}</td><td className="p-4">{formatDate(inv.date)}</td><td className="p-4">{inv.buyerName}</td><td className="p-4 font-bold">{formatCurrency(inv.total)}</td><td className="p-4 text-right no-print"><Button variant="ghost" onClick={() => { setCurrentInvoice(inv); setMode('view'); }} className="!py-1">View</Button></td></tr>))}</tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        const PurchasingView = ({ materials, contacts, appId }) => {
+            const [cart, setCart] = useState({});
+            const [sellerId, setSellerId] = useState('');
+
+            const commitPurchase = async () => {
+                const batch = writeBatch(db);
+                let totalCost = 0;
+                let descItems = [];
+                Object.entries(cart).forEach(([matId, qty]) => {
+                    if(qty > 0) {
+                        const mat = materials.find(m => m.id === matId);
+                        const ref = doc(db, 'artifacts', appId, 'public', 'data', 'materials', matId);
+                        batch.update(ref, { stock: Number(mat.stock) + Number(qty) });
+                        totalCost += (mat.cost * qty);
+                        descItems.push(`${qty}${mat.unit} ${mat.name}`);
+                    }
+                });
+                const transRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'transactions'));
+                batch.set(transRef, { type: 'expense', amount: totalCost, date: new Date().toISOString(), description: `Restock: ${descItems.join(', ')}`, relatedId: sellerId });
+                await batch.commit();
+                setCart({});
+                alert("Stock received.");
+            };
+
+            return (
+                <div className="space-y-6">
+                    <h2 className="text-2xl font-bold text-slate-800">Purchasing</h2>
+                    <div className="flex items-center gap-4 bg-white p-4 rounded-xl border">
+                        <span className="font-medium">Seller:</span>
+                        <select className="border p-2 rounded flex-1" value={sellerId} onChange={e => setSellerId(e.target.value)}>
+                            <option value="">Select...</option>
+                            {contacts.filter(c => c.type !== 'buyer').map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                        </select>
+                        {Object.keys(cart).length > 0 && <Button onClick={commitPurchase} variant="success">Receive Stock</Button>}
+                    </div>
+                    <div className="bg-white rounded-xl border overflow-hidden">
+                        <table className="w-full text-left"><thead className="bg-slate-50 text-slate-500"><tr><th className="p-4">Material</th><th className="p-4">Cost</th><th className="p-4">Stock</th><th className="p-4">Order Qty</th><th className="p-4">Subtotal</th></tr></thead>
+                        <tbody className="divide-y">{materials.map(mat => {
+                            const qty = cart[mat.id] || 0;
+                            return (
+                                <tr key={mat.id}><td className="p-4 font-medium">{mat.name}</td><td className="p-4">{formatCurrency(mat.cost)}</td><td className="p-4">{mat.stock}</td><td className="p-4"><input type="number" className="border p-1 rounded w-24" value={qty || ''} onChange={e => setCart({...cart, [mat.id]: Number(e.target.value)})} /></td><td className="p-4 font-mono">{formatCurrency(qty * mat.cost)}</td></tr>
+                            )
+                        })}</tbody></table>
+                    </div>
+                </div>
+            )
+        };
+
+        // --- Main Component ---
+
         function MaterialMaster() {
             const [user, setUser] = useState(null);
             const [activeTab, setActiveTab] = useState('dashboard');
             const [loading, setLoading] = useState(true);
 
-            // Data State
+            // Data
             const [materials, setMaterials] = useState([]);
             const [products, setProducts] = useState([]);
             const [contacts, setContacts] = useState([]);
@@ -156,617 +522,57 @@
             const [productionTarget, setProductionTarget] = useState({ productId: '', quantity: 1 });
             const [newContact, setNewContact] = useState({ name: '', type: 'buyer', address: '', contactPerson: '', phone: '' });
 
-            // UI Toggles
+            // UI
             const [isAddingMaterial, setIsAddingMaterial] = useState(false);
             const [isAddingProduct, setIsAddingProduct] = useState(false);
             const [isAddingContact, setIsAddingContact] = useState(false);
 
-            // --- Authentication ---
+            // Auth
             useEffect(() => {
                 const initAuth = async () => {
                     try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    } catch (error) {
-                        console.error("Auth failed:", error);
-                        // Fallback for demo purposes if auth fails totally
-                        setLoading(false); 
-                    }
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                        else await signInAnonymously(auth);
+                    } catch (error) { setLoading(false); }
                 };
-                
                 if (auth) {
                     initAuth();
-                    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-                        setUser(currentUser);
-                        if (currentUser) setLoading(false);
-                    });
-                    return () => unsubscribe();
-                } else {
-                    setLoading(false);
-                }
+                    return onAuthStateChanged(auth, (u) => { setUser(u); if (u) setLoading(false); });
+                } else setLoading(false);
             }, []);
 
-            // --- Data Sync ---
+            // Data
             useEffect(() => {
                 if (!user || !db) return;
-
-                const collections = ['materials', 'products', 'contacts', 'transactions', 'invoices'];
-                const unsubscribes = collections.map(colName => {
-                    return onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', colName), 
-                        (snapshot) => {
-                            const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            if (colName === 'materials') setMaterials(data);
-                            if (colName === 'products') setProducts(data);
-                            if (colName === 'contacts') setContacts(data);
-                            if (colName === 'transactions') setTransactions(data.sort((a,b) => new Date(b.date) - new Date(a.date)));
-                            if (colName === 'invoices') setInvoices(data.sort((a,b) => new Date(b.date) - new Date(a.date)));
-                        },
-                        (err) => console.error(`${colName} error:`, err)
-                    );
-                });
-
-                return () => unsubscribes.forEach(unsub => unsub());
+                const unsubMaterials = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'materials'), s => setMaterials(s.docs.map(d => ({id:d.id, ...d.data()}))));
+                const unsubProducts = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'products'), s => setProducts(s.docs.map(d => ({id:d.id, ...d.data()}))));
+                const unsubContacts = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'contacts'), s => setContacts(s.docs.map(d => ({id:d.id, ...d.data()}))));
+                const unsubTrans = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'transactions'), s => setTransactions(s.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b) => new Date(b.date) - new Date(a.date))));
+                const unsubInvoices = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'invoices'), s => setInvoices(s.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b) => new Date(b.date) - new Date(a.date))));
+                return () => { unsubMaterials(); unsubProducts(); unsubContacts(); unsubTrans(); unsubInvoices(); };
             }, [user]);
 
-            // --- Actions ---
-
-            const handleAddMaterial = async () => {
-                if (!newMaterial.name) return;
-                try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'materials'), {
-                        ...newMaterial,
-                        stock: Number(newMaterial.stock),
-                        cost: Number(newMaterial.cost),
-                        createdAt: new Date().toISOString()
-                    });
-                    setNewMaterial({ name: '', unit: 'kg', stock: 0, cost: 0 });
-                    setIsAddingMaterial(false);
-                } catch (e) { console.error(e); }
-            };
-
-            const handleDeleteMaterial = async (id) => {
-                if (!confirm('Delete this material?')) return;
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'materials', id));
-            };
-
-            const handleUpdateMaterial = async (id, field, value) => {
-                try {
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'materials', id), { [field]: value });
-                } catch(e) { console.error(e); }
-            };
-
-            const handleAddProduct = async () => {
-                if (!newProduct.name || newProduct.ingredients.length === 0) return;
-                try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), {
-                        ...newProduct,
-                        sellingPrice: Number(newProduct.sellingPrice),
-                        stock: 0,
-                        createdAt: new Date().toISOString()
-                    });
-                    setNewProduct({ name: '', ingredients: [], sellingPrice: 0, stock: 0 });
-                    setIsAddingProduct(false);
-                } catch (e) { console.error(e); }
-            };
-
-            const handleDeleteProduct = async (id) => {
-                if (!confirm('Delete this product?')) return;
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id));
-            };
-
-            const handleAddContact = async () => {
-                if (!newContact.name) return;
-                try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'contacts'), {
-                        ...newContact,
-                        createdAt: new Date().toISOString()
-                    });
-                    setNewContact({ name: '', type: 'buyer', address: '', contactPerson: '', phone: '' });
-                    setIsAddingContact(false);
-                } catch(e) { console.error(e); }
-            };
-
-            const handleDeleteContact = async (id) => {
-                if(!confirm('Delete contact?')) return;
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'contacts', id));
-            };
-
+            // Handlers
+            const handleAddMaterial = async () => { if (!newMaterial.name) return; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'materials'), { ...newMaterial, stock: Number(newMaterial.stock), cost: Number(newMaterial.cost), createdAt: new Date().toISOString() }); setNewMaterial({ name: '', unit: 'kg', stock: 0, cost: 0 }); setIsAddingMaterial(false); };
+            const handleDeleteMaterial = async (id) => { if (confirm('Delete material?')) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'materials', id)); };
+            const handleUpdateMaterial = async (id, f, v) => await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'materials', id), { [f]: v });
+            const handleAddProduct = async () => { if (!newProduct.name) return; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { ...newProduct, sellingPrice: Number(newProduct.sellingPrice), stock: 0, createdAt: new Date().toISOString() }); setNewProduct({ name: '', ingredients: [], sellingPrice: 0, stock: 0 }); setIsAddingProduct(false); };
+            const handleDeleteProduct = async (id) => { if (confirm('Delete product?')) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id)); };
+            const handleAddContact = async () => { if (!newContact.name) return; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'contacts'), { ...newContact, createdAt: new Date().toISOString() }); setNewContact({ name: '', type: 'buyer', address: '', contactPerson: '', phone: '' }); setIsAddingContact(false); };
+            const handleDeleteContact = async (id) => { if (confirm('Delete contact?')) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'contacts', id)); };
             const executeProduction = async () => {
                 const product = products.find(p => p.id === productionTarget.productId);
                 if (!product) return;
                 const qty = Number(productionTarget.quantity);
-                if (qty <= 0) return;
-
-                const insufficient = product.ingredients.some(ing => {
-                    const mat = materials.find(m => m.id === ing.materialId);
-                    return !mat || mat.stock < (ing.qty * qty);
-                });
-
-                if (insufficient) {
-                    alert("Insufficient stock.");
-                    return;
-                }
-
                 const batch = writeBatch(db);
-                
                 product.ingredients.forEach(ing => {
                     const mat = materials.find(m => m.id === ing.materialId);
-                    if (mat) {
-                        const matRef = doc(db, 'artifacts', appId, 'public', 'data', 'materials', mat.id);
-                        batch.update(matRef, { stock: Number(mat.stock) - (Number(ing.qty) * qty) });
-                    }
+                    if (mat) batch.update(doc(db, 'artifacts', appId, 'public', 'data', 'materials', mat.id), { stock: Number(mat.stock) - (Number(ing.qty) * qty) });
                 });
-
-                const prodRef = doc(db, 'artifacts', appId, 'public', 'data', 'products', product.id);
-                batch.update(prodRef, { stock: (product.stock || 0) + qty });
-
-                try {
-                    await batch.commit();
-                    alert(`Produced ${qty} units of ${product.name}`);
-                    setProductionTarget({ ...productionTarget, quantity: 1 });
-                } catch (e) { console.error(e); }
-            };
-
-            // --- Sub-Components/Views ---
-
-            const DashboardView = () => {
-                const totalMaterialValue = materials.reduce((acc, m) => acc + (m.stock * m.cost), 0);
-                const totalProductValue = products.reduce((acc, p) => acc + ((p.stock || 0) * p.sellingPrice), 0);
-                const lowStockMaterials = materials.filter(m => m.stock < 10);
-                const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
-                const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
-                const netProfit = totalIncome - totalExpenses;
-
-                return (
-                    <div className="space-y-6">
-                        <h2 className="text-2xl font-bold text-slate-800">Dashboard</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <Card title="Net Profit" className={netProfit >= 0 ? "border-l-4 border-l-emerald-500" : "border-l-4 border-l-red-500"}>
-                                <div className={`text-3xl font-bold ${netProfit >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                                    {formatCurrency(netProfit)}
-                                </div>
-                                <p className="text-sm text-slate-500 mt-1">Income - Expenses</p>
-                            </Card>
-                            <Card title="Inventory Value" className="border-l-4 border-l-indigo-500">
-                                <div className="text-3xl font-bold text-slate-800">{formatCurrency(totalMaterialValue + totalProductValue)}</div>
-                                <p className="text-sm text-slate-500 mt-1">Total Assets</p>
-                            </Card>
-                            <Card title="Expenses" className="border-l-4 border-l-orange-500">
-                                <div className="text-3xl font-bold text-slate-800">{formatCurrency(totalExpenses)}</div>
-                                <p className="text-sm text-slate-500 mt-1">Total Material Cost</p>
-                            </Card>
-                            <Card title="Sales" className="border-l-4 border-l-blue-500">
-                                <div className="text-3xl font-bold text-slate-800">{formatCurrency(totalIncome)}</div>
-                                <p className="text-sm text-slate-500 mt-1">Total Invoiced</p>
-                            </Card>
-                        </div>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <Card title="Low Stock Alerts">
-                                {lowStockMaterials.length > 0 ? (
-                                    <ul className="divide-y divide-slate-100">
-                                        {lowStockMaterials.map(m => (
-                                            <li key={m.id} className="py-3 flex justify-between items-center">
-                                                <span className="font-medium text-slate-700">{m.name}</span>
-                                                <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">{m.stock} {m.unit}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : <p className="text-slate-400 italic">Stock levels healthy.</p>}
-                            </Card>
-                            <Card title="Recent Transactions">
-                                <ul className="divide-y divide-slate-100">
-                                    {transactions.slice(0, 5).map(t => (
-                                        <li key={t.id} className="py-3 flex justify-between items-center">
-                                            <div>
-                                                <p className="font-medium text-slate-800 truncate max-w-[200px]">{t.description}</p>
-                                                <p className="text-xs text-slate-400">{formatDate(t.date)}</p>
-                                            </div>
-                                            <span className={`font-mono font-bold ${t.type === 'income' ? 'text-emerald-600' : 'text-red-600'}`}>
-                                                {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </Card>
-                        </div>
-                    </div>
-                );
-            };
-
-            const InventoryView = () => (
-                <div className="space-y-6">
-                    <div className="flex justify-between items-end no-print">
-                        <div>
-                            <h2 className="text-2xl font-bold text-slate-800">Raw Materials</h2>
-                            <p className="text-slate-500">Inventory and Cost Management</p>
-                        </div>
-                        <Button onClick={() => setIsAddingMaterial(true)} icon={Plus}>Add Material</Button>
-                    </div>
-
-                    {isAddingMaterial && (
-                        <Card title="New Material" action={<Button variant="secondary" onClick={() => setIsAddingMaterial(false)} className="!py-1 !px-2 text-sm">Cancel</Button>}>
-                            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium mb-1">Name</label>
-                                    <input className="w-full border p-2 rounded" value={newMaterial.name} onChange={e => setNewMaterial({...newMaterial, name: e.target.value})} />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Unit</label>
-                                    <select className="w-full border p-2 rounded" value={newMaterial.unit} onChange={e => setNewMaterial({...newMaterial, unit: e.target.value})}>
-                                        {['kg', 'g', 'l', 'ml', 'pcs', 'm', 'ft'].map(u => <option key={u} value={u}>{u}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Cost/Unit</label>
-                                    <input type="number" className="w-full border p-2 rounded" value={newMaterial.cost} onChange={e => setNewMaterial({...newMaterial, cost: e.target.value})} />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Stock</label>
-                                    <input type="number" className="w-full border p-2 rounded" value={newMaterial.stock} onChange={e => setNewMaterial({...newMaterial, stock: e.target.value})} />
-                                </div>
-                                <Button onClick={handleAddMaterial} icon={Save} className="md:col-span-5">Save</Button>
-                            </div>
-                        </Card>
-                    )}
-
-                    <div className="bg-white rounded-xl shadow border overflow-hidden">
-                        <table className="w-full text-left">
-                            <thead className="bg-slate-50 border-b text-slate-600">
-                                <tr>
-                                    <th className="p-4">Name</th>
-                                    <th className="p-4">Stock</th>
-                                    <th className="p-4">Unit Cost</th>
-                                    <th className="p-4">Total Value</th>
-                                    <th className="p-4 text-right no-print">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y">
-                                {materials.map(mat => (
-                                    <tr key={mat.id} className="hover:bg-slate-50">
-                                        <td className="p-4 font-medium">{mat.name}</td>
-                                        <td className="p-4"><span className={`px-2 py-1 rounded text-sm font-bold ${mat.stock < 10 ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'}`}>{mat.stock} {mat.unit}</span></td>
-                                        <td className="p-4">
-                                            <div className="flex items-center gap-1">
-                                                <span className="text-slate-400">$</span>
-                                                <input type="number" className="w-20 bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-500 outline-none" value={mat.cost} onChange={(e) => handleUpdateMaterial(mat.id, 'cost', Number(e.target.value))} />
-                                            </div>
-                                        </td>
-                                        <td className="p-4 text-slate-500 font-mono">{formatCurrency(mat.stock * mat.cost)}</td>
-                                        <td className="p-4 text-right no-print">
-                                            <button onClick={() => handleDeleteMaterial(mat.id)} className="text-slate-400 hover:text-red-600"><Trash2 size={16}/></button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            );
-
-            const FormulasView = () => {
-                const [tempIngredient, setTempIngredient] = useState({ materialId: '', qty: 1 });
-
-                const addIngredientToProduct = () => {
-                    if (!tempIngredient.materialId) return;
-                    const mat = materials.find(m => m.id === tempIngredient.materialId);
-                    setNewProduct(prev => ({
-                        ...prev,
-                        ingredients: [...prev.ingredients, { ...tempIngredient, name: mat.name, unit: mat.unit }]
-                    }));
-                    setTempIngredient({ materialId: '', qty: 1 });
-                };
-
-                return (
-                    <div className="space-y-6">
-                        <div className="flex justify-between items-end no-print">
-                            <div><h2 className="text-2xl font-bold text-slate-800">Products</h2><p className="text-slate-500">Recipes & Pricing</p></div>
-                            <Button onClick={() => setIsAddingProduct(true)} icon={Plus}>Create Product</Button>
-                        </div>
-                        
-                        {isAddingProduct && (
-                            <Card title="New Product">
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div><label className="block text-sm font-medium mb-1">Name</label><input className="w-full border p-2 rounded" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} /></div>
-                                        <div><label className="block text-sm font-medium mb-1">Price</label><input type="number" className="w-full border p-2 rounded" value={newProduct.sellingPrice} onChange={e => setNewProduct({...newProduct, sellingPrice: e.target.value})} /></div>
-                                    </div>
-                                    <div className="p-4 bg-slate-50 rounded border">
-                                        <h4 className="text-sm font-bold uppercase mb-2">Recipe</h4>
-                                        <div className="flex gap-2 mb-2">
-                                            <select className="flex-1 border p-2 rounded" value={tempIngredient.materialId} onChange={e => setTempIngredient({...tempIngredient, materialId: e.target.value})}>
-                                                <option value="">Select Material...</option>
-                                                {materials.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                                            </select>
-                                            <input type="number" className="w-20 border p-2 rounded" value={tempIngredient.qty} onChange={e => setTempIngredient({...tempIngredient, qty: e.target.value})} placeholder="Qty" />
-                                            <Button onClick={addIngredientToProduct} variant="secondary" icon={Plus}>Add</Button>
-                                        </div>
-                                        {newProduct.ingredients.map((ing, i) => (
-                                            <div key={i} className="flex justify-between bg-white p-2 rounded border mb-1 text-sm">
-                                                <span>{ing.qty} {ing.unit} of {ing.name}</span>
-                                                <button onClick={() => setNewProduct(prev => ({...prev, ingredients: prev.ingredients.filter((_, idx) => idx !== i)}))} className="text-red-500">&times;</button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div className="flex justify-end gap-2">
-                                        <Button variant="secondary" onClick={() => setIsAddingProduct(false)}>Cancel</Button>
-                                        <Button onClick={handleAddProduct} icon={Save}>Save</Button>
-                                    </div>
-                                </div>
-                            </Card>
-                        )}
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {products.map(prod => (
-                                <Card key={prod.id} title={prod.name} action={<button onClick={() => handleDeleteProduct(prod.id)} className="text-slate-400 hover:text-red-600 no-print"><Trash2 size={16}/></button>}>
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between border-b pb-2"><span className="text-slate-500 text-sm">Price</span><span className="font-bold text-emerald-600">{formatCurrency(prod.sellingPrice)}</span></div>
-                                        <div className="flex justify-between border-b pb-2"><span className="text-slate-500 text-sm">Stock</span><span className="font-bold text-slate-800">{prod.stock || 0} units</span></div>
-                                        <p className="text-xs text-slate-400 uppercase font-bold mt-2">Ingredients</p>
-                                        <ul className="text-sm text-slate-600 space-y-1">
-                                            {prod.ingredients.map((ing, i) => <li key={i}>{ing.qty} {ing.unit} {ing.name}</li>)}
-                                        </ul>
-                                    </div>
-                                </Card>
-                            ))}
-                        </div>
-                    </div>
-                );
-            };
-
-            const ProductionView = () => {
-                const selectedProd = products.find(p => p.id === productionTarget.productId);
-                return (
-                    <div className="space-y-6">
-                        <div><h2 className="text-2xl font-bold text-slate-800">Production</h2><p className="text-slate-500">Run batches</p></div>
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div className="lg:col-span-1">
-                                <Card title="Start Batch">
-                                    <label className="block text-sm font-medium mb-1">Product</label>
-                                    <select className="w-full border p-2 rounded mb-3" value={productionTarget.productId} onChange={e => setProductionTarget({...productionTarget, productId: e.target.value})}>
-                                        <option value="">Select...</option>
-                                        {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                                    </select>
-                                    <label className="block text-sm font-medium mb-1">Qty</label>
-                                    <input type="number" className="w-full border p-2 rounded mb-4" value={productionTarget.quantity} onChange={e => setProductionTarget({...productionTarget, quantity: e.target.value})} />
-                                    <Button onClick={executeProduction} variant="success" icon={Factory} disabled={!selectedProd} className="w-full">Run</Button>
-                                </Card>
-                            </div>
-                            <div className="lg:col-span-2">
-                                {selectedProd && (
-                                    <Card title="Requirements">
-                                        <table className="w-full text-sm text-left">
-                                            <thead className="bg-slate-50 text-slate-500"><tr><th className="p-2">Material</th><th className="p-2">Req</th><th className="p-2">Avail</th><th className="p-2">Status</th></tr></thead>
-                                            <tbody>
-                                                {selectedProd.ingredients.map((ing, i) => {
-                                                    const mat = materials.find(m => m.id === ing.materialId);
-                                                    const req = ing.qty * productionTarget.quantity;
-                                                    const avail = mat ? mat.stock : 0;
-                                                    return (
-                                                        <tr key={i} className="border-b">
-                                                            <td className="p-2">{mat?.name}</td>
-                                                            <td className="p-2">{req} {mat?.unit}</td>
-                                                            <td className="p-2">{avail} {mat?.unit}</td>
-                                                            <td className="p-2 font-bold">{avail >= req ? <span className="text-emerald-600">OK</span> : <span className="text-red-600">Low</span>}</td>
-                                                        </tr>
-                                                    )
-                                                })}
-                                            </tbody>
-                                        </table>
-                                    </Card>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                );
-            };
-
-            const ContactsView = () => (
-                <div className="space-y-6">
-                    <div className="flex justify-between items-end no-print">
-                        <div><h2 className="text-2xl font-bold text-slate-800">Contacts</h2><p className="text-slate-500">Buyers & Sellers</p></div>
-                        <Button onClick={() => setIsAddingContact(true)} icon={Plus}>Add Contact</Button>
-                    </div>
-
-                    {isAddingContact && (
-                        <Card title="New Contact">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><label className="text-sm font-medium block mb-1">Name</label><input className="border p-2 rounded w-full" value={newContact.name} onChange={e => setNewContact({...newContact, name: e.target.value})} /></div>
-                                <div><label className="text-sm font-medium block mb-1">Type</label><select className="border p-2 rounded w-full" value={newContact.type} onChange={e => setNewContact({...newContact, type: e.target.value})}><option value="buyer">Buyer</option><option value="seller">Seller</option></select></div>
-                                <div><label className="text-sm font-medium block mb-1">Person</label><input className="border p-2 rounded w-full" value={newContact.contactPerson} onChange={e => setNewContact({...newContact, contactPerson: e.target.value})} /></div>
-                                <div><label className="text-sm font-medium block mb-1">Phone</label><input className="border p-2 rounded w-full" value={newContact.phone} onChange={e => setNewContact({...newContact, phone: e.target.value})} /></div>
-                                <div className="md:col-span-2"><label className="text-sm font-medium block mb-1">Address</label><input className="border p-2 rounded w-full" value={newContact.address} onChange={e => setNewContact({...newContact, address: e.target.value})} /></div>
-                                <div className="md:col-span-2 flex justify-end gap-2">
-                                    <Button variant="secondary" onClick={() => setIsAddingContact(false)}>Cancel</Button>
-                                    <Button onClick={handleAddContact} icon={Save}>Save</Button>
-                                </div>
-                            </div>
-                        </Card>
-                    )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {contacts.map(c => (
-                            <Card key={c.id} title={c.name} action={<button onClick={() => handleDeleteContact(c.id)} className="text-slate-400 hover:text-red-500 no-print"><Trash2 size={16}/></button>}>
-                                <div className="text-sm text-slate-600 space-y-1">
-                                    <div className="flex justify-between"><span className="text-slate-400">Type</span><span className="uppercase font-bold text-xs bg-slate-100 px-2 rounded">{c.type}</span></div>
-                                    <div className="flex justify-between"><span className="text-slate-400">Person</span><span>{c.contactPerson}</span></div>
-                                    <div className="flex justify-between"><span className="text-slate-400">Phone</span><span>{c.phone}</span></div>
-                                    <div className="pt-2 border-t mt-2 text-xs">{c.address}</div>
-                                </div>
-                            </Card>
-                        ))}
-                    </div>
-                </div>
-            );
-
-            const InvoiceView = () => {
-                const [mode, setMode] = useState('list');
-                const [currentInvoice, setCurrentInvoice] = useState(null);
-                const [invBuyerId, setInvBuyerId] = useState('');
-                const [invItems, setInvItems] = useState([]);
-                const [invTempItem, setInvTempItem] = useState({ prodId: '', qty: 1 });
-
-                const addItem = () => {
-                    if(!invTempItem.prodId) return;
-                    const prod = products.find(p => p.id === invTempItem.prodId);
-                    setInvItems([...invItems, { prodId: prod.id, qty: Number(invTempItem.qty), price: prod.sellingPrice, name: prod.name }]);
-                    setInvTempItem({ prodId: '', qty: 1 });
-                };
-
-                const generateInvoice = async () => {
-                    if(!invBuyerId || invItems.length === 0) return;
-                    const buyer = contacts.find(c => c.id === invBuyerId);
-                    const total = invItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
-                    const batch = writeBatch(db);
-
-                    invItems.forEach(item => {
-                        const prod = products.find(p => p.id === item.prodId);
-                        if(prod) {
-                            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'products', prod.id);
-                            batch.update(ref, { stock: (prod.stock || 0) - item.qty });
-                        }
-                    });
-
-                    const invRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'invoices'));
-                    const invData = {
-                        invoiceNumber: `INV-${Date.now().toString().slice(-6)}`,
-                        buyerId: invBuyerId,
-                        buyerName: buyer.name,
-                        buyerAddress: buyer.address,
-                        buyerPhone: buyer.phone,
-                        items: invItems,
-                        total: total,
-                        date: new Date().toISOString(),
-                    };
-                    batch.set(invRef, invData);
-
-                    const transRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'transactions'));
-                    batch.set(transRef, {
-                        type: 'income',
-                        amount: total,
-                        date: new Date().toISOString(),
-                        description: `Invoice ${invData.invoiceNumber} to ${buyer.name}`,
-                        relatedId: invRef.id
-                    });
-
-                    await batch.commit();
-                    setMode('list');
-                    setInvItems([]);
-                };
-
-                if (mode === 'view' && currentInvoice) {
-                    return (
-                        <div className="bg-white min-h-screen">
-                            <div className="no-print p-4 border-b flex justify-between bg-slate-50">
-                                <Button onClick={() => setMode('list')} variant="secondary" icon={ArrowLeft}>Back</Button>
-                                <Button onClick={() => window.print()} icon={Printer}>Print</Button>
-                            </div>
-                            <div className="max-w-3xl mx-auto p-12 print:p-0 print:max-w-none">
-                                <div className="flex justify-between items-start mb-12">
-                                    <div><h1 className="text-4xl font-bold text-slate-900 mb-2">INVOICE</h1><p className="text-slate-500 font-mono">#{currentInvoice.invoiceNumber}</p></div>
-                                    <div className="text-right"><h3 className="font-bold text-xl text-indigo-600">XYZ Company</h3><p>123 Random Business Park</p><p>Innovation City, IN 45000</p></div>
-                                </div>
-                                <div className="mb-12 flex justify-between">
-                                    <div><h4 className="text-xs font-bold uppercase text-slate-400 mb-2">Bill To</h4><p className="font-bold text-lg">{currentInvoice.buyerName}</p><p className="whitespace-pre-line">{currentInvoice.buyerAddress}</p><p>{currentInvoice.buyerPhone}</p></div>
-                                    <div className="text-right"><div><span className="text-slate-400 text-xs font-bold uppercase mr-4">Date</span><span className="font-medium">{formatDate(currentInvoice.date)}</span></div><div><span className="text-slate-400 text-xs font-bold uppercase mr-4">Total</span><span className="font-bold text-xl text-emerald-600">{formatCurrency(currentInvoice.total)}</span></div></div>
-                                </div>
-                                <table className="w-full mb-12"><thead className="border-b-2 border-slate-900"><tr><th className="text-left py-3">Description</th><th className="text-right py-3">Qty</th><th className="text-right py-3">Price</th><th className="text-right py-3">Amount</th></tr></thead><tbody className="divide-y divide-slate-100">{currentInvoice.items.map((item, i) => (<tr key={i}><td className="py-4">{item.name}</td><td className="py-4 text-right">{item.qty}</td><td className="py-4 text-right">{formatCurrency(item.price)}</td><td className="py-4 text-right font-bold">{formatCurrency(item.qty * item.price)}</td></tr>))}</tbody></table>
-                                <div className="border-t-2 border-slate-100 pt-8 flex justify-end"><div className="w-1/2 flex justify-between py-2 border-t border-slate-200"><span className="font-bold text-lg">Total</span><span className="font-bold text-2xl text-indigo-600">{formatCurrency(currentInvoice.total)}</span></div></div>
-                            </div>
-                        </div>
-                    );
-                }
-
-                if (mode === 'create') {
-                    return (
-                        <div className="max-w-4xl mx-auto space-y-6">
-                            <div className="flex items-center gap-4"><Button onClick={() => setMode('list')} variant="secondary" icon={ArrowLeft}>Back</Button><h2 className="text-2xl font-bold">New Invoice</h2></div>
-                            <Card title="Customer">
-                                <select className="w-full border p-2 rounded" value={invBuyerId} onChange={e => setInvBuyerId(e.target.value)}>
-                                    <option value="">Select Buyer...</option>
-                                    {contacts.filter(c => c.type !== 'seller').map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                </select>
-                            </Card>
-                            <Card title="Items">
-                                <div className="flex gap-2 mb-4">
-                                    <select className="flex-1 border p-2 rounded" value={invTempItem.prodId} onChange={e => setInvTempItem({...invTempItem, prodId: e.target.value})}>
-                                        <option value="">Add Product...</option>
-                                        {products.map(p => <option key={p.id} value={p.id}>{p.name} ({formatCurrency(p.sellingPrice)})</option>)}
-                                    </select>
-                                    <input type="number" className="w-24 border p-2 rounded" value={invTempItem.qty} onChange={e => setInvTempItem({...invTempItem, qty: e.target.value})} />
-                                    <Button onClick={addItem} variant="secondary">Add</Button>
-                                </div>
-                                <table className="w-full text-left"><thead className="bg-slate-50"><tr><th className="p-2">Item</th><th className="p-2">Qty</th><th className="p-2">Total</th><th></th></tr></thead><tbody>{invItems.map((item, i) => (<tr key={i}><td className="p-2">{item.name}</td><td className="p-2">{item.qty}</td><td className="p-2">{formatCurrency(item.qty * item.price)}</td><td className="p-2"><button onClick={() => setInvItems(invItems.filter((_, idx) => idx !== i))} className="text-red-500">&times;</button></td></tr>))}</tbody></table>
-                            </Card>
-                            <div className="flex justify-end"><Button onClick={generateInvoice} variant="success" icon={FileText} disabled={!invBuyerId || invItems.length === 0}>Generate</Button></div>
-                        </div>
-                    )
-                }
-
-                return (
-                    <div className="space-y-6">
-                        <div className="flex justify-between items-end no-print">
-                            <div><h2 className="text-2xl font-bold text-slate-800">Invoices</h2><p className="text-slate-500">Billing Records</p></div>
-                            <Button onClick={() => setMode('create')} icon={Plus}>New Invoice</Button>
-                        </div>
-                        <div className="bg-white rounded-xl shadow border overflow-hidden">
-                            <table className="w-full text-left">
-                                <thead className="bg-slate-50 text-slate-500"><tr><th className="p-4">#</th><th className="p-4">Date</th><th className="p-4">Customer</th><th className="p-4">Total</th><th className="p-4"></th></tr></thead>
-                                <tbody className="divide-y">{invoices.map(inv => (<tr key={inv.id}><td className="p-4 font-mono text-slate-600">{inv.invoiceNumber}</td><td className="p-4">{formatDate(inv.date)}</td><td className="p-4">{inv.buyerName}</td><td className="p-4 font-bold">{formatCurrency(inv.total)}</td><td className="p-4 text-right no-print"><Button variant="ghost" onClick={() => { setCurrentInvoice(inv); setMode('view'); }} className="!py-1">View</Button></td></tr>))}</tbody>
-                            </table>
-                        </div>
-                    </div>
-                );
-            };
-
-            const PurchasingView = () => {
-                const [cart, setCart] = useState({});
-                const [sellerId, setSellerId] = useState('');
-
-                const commitPurchase = async () => {
-                    const batch = writeBatch(db);
-                    let totalCost = 0;
-                    let descItems = [];
-                    Object.entries(cart).forEach(([matId, qty]) => {
-                        if(qty > 0) {
-                            const mat = materials.find(m => m.id === matId);
-                            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'materials', matId);
-                            batch.update(ref, { stock: Number(mat.stock) + Number(qty) });
-                            totalCost += (mat.cost * qty);
-                            descItems.push(`${qty}${mat.unit} ${mat.name}`);
-                        }
-                    });
-                    const transRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'transactions'));
-                    batch.set(transRef, { type: 'expense', amount: totalCost, date: new Date().toISOString(), description: `Restock: ${descItems.join(', ')}`, relatedId: sellerId });
-                    await batch.commit();
-                    setCart({});
-                    alert("Stock received.");
-                };
-
-                return (
-                    <div className="space-y-6">
-                        <h2 className="text-2xl font-bold text-slate-800">Purchasing</h2>
-                        <div className="flex items-center gap-4 bg-white p-4 rounded-xl border">
-                            <span className="font-medium">Seller:</span>
-                            <select className="border p-2 rounded flex-1" value={sellerId} onChange={e => setSellerId(e.target.value)}>
-                                <option value="">Select...</option>
-                                {contacts.filter(c => c.type !== 'buyer').map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                            </select>
-                            {Object.keys(cart).length > 0 && <Button onClick={commitPurchase} variant="success">Receive Stock</Button>}
-                        </div>
-                        <div className="bg-white rounded-xl border overflow-hidden">
-                            <table className="w-full text-left"><thead className="bg-slate-50 text-slate-500"><tr><th className="p-4">Material</th><th className="p-4">Cost</th><th className="p-4">Stock</th><th className="p-4">Order Qty</th><th className="p-4">Subtotal</th></tr></thead>
-                            <tbody className="divide-y">{materials.map(mat => {
-                                const qty = cart[mat.id] || 0;
-                                return (
-                                    <tr key={mat.id}><td className="p-4 font-medium">{mat.name}</td><td className="p-4">{formatCurrency(mat.cost)}</td><td className="p-4">{mat.stock}</td><td className="p-4"><input type="number" className="border p-1 rounded w-24" value={qty || ''} onChange={e => setCart({...cart, [mat.id]: Number(e.target.value)})} /></td><td className="p-4 font-mono">{formatCurrency(qty * mat.cost)}</td></tr>
-                                )
-                            })}</tbody></table>
-                        </div>
-                    </div>
-                )
+                batch.update(doc(db, 'artifacts', appId, 'public', 'data', 'products', product.id), { stock: (product.stock || 0) + qty });
+                await batch.commit();
+                alert(`Produced ${qty} units.`);
+                setProductionTarget({ ...productionTarget, quantity: 1 });
             };
 
             if (loading) return <LoadingScreen />;
@@ -798,13 +604,13 @@
                     <div className="flex-1 ml-20 lg:ml-64 main-content">
                         <div className="p-8">
                             <div className="max-w-7xl mx-auto">
-                                {activeTab === 'dashboard' && <DashboardView />}
-                                {activeTab === 'inventory' && <InventoryView />}
-                                {activeTab === 'formulas' && <FormulasView />}
-                                {activeTab === 'production' && <ProductionView />}
-                                {activeTab === 'purchasing' && <PurchasingView />}
-                                {activeTab === 'invoices' && <InvoiceView />}
-                                {activeTab === 'contacts' && <ContactsView />}
+                                {activeTab === 'dashboard' && <DashboardView materials={materials} products={products} transactions={transactions} />}
+                                {activeTab === 'inventory' && <InventoryView materials={materials} isAdding={isAddingMaterial} setIsAdding={setIsAddingMaterial} newMat={newMaterial} setNewMat={setNewMaterial} handleAdd={handleAddMaterial} handleUpdate={handleUpdateMaterial} handleDelete={handleDeleteMaterial} />}
+                                {activeTab === 'formulas' && <FormulasView materials={materials} products={products} isAdding={isAddingProduct} setIsAdding={setIsAddingProduct} newProd={newProduct} setNewProd={setNewProduct} handleAdd={handleAddProduct} handleDelete={handleDeleteProduct} />}
+                                {activeTab === 'production' && <ProductionView products={products} materials={materials} target={productionTarget} setTarget={setProductionTarget} execute={executeProduction} />}
+                                {activeTab === 'purchasing' && <PurchasingView materials={materials} contacts={contacts} appId={appId} />}
+                                {activeTab === 'invoices' && <InvoiceView invoices={invoices} contacts={contacts} products={products} appId={appId} />}
+                                {activeTab === 'contacts' && <ContactsView contacts={contacts} isAdding={isAddingContact} setIsAdding={setIsAddingContact} newContact={newContact} setNewContact={setNewContact} handleAdd={handleAddContact} handleDelete={handleDeleteContact} />}
                             </div>
                         </div>
                     </div>

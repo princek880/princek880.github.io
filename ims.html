@@ -43,7 +43,6 @@
         import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Configuration ---
-        const apiKey = ""; 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
@@ -121,7 +120,7 @@
             </div>
         );
 
-        // --- Feature Views (Defined OUTSIDE Main Component to fix focus bug) ---
+        // --- Feature Views ---
 
         const DashboardView = ({ materials, products, transactions }) => {
             const totalMaterialValue = materials.reduce((acc, m) => acc + (m.stock * m.cost), 0);
@@ -194,10 +193,10 @@
                 {isAdding && (
                     <Card title="New Material" action={<Button variant="secondary" onClick={() => setIsAdding(false)} className="!py-1 !px-2 text-sm">Cancel</Button>}>
                         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                            <div className="md:col-span-2"><label className="block text-sm font-medium mb-1">Name</label><input className="w-full border p-2 rounded" value={newMat.name} onChange={e => setNewMat({...newMat, name: e.target.value})} /></div>
+                            <div className="md:col-span-2"><label className="block text-sm font-medium mb-1">Name</label><input className="w-full border p-2 rounded" value={newMat.name} onChange={e => setNewMat({...newMat, name: e.target.value})} placeholder="e.g. Steel" /></div>
                             <div><label className="block text-sm font-medium mb-1">Unit</label><select className="w-full border p-2 rounded" value={newMat.unit} onChange={e => setNewMat({...newMat, unit: e.target.value})}>{['kg', 'g', 'l', 'ml', 'pcs', 'm', 'ft'].map(u => <option key={u} value={u}>{u}</option>)}</select></div>
-                            <div><label className="block text-sm font-medium mb-1">Cost/Unit</label><input type="number" className="w-full border p-2 rounded" value={newMat.cost} onChange={e => setNewMat({...newMat, cost: e.target.value})} /></div>
-                            <div><label className="block text-sm font-medium mb-1">Stock</label><input type="number" className="w-full border p-2 rounded" value={newMat.stock} onChange={e => setNewMat({...newMat, stock: e.target.value})} /></div>
+                            <div><label className="block text-sm font-medium mb-1">Cost/Unit</label><input type="number" className="w-full border p-2 rounded" value={newMat.cost} onChange={e => setNewMat({...newMat, cost: e.target.value})} placeholder="0.00" /></div>
+                            <div><label className="block text-sm font-medium mb-1">Stock</label><input type="number" className="w-full border p-2 rounded" value={newMat.stock} onChange={e => setNewMat({...newMat, stock: e.target.value})} placeholder="0" /></div>
                             <Button onClick={handleAdd} icon={Save} className="md:col-span-5">Save</Button>
                         </div>
                     </Card>
@@ -234,7 +233,7 @@
                         <Card title="New Product">
                             <div className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div><label className="block text-sm font-medium mb-1">Name</label><input className="w-full border p-2 rounded" value={newProd.name} onChange={e => setNewProd({...newProd, name: e.target.value})} /></div>
+                                    <div><label className="block text-sm font-medium mb-1">Name</label><input className="w-full border p-2 rounded" value={newProd.name} onChange={e => setNewProd({...newProd, name: e.target.value})} placeholder="Product Name" /></div>
                                     <div><label className="block text-sm font-medium mb-1">Price</label><input type="number" className="w-full border p-2 rounded" value={newProd.sellingPrice} onChange={e => setNewProd({...newProd, sellingPrice: e.target.value})} /></div>
                                 </div>
                                 <div className="p-4 bg-slate-50 rounded border">
@@ -321,11 +320,11 @@
                 {isAdding && (
                     <Card title="New Contact">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div><label className="text-sm font-medium block mb-1">Name</label><input className="border p-2 rounded w-full" value={newContact.name} onChange={e => setNewContact({...newContact, name: e.target.value})} /></div>
+                            <div><label className="text-sm font-medium block mb-1">Name</label><input className="border p-2 rounded w-full" value={newContact.name} onChange={e => setNewContact({...newContact, name: e.target.value})} placeholder="Name" /></div>
                             <div><label className="text-sm font-medium block mb-1">Type</label><select className="border p-2 rounded w-full" value={newContact.type} onChange={e => setNewContact({...newContact, type: e.target.value})}><option value="buyer">Buyer</option><option value="seller">Seller</option></select></div>
-                            <div><label className="text-sm font-medium block mb-1">Person</label><input className="border p-2 rounded w-full" value={newContact.contactPerson} onChange={e => setNewContact({...newContact, contactPerson: e.target.value})} /></div>
-                            <div><label className="text-sm font-medium block mb-1">Phone</label><input className="border p-2 rounded w-full" value={newContact.phone} onChange={e => setNewContact({...newContact, phone: e.target.value})} /></div>
-                            <div className="md:col-span-2"><label className="text-sm font-medium block mb-1">Address</label><input className="border p-2 rounded w-full" value={newContact.address} onChange={e => setNewContact({...newContact, address: e.target.value})} /></div>
+                            <div><label className="text-sm font-medium block mb-1">Person</label><input className="border p-2 rounded w-full" value={newContact.contactPerson} onChange={e => setNewContact({...newContact, contactPerson: e.target.value})} placeholder="Contact Person" /></div>
+                            <div><label className="text-sm font-medium block mb-1">Phone</label><input className="border p-2 rounded w-full" value={newContact.phone} onChange={e => setNewContact({...newContact, phone: e.target.value})} placeholder="Phone" /></div>
+                            <div className="md:col-span-2"><label className="text-sm font-medium block mb-1">Address</label><input className="border p-2 rounded w-full" value={newContact.address} onChange={e => setNewContact({...newContact, address: e.target.value})} placeholder="Address" /></div>
                             <div className="md:col-span-2 flex justify-end gap-2"><Button variant="secondary" onClick={() => setIsAdding(false)}>Cancel</Button><Button onClick={handleAdd} icon={Save}>Save</Button></div>
                         </div>
                     </Card>
@@ -340,6 +339,30 @@
                         </div>
                     </Card>
                 ))}</div>
+            </div>
+        );
+
+        const FinancialsView = ({ transactions }) => (
+            <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-slate-800">Financial Ledger</h2>
+                <div className="bg-white rounded-xl shadow border overflow-hidden">
+                    <table className="w-full text-left">
+                        <thead className="bg-slate-50 text-slate-500"><tr><th className="p-4">Date</th><th className="p-4">Description</th><th className="p-4">Type</th><th className="p-4 text-right">Amount</th></tr></thead>
+                        <tbody className="divide-y">
+                            {transactions.map(t => (
+                                <tr key={t.id} className="hover:bg-slate-50">
+                                    <td className="p-4 text-slate-500 whitespace-nowrap">{formatDate(t.date)}</td>
+                                    <td className="p-4 font-medium">{t.description}</td>
+                                    <td className="p-4"><span className={`px-2 py-1 rounded text-xs font-bold uppercase ${t.type === 'income' ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'}`}>{t.type}</span></td>
+                                    <td className={`p-4 text-right font-mono font-bold ${t.type === 'income' ? 'text-emerald-600' : 'text-red-600'}`}>
+                                        {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                                    </td>
+                                </tr>
+                            ))}
+                            {transactions.length === 0 && <tr><td colSpan={4} className="p-8 text-center text-slate-400">No transactions recorded.</td></tr>}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         );
 
@@ -359,37 +382,41 @@
 
             const generateInvoice = async () => {
                 if(!invBuyerId || invItems.length === 0) return;
-                const buyer = contacts.find(c => c.id === invBuyerId);
-                const total = invItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
-                const batch = writeBatch(db);
+                try {
+                    const buyer = contacts.find(c => c.id === invBuyerId);
+                    const total = invItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
+                    const batch = writeBatch(db);
 
-                invItems.forEach(item => {
-                    const prod = products.find(p => p.id === item.prodId);
-                    if(prod) {
-                        const ref = doc(db, 'artifacts', appId, 'public', 'data', 'products', prod.id);
-                        batch.update(ref, { stock: (prod.stock || 0) - item.qty });
-                    }
-                });
+                    invItems.forEach(item => {
+                        const prod = products.find(p => p.id === item.prodId);
+                        if(prod) {
+                            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'products', prod.id);
+                            batch.update(ref, { stock: (prod.stock || 0) - item.qty });
+                        }
+                    });
 
-                const invRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'invoices'));
-                const invData = {
-                    invoiceNumber: `INV-${Date.now().toString().slice(-6)}`,
-                    buyerId: invBuyerId,
-                    buyerName: buyer.name,
-                    buyerAddress: buyer.address,
-                    buyerPhone: buyer.phone,
-                    items: invItems,
-                    total: total,
-                    date: new Date().toISOString(),
-                };
-                batch.set(invRef, invData);
+                    const invRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'invoices'));
+                    const invData = {
+                        invoiceNumber: `INV-${Date.now().toString().slice(-6)}`,
+                        buyerId: invBuyerId,
+                        buyerName: buyer.name,
+                        buyerAddress: buyer.address,
+                        buyerPhone: buyer.phone,
+                        items: invItems,
+                        total: total,
+                        date: new Date().toISOString(),
+                    };
+                    batch.set(invRef, invData);
 
-                const transRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'transactions'));
-                batch.set(transRef, { type: 'income', amount: total, date: new Date().toISOString(), description: `Invoice ${invData.invoiceNumber} to ${buyer.name}`, relatedId: invRef.id });
+                    const transRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'transactions'));
+                    batch.set(transRef, { type: 'income', amount: total, date: new Date().toISOString(), description: `Invoice ${invData.invoiceNumber} to ${buyer.name}`, relatedId: invRef.id });
 
-                await batch.commit();
-                setMode('list');
-                setInvItems([]);
+                    await batch.commit();
+                    setMode('list');
+                    setInvItems([]);
+                } catch (e) {
+                    alert("Error saving invoice: " + e.message);
+                }
             };
 
             if (mode === 'view' && currentInvoice) {
@@ -459,23 +486,28 @@
             const [sellerId, setSellerId] = useState('');
 
             const commitPurchase = async () => {
-                const batch = writeBatch(db);
-                let totalCost = 0;
-                let descItems = [];
-                Object.entries(cart).forEach(([matId, qty]) => {
-                    if(qty > 0) {
-                        const mat = materials.find(m => m.id === matId);
-                        const ref = doc(db, 'artifacts', appId, 'public', 'data', 'materials', matId);
-                        batch.update(ref, { stock: Number(mat.stock) + Number(qty) });
-                        totalCost += (mat.cost * qty);
-                        descItems.push(`${qty}${mat.unit} ${mat.name}`);
-                    }
-                });
-                const transRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'transactions'));
-                batch.set(transRef, { type: 'expense', amount: totalCost, date: new Date().toISOString(), description: `Restock: ${descItems.join(', ')}`, relatedId: sellerId });
-                await batch.commit();
-                setCart({});
-                alert("Stock received.");
+                if (!appId) { alert("App ID error"); return; }
+                try {
+                    const batch = writeBatch(db);
+                    let totalCost = 0;
+                    let descItems = [];
+                    Object.entries(cart).forEach(([matId, qty]) => {
+                        if(qty > 0) {
+                            const mat = materials.find(m => m.id === matId);
+                            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'materials', matId);
+                            batch.update(ref, { stock: Number(mat.stock) + Number(qty) });
+                            totalCost += (mat.cost * qty);
+                            descItems.push(`${qty}${mat.unit} ${mat.name}`);
+                        }
+                    });
+                    const transRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'transactions'));
+                    batch.set(transRef, { type: 'expense', amount: totalCost, date: new Date().toISOString(), description: `Restock: ${descItems.join(', ')}`, relatedId: sellerId });
+                    await batch.commit();
+                    setCart({});
+                    alert("Stock received.");
+                } catch(e) {
+                    alert("Error purchasing: " + e.message);
+                }
             };
 
             return (
@@ -533,7 +565,7 @@
                     try {
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
                         else await signInAnonymously(auth);
-                    } catch (error) { setLoading(false); }
+                    } catch (error) { console.error(error); setLoading(false); }
                 };
                 if (auth) {
                     initAuth();
@@ -552,27 +584,71 @@
                 return () => { unsubMaterials(); unsubProducts(); unsubContacts(); unsubTrans(); unsubInvoices(); };
             }, [user]);
 
-            // Handlers
-            const handleAddMaterial = async () => { if (!newMaterial.name) return; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'materials'), { ...newMaterial, stock: Number(newMaterial.stock), cost: Number(newMaterial.cost), createdAt: new Date().toISOString() }); setNewMaterial({ name: '', unit: 'kg', stock: 0, cost: 0 }); setIsAddingMaterial(false); };
-            const handleDeleteMaterial = async (id) => { if (confirm('Delete material?')) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'materials', id)); };
-            const handleUpdateMaterial = async (id, f, v) => await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'materials', id), { [f]: v });
-            const handleAddProduct = async () => { if (!newProduct.name) return; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { ...newProduct, sellingPrice: Number(newProduct.sellingPrice), stock: 0, createdAt: new Date().toISOString() }); setNewProduct({ name: '', ingredients: [], sellingPrice: 0, stock: 0 }); setIsAddingProduct(false); };
-            const handleDeleteProduct = async (id) => { if (confirm('Delete product?')) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id)); };
-            const handleAddContact = async () => { if (!newContact.name) return; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'contacts'), { ...newContact, createdAt: new Date().toISOString() }); setNewContact({ name: '', type: 'buyer', address: '', contactPerson: '', phone: '' }); setIsAddingContact(false); };
-            const handleDeleteContact = async (id) => { if (confirm('Delete contact?')) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'contacts', id)); };
+            // Handlers with Error Reporting
+            const handleAddMaterial = async () => { 
+                if (!newMaterial.name) return;
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'materials'), { ...newMaterial, stock: Number(newMaterial.stock), cost: Number(newMaterial.cost), createdAt: new Date().toISOString() }); 
+                    setNewMaterial({ name: '', unit: 'kg', stock: 0, cost: 0 }); 
+                    setIsAddingMaterial(false); 
+                } catch(e) { alert("Failed to add material: " + e.message); }
+            };
+
+            const handleDeleteMaterial = async (id) => { 
+                if (confirm('Delete material?')) {
+                    try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'materials', id)); } catch(e) { alert(e.message); }
+                }
+            };
+
+            const handleUpdateMaterial = async (id, f, v) => {
+                try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'materials', id), { [f]: v }); } catch(e) { alert(e.message); }
+            };
+
+            const handleAddProduct = async () => { 
+                if (!newProduct.name) return; 
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { ...newProduct, sellingPrice: Number(newProduct.sellingPrice), stock: 0, createdAt: new Date().toISOString() }); 
+                    setNewProduct({ name: '', ingredients: [], sellingPrice: 0, stock: 0 }); 
+                    setIsAddingProduct(false); 
+                } catch(e) { alert("Failed to add product: " + e.message); }
+            };
+
+            const handleDeleteProduct = async (id) => { 
+                if (confirm('Delete product?')) {
+                    try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id)); } catch(e) { alert(e.message); }
+                }
+            };
+
+            const handleAddContact = async () => { 
+                if (!newContact.name) return; 
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'contacts'), { ...newContact, createdAt: new Date().toISOString() }); 
+                    setNewContact({ name: '', type: 'buyer', address: '', contactPerson: '', phone: '' }); 
+                    setIsAddingContact(false); 
+                } catch(e) { alert("Failed to add contact: " + e.message); }
+            };
+
+            const handleDeleteContact = async (id) => { 
+                if (confirm('Delete contact?')) {
+                    try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'contacts', id)); } catch(e) { alert(e.message); }
+                }
+            };
+
             const executeProduction = async () => {
                 const product = products.find(p => p.id === productionTarget.productId);
                 if (!product) return;
                 const qty = Number(productionTarget.quantity);
-                const batch = writeBatch(db);
-                product.ingredients.forEach(ing => {
-                    const mat = materials.find(m => m.id === ing.materialId);
-                    if (mat) batch.update(doc(db, 'artifacts', appId, 'public', 'data', 'materials', mat.id), { stock: Number(mat.stock) - (Number(ing.qty) * qty) });
-                });
-                batch.update(doc(db, 'artifacts', appId, 'public', 'data', 'products', product.id), { stock: (product.stock || 0) + qty });
-                await batch.commit();
-                alert(`Produced ${qty} units.`);
-                setProductionTarget({ ...productionTarget, quantity: 1 });
+                try {
+                    const batch = writeBatch(db);
+                    product.ingredients.forEach(ing => {
+                        const mat = materials.find(m => m.id === ing.materialId);
+                        if (mat) batch.update(doc(db, 'artifacts', appId, 'public', 'data', 'materials', mat.id), { stock: Number(mat.stock) - (Number(ing.qty) * qty) });
+                    });
+                    batch.update(doc(db, 'artifacts', appId, 'public', 'data', 'products', product.id), { stock: (product.stock || 0) + qty });
+                    await batch.commit();
+                    alert(`Produced ${qty} units.`);
+                    setProductionTarget({ ...productionTarget, quantity: 1 });
+                } catch(e) { alert("Production error: " + e.message); }
             };
 
             if (loading) return <LoadingScreen />;
@@ -592,6 +668,7 @@
                                 { id: 'production', label: 'Production', icon: Factory },
                                 { id: 'purchasing', label: 'Purchasing', icon: ShoppingCart },
                                 { id: 'invoices', label: 'Invoices', icon: FileText },
+                                { id: 'financials', label: 'Financials', icon: DollarSign },
                                 { id: 'contacts', label: 'Contacts', icon: Users },
                             ].map(item => (
                                 <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center p-3 rounded-lg transition-all ${activeTab === item.id ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
@@ -610,6 +687,7 @@
                                 {activeTab === 'production' && <ProductionView products={products} materials={materials} target={productionTarget} setTarget={setProductionTarget} execute={executeProduction} />}
                                 {activeTab === 'purchasing' && <PurchasingView materials={materials} contacts={contacts} appId={appId} />}
                                 {activeTab === 'invoices' && <InvoiceView invoices={invoices} contacts={contacts} products={products} appId={appId} />}
+                                {activeTab === 'financials' && <FinancialsView transactions={transactions} />}
                                 {activeTab === 'contacts' && <ContactsView contacts={contacts} isAdding={isAddingContact} setIsAdding={setIsAddingContact} newContact={newContact} setNewContact={setNewContact} handleAdd={handleAddContact} handleDelete={handleDeleteContact} />}
                             </div>
                         </div>

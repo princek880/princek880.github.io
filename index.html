@@ -50,7 +50,7 @@
         h2::after {
             content: "";
             display: block;
-            width: 100%; /* Fills remaining space */
+            width: 100%;
             height: 1px;
             background-color: var(--text-muted);
             margin-left: 20px;
@@ -72,6 +72,7 @@
         .highlight { color: var(--accent); font-family: 'JetBrains Mono', monospace; }
         
         a { text-decoration: none; color: inherit; transition: var(--transition); }
+        .external-link { border-bottom: 1px solid var(--accent); }
         
         .btn {
             display: inline-block;
@@ -223,6 +224,8 @@
             cursor: default;
             position: relative;
             top: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .card:hover {
@@ -242,7 +245,7 @@
         .card h3 { font-size: 1.4rem; margin-bottom: 1rem; color: var(--white); transition: var(--transition); }
         .card:hover h3 { color: var(--accent); }
 
-        .card p { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+        .card p { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; }
 
         .card-tech {
             display: flex;
@@ -251,6 +254,7 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.8rem;
             color: var(--text-muted);
+            margin-top: auto;
         }
 
         /* --- Timeline (Experience) --- */
@@ -294,6 +298,9 @@
         .role { font-size: 1.3rem; color: var(--white); }
         .company { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 1rem;}
         .date { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; display: block;}
+        .timeline-desc { color: var(--text-muted); font-size: 0.95rem; }
+        .timeline-desc ul { padding-left: 1.2rem; margin-top: 0.5rem; }
+        .timeline-desc li { margin-bottom: 0.3rem; }
 
         /* --- Gallery --- */
         .gallery-grid {
@@ -376,7 +383,7 @@
         @media (max-width: 768px) {
             #hero h2 { font-size: 3rem; }
             #hero h3 { font-size: 2rem; }
-            .nav-links { display: none; } /* Simplified for brevity, normally strictly mobile menu */
+            .nav-links { display: none; } 
             .stats-row { flex-direction: column; gap: 1rem; }
             .container { padding: 0 25px; }
         }
@@ -392,7 +399,7 @@
         <li><a href="#about">About</a></li>
         <li><a href="#experience">Experience</a></li>
         <li><a href="#projects">Work</a></li>
-        <li><a href="#gallery">Lab</a></li>
+        <li><a href="#publications">Publications</a></li>
     </ul>
 </nav>
 
@@ -403,7 +410,7 @@
         <h2 id="typewriter"></h2>
         <h3>I build things for physics.</h3>
         <p>
-            I am a final-year undergraduate at <strong>IIT Madras</strong> specializing in Experimental High-Energy Physics, Hardware, and Machine Learning. Currently focused on GNN vertexing for CMS and FPGA readout for ATLAS.
+            I am a B.Tech (Hons.) student in Engineering Physics at <a href="https://www.iitm.ac.in/" target="_blank" class="highlight external-link">IIT Madras</a>. My research focuses on the intersection of Hardware Acceleration (FPGA), Graph Neural Networks, and Experimental High-Energy Physics (CMS & ATLAS).
         </p>
         
         <div class="stats-row">
@@ -412,12 +419,12 @@
                 <span class="stat-label">Physics GRE</span>
             </div>
             <div class="stat-item">
-                <span class="stat-val">9.09/10</span>
-                <span class="stat-label">CGPA @ IITM</span>
+                <span class="stat-val">Top 1%</span>
+                <span class="stat-label">JEE Mains (Nationally)</span>
             </div>
             <div class="stat-item">
-                <span class="stat-val">Fellow</span>
-                <span class="stat-label">RPIT (École Polytechnique)</span>
+                <span class="stat-val">Member</span>
+                <span class="stat-label">CMS Collaboration</span>
             </div>
         </div>
 
@@ -429,19 +436,19 @@
         <div style="display: grid; grid-template-columns: 3fr 2fr; gap: 50px; align-items: center;">
             <div>
                 <p style="margin-bottom: 15px; color: var(--text-muted);">
-                    My journey began with a fascination for the fundamental building blocks of the universe. As an Engineering Physics major at <span class="highlight">IIT Madras</span>, I've dedicated my academic career to the intersection of hardware acceleration and deep learning in high-energy physics.
+                    I specialize in experimental setups and computational modeling. My work ranges from <span class="highlight">GNN-based track classification</span> for the CMS experiment to developing firmware for the <span class="highlight">ATLAS readout upgrade</span>.
                 </p>
                 <p style="margin-bottom: 15px; color: var(--text-muted);">
-                    I am currently working on <span class="highlight">FusionNet</span> (a Geometric DL model) and preparing for the launch of the <span class="highlight">SPEED Payload</span> on the IITMSAT satellite (Dec 2025).
+                    Currently, I am working on the <span class="highlight">SPEED Payload</span> for the IITMSAT satellite (ISRO launch) and conducting heavy ion physics analysis.
                 </p>
-                <p style="color: var(--text-muted);">Here are a few technologies I've been working with recently:</p>
+                <p style="color: var(--text-muted);">Technologies I use:</p>
                 <ul style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; list-style: none; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-muted);">
-                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> C++ / Python</li>
-                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> ROOT / Geant4</li>
-                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> PyTorch (GNNs)</li>
-                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> FPGA (Vivado)</li>
-                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> CMSSW</li>
-                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> Verilog</li>
+                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> C++ / Python / ROOT</li>
+                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> Geant4 / Pythia</li>
+                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> Verilog / VHDL (Vivado)</li>
+                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> PyTorch / Keras</li>
+                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> Wireshark / NetworkX</li>
+                    <li><i class="fas fa-caret-right" style="color: var(--accent)"></i> LTSpice / KiCAD</li>
                 </ul>
             </div>
             <div style="position: relative;">
@@ -451,113 +458,147 @@
     </section>
 
     <section id="experience" class="fade-in" style="margin-top: 100px;">
-        <h2>Where I've Worked</h2>
+        <h2>Experience</h2>
         <div class="timeline">
             <div class="timeline-item">
+                <h3 class="role">Undergraduate Researcher (Space Lab)</h3>
+                <span class="company">@ IIT Madras (PI: Dr. David Koilpillai)</span>
+                <span class="date">Aug 2025 - Present</span>
+                <div class="timeline-desc">
+                    Working on the <strong>SPEED Payload</strong> (Space-based Proton Electron Energy Detector).
+                    
+                    <ul>
+                        <li>Performed <strong>Geant4 simulations</strong> for detector efficiency and cosmic muon response.</li>
+                        <li>Executed DAQ workflows using <strong>MC² Analyzer</strong> and debugged ADC-to-energy mapping.</li>
+                        <li>Co-led C firmware development for real-time charged-particle flux monitoring.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="timeline-item">
                 <h3 class="role">RPIT Research Fellow</h3>
-                <span class="company">@ LLR, École Polytechnique (France)</span>
+                <span class="company">@ LLR, École Polytechnique, France</span>
                 <span class="date">Jun 2025 - Aug 2025</span>
-                <p style="color: var(--text-muted);">Developed semi-supervised GNN clustering algorithms for primary vertexing in CMS. Optimized reconstruction purity and benchmarked against standard algorithms using ARI metrics.</p>
+                <div class="timeline-desc">
+                    Research in CMS Experiment: Graph ML & Jet Substructure.
+                    
+
+[Image of Graph Neural Network architecture]
+
+                    <ul>
+                        <li>Engineered <strong>FusionNet</strong> (GNN), outperforming Boosted Decision Trees by <strong>5–15%</strong> in high signal-efficiency regions.</li>
+                        <li>Developed VGAE-based contrastive clustering for jet substructure analysis.</li>
+                    </ul>
+                </div>
             </div>
+
             <div class="timeline-item">
-                <h3 class="role">Young Research Fellow</h3>
-                <span class="company">@ EHEP Lab, IIT Madras</span>
-                <span class="date">Jun 2024 - Present</span>
-                <p style="color: var(--text-muted);">Investigating the QCD dead cone effect. Built an end-to-end Deep Learning pipeline processing TB-scale CMSSW data on the grid. Member of CMS Collaboration.</p>
-            </div>
-            <div class="timeline-item">
-                <h3 class="role">Firmware Developer</h3>
-                <span class="company">@ HEP Lab, IIT Madras</span>
+                <h3 class="role">Firmware Developer (Detector Dev Lab)</h3>
+                <span class="company">@ IIT Madras (PI: Dr. Prafulla Kumar Behera)</span>
                 <span class="date">Nov 2024 - May 2025</span>
-                <p style="color: var(--text-muted);">Hardware R&D for ATLAS. Ported readout firmware for MALTA pixel sensors to Kintex Ultrascale (AXKU040) FPGAs.</p>
+                <div class="timeline-desc">
+                    Hardware R&D for ATLAS Experiment readout chain.
+                    
+
+[Image of FPGA logic block diagram]
+
+                    <ul>
+                        <li>Executed end-to-end FPGA workflow on ALINX board using Vivado.</li>
+                        <li>Ported firmware from KC705 (Kintex7) to <strong>AXKU040 (Kintex Ultrascale)</strong>.</li>
+                        <li>Adapted SGMII to RGMII for MAC-PHY Ethernet communication.</li>
+                    </ul>
+                </div>
+            </div>
+            
+             <div class="timeline-item">
+                <h3 class="role">Young Research Fellow (EHEP Lab)</h3>
+                <span class="company">@ IIT Madras (PI: Dr. Prabhat Pujahari)</span>
+                <span class="date">Jun 2024 - May 2025</span>
+                <div class="timeline-desc">
+                    <ul>
+                        <li>Investigated the <strong>dead cone effect</strong> in pp/PbPb collisions using GNNs.</li>
+                        <li>Built end-to-end framework with <strong>uproot/awkward-array</strong> to process 50GB+ ROOT data.</li>
+                        <li>Developed custom gen fragment for heavy ion analysis (Filter eff: $1.3 \times 10^{-6}$).</li>
+                    </ul>
+                </div>
+            </div>
+
+             <div class="timeline-item">
+                <h3 class="role">Computer Vision Researcher</h3>
+                <span class="company">@ Computational Imaging Lab (PI: Dr. Kaushik Mitra)</span>
+                <span class="date">Jan 2024 - May 2024</span>
+                <div class="timeline-desc">
+                    <ul>
+                        <li>Developed GAN-based models (Uformer, NAFNet) for flare artifact removal.</li>
+                        <li>Achieved near state-of-the-art <strong>PSNR (23.52)</strong> and SSIM (0.66).</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </section>
 
     <section id="projects" class="fade-in" style="margin-top: 100px;">
-        <h2>Notable Projects</h2>
+        <h2>Publications & Projects</h2>
         <div class="grid">
             <div class="card">
                 <div class="card-header">
-                    <i class="far fa-folder folder-icon"></i>
-                    <a href="#" target="_blank"><i class="fas fa-external-link-alt" style="color: var(--text-main); font-size: 1.2rem;"></i></a>
+                    <i class="far fa-file-alt folder-icon"></i>
+                    <a href="https://cds.cern.ch/record/2937581" target="_blank"><i class="fas fa-external-link-alt" style="color: var(--text-main); font-size: 1.2rem;"></i></a>
                 </div>
-                <h3>FusionNet (CMS-DP-2025-035)</h3>
-                <p>A novel geometric deep learning model for track finding in b-jets. Published as a Detector Performance Summary and presented at EuCAIF 2025.</p>
+                <h3>CMS-DP-2025-035</h3>
+                <p>Lead author. "A novel track finding algorithm to identify b-hadrons in b-jets using FusionNet: a geometric deep learning model."</p>
                 <div class="card-tech">
-                    <span>PyTorch</span>
-                    <span>GNN</span>
-                    <span>Latex</span>
+                    <span>CERN CDS</span>
+                    <span>Publication</span>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">
                     <i class="far fa-folder folder-icon"></i>
-                    <a href="#" target="_blank"><i class="fab fa-github" style="color: var(--text-main); font-size: 1.2rem;"></i></a>
                 </div>
                 <h3>AstroStellar N-Body</h3>
-                <p>High-performance C++ simulation of gravitational interactions. Parallelized using OpenMP to handle 1M+ particles with Runge-Kutta integration.</p>
+                <p>3D Gravitational Simulation. Solved Hamiltonian dynamics using <strong>Leapfrog & Runge-Kutta</strong>. Parallelized to 1M+ particles.</p>
                 <div class="card-tech">
                     <span>C++</span>
                     <span>OpenMP</span>
-                    <span>HPC</span>
+                    <span>MATLAB</span>
                 </div>
             </div>
 
             <div class="card">
-                <div class="card-header">
-                    <i class="far fa-folder folder-icon"></i>
-                </div>
-                <h3>SPEED Payload (IITMSAT)</h3>
-                <p>Calibration and data acquisition for the Space-based Proton Electron Energy Detector. Satellite launch scheduled for Dec 2025.</p>
-                <div class="card-tech">
-                    <span>Geant4</span>
-                    <span>Calibration</span>
-                    <span>Hardware</span>
-                </div>
-            </div>
-
-             <div class="card">
                 <div class="card-header">
                     <i class="far fa-folder folder-icon"></i>
                 </div>
                 <h3>Audio-Analog System</h3>
-                <p>Designed active filters and Class-D amplifiers for sound-reactive LED arrays. Simulated in LTSpice with high fidelity.</p>
+                <p>Composite system synchronizing light & sound. Integrated DC-DC converters, bandpass filters, and Class-D amplifiers.</p>
                 <div class="card-tech">
                     <span>LTSpice</span>
                     <span>KiCad</span>
-                    <span>Analog</span>
+                    <span>Electronics</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="gallery" class="fade-in" style="margin-top: 100px;">
-        <h2>Research Gallery</h2>
-        <div class="gallery-grid">
-            <div class="gallery-item" onclick="openModal(this)">
-                <img src="https://via.placeholder.com/600x400?text=LLR+France+Lab" alt="LLR Lab France">
-                <div class="gallery-overlay"><span class="gallery-text">LLR Internship</span></div>
-                <p style="display:none">Working at LLR, École Polytechnique on CMS vertexing algorithms.</p>
+    <section id="teaching" class="fade-in" style="margin-top: 100px;">
+        <h2>Teaching & Community</h2>
+        <div class="grid">
+             <div class="card">
+                <h3>Foundations of Comp. Physics</h3>
+                <p><strong>Course Instructor</strong> (Aug 2025 - Nov 2025). Taught numerical methods, Python/C++, and ROOT to ~50 undergraduates.</p>
             </div>
-            <div class="gallery-item" onclick="openModal(this)">
-                <img src="https://via.placeholder.com/600x400?text=FPGA+Setup" alt="FPGA Setup">
-                <div class="gallery-overlay"><span class="gallery-text">ATLAS Firmware</span></div>
-                <p style="display:none">Kintex Ultrascale FPGA setup for MALTA sensor readout.</p>
+             <div class="card">
+                <h3>Saathi Mentor</h3>
+                <p>Mentoring junior students at IIT Madras to navigate academic and hostel life.</p>
             </div>
-            <div class="gallery-item" onclick="openModal(this)">
-                <img src="https://via.placeholder.com/600x400?text=GNN+Viz" alt="GNN Visualization">
-                <div class="gallery-overlay"><span class="gallery-text">FusionNet Viz</span></div>
-                <p style="display:none">Point cloud visualization of jet constituents for b-tagging.</p>
-            </div>
-             <div class="gallery-item" onclick="openModal(this)">
-                <img src="https://via.placeholder.com/600x400?text=SPEED+Payload" alt="SPEED Payload">
-                <div class="gallery-overlay"><span class="gallery-text">SPEED Payload</span></div>
-                <p style="display:none">Pre-launch calibration of the IITMSAT particle detector.</p>
+             <div class="card">
+                <h3>Shiksha Prayas</h3>
+                <p>Mentored underprivileged high school students from Haryana, improving their academic outcomes.</p>
             </div>
         </div>
-    </section>
+     </section>
+
 
     <footer>
         <div class="socials">
@@ -567,12 +608,6 @@
         </div>
         <p>Designed & Built by Prince Kumar</p>
     </footer>
-</div>
-
-<div id="imgModal" class="modal" onclick="closeModal()">
-    <span class="close">&times;</span>
-    <img id="modalImg" src="">
-    <div id="modalCaption" class="modal-caption"></div>
 </div>
 
 <script>
@@ -601,24 +636,7 @@
         observer.observe(section);
     });
 
-    // --- Modal Logic ---
-    function openModal(element) {
-        const modal = document.getElementById('imgModal');
-        const img = document.getElementById('modalImg');
-        const caption = document.getElementById('modalCaption');
-        const srcImg = element.querySelector('img');
-        const srcText = element.querySelector('p').innerText;
-        
-        modal.style.display = "flex";
-        img.src = srcImg.src;
-        caption.innerText = srcText;
-    }
-
-    function closeModal() {
-        document.getElementById('imgModal').style.display = "none";
-    }
-
-    // --- Particle Background Script (Custom Lightweight) ---
+    // --- Particle Background Script ---
     const canvas = document.getElementById('canvas-container');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -630,20 +648,20 @@
         constructor() {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
-            this.directionX = (Math.random() * 2) - 1; // Speed adjustment
+            this.directionX = (Math.random() * 2) - 1; 
             this.directionY = (Math.random() * 2) - 1;
-            this.size = (Math.random() * 2) + 1; // Size variation
+            this.size = (Math.random() * 2) + 1; 
         }
         draw() {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-            ctx.fillStyle = 'rgba(100, 255, 218, 0.6)'; // Accent color
+            ctx.fillStyle = 'rgba(100, 255, 218, 0.6)'; 
             ctx.fill();
         }
         update() {
             if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
             if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
-            this.x += this.directionX * 0.2; // Velocity factor
+            this.x += this.directionX * 0.2; 
             this.y += this.directionY * 0.2;
             this.draw();
         }
@@ -651,7 +669,7 @@
 
     function init() {
         particlesArray = [];
-        let numberOfParticles = (canvas.height * canvas.width) / 15000; // Density
+        let numberOfParticles = (canvas.height * canvas.width) / 15000; 
         for (let i = 0; i < numberOfParticles; i++) {
             particlesArray.push(new Particle());
         }

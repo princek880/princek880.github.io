@@ -242,10 +242,22 @@
 
         .folder-icon { font-size: 2.5rem; color: var(--accent); }
         
-        .card h3 { font-size: 1.4rem; margin-bottom: 1rem; color: var(--white); transition: var(--transition); }
+        .card h3 { font-size: 1.3rem; margin-bottom: 1rem; color: var(--white); transition: var(--transition); }
         .card:hover h3 { color: var(--accent); }
 
         .card p { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; flex-grow: 1; }
+        
+        /* New style for conference badges */
+        .conf-badge {
+            display: inline-block;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            border-radius: 50px;
+            margin-bottom: 0.5rem;
+            font-family: 'JetBrains Mono';
+        }
 
         .card-tech {
             display: flex;
@@ -305,16 +317,25 @@
         /* --- Gallery --- */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
 
         .gallery-item {
             position: relative;
             overflow: hidden;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            height: 200px;
+            height: 250px;
+            background: var(--bg-light);
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            transition: var(--transition);
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
         }
 
         .gallery-item img {
@@ -322,26 +343,38 @@
             height: 100%;
             object-fit: cover;
             transition: transform 0.5s ease;
-            filter: grayscale(100%);
+            opacity: 0.8;
+            filter: grayscale(80%);
         }
 
         .gallery-item:hover img {
-            transform: scale(1.1);
+            transform: scale(1.05);
+            opacity: 1;
             filter: grayscale(0%);
         }
         
         .gallery-overlay {
             position: absolute;
-            top:0; left:0; width:100%; height:100%;
-            background: rgba(10, 25, 47, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
+            bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(transparent, rgba(2, 12, 27, 0.95));
+            padding: 1rem;
+            transform: translateY(10px);
             transition: 0.3s;
         }
-        .gallery-item:hover .gallery-overlay { opacity: 1; }
-        .gallery-text { color: var(--accent); font-family: 'JetBrains Mono'; font-weight: bold; }
+        
+        .gallery-text { 
+            color: var(--white); 
+            font-family: 'JetBrains Mono'; 
+            font-size: 0.9rem;
+            display: block;
+        }
+        
+        .gallery-subtext {
+            color: var(--accent);
+            font-size: 0.75rem;
+            display: block;
+            margin-top: 5px;
+        }
 
         /* --- Modal --- */
         .modal {
@@ -355,7 +388,7 @@
             align-items: center;
             flex-direction: column;
         }
-        .modal img { max-width: 80%; max-height: 80vh; border: 2px solid var(--accent); border-radius: 4px;}
+        .modal img { max-width: 90%; max-height: 85vh; border: 2px solid var(--accent); border-radius: 4px;}
         .modal-caption { margin-top: 1rem; color: var(--white); font-family: 'JetBrains Mono'; }
         .close { position: absolute; top: 2rem; right: 3rem; color: var(--white); font-size: 3rem; cursor: pointer; }
 
@@ -398,8 +431,9 @@
     <ul class="nav-links">
         <li><a href="#about">About</a></li>
         <li><a href="#experience">Experience</a></li>
-        <li><a href="#projects">Work</a></li>
-        <li><a href="#publications">Publications</a></li>
+        <li><a href="#output">Output</a></li>
+        <li><a href="#teaching">Teaching</a></li>
+        <li><a href="#gallery">Gallery</a></li>
     </ul>
 </nav>
 
@@ -452,7 +486,7 @@
                 </ul>
             </div>
             <div style="position: relative;">
-                <img src="https://raw.githubusercontent.com/princek880/princek880.github.io/main/Prince_workshop.JPG" alt="Prince Kumar" style="width: 100%; border-radius: 4px; filter: grayscale(100%); transition: var(--transition); border: 2px solid var(--accent);">
+                 <img src="https://raw.githubusercontent.com/princek880/princek880.github.io/main/Prince_workshop.JPG" alt="Prince Kumar" style="width: 100%; border-radius: 4px; filter: grayscale(100%); transition: var(--transition); border: 2px solid var(--accent);">
             </div>
         </div>
     </section>
@@ -480,13 +514,10 @@
                 <span class="date">Jun 2025 - Aug 2025</span>
                 <div class="timeline-desc">
                     Research in CMS Experiment: Graph ML & Jet Substructure.
-                    
-
-[Image of Graph Neural Network architecture]
-
                     <ul>
                         <li>Engineered <strong>FusionNet</strong> (GNN), outperforming Boosted Decision Trees by <strong>5–15%</strong> in high signal-efficiency regions.</li>
                         <li>Developed VGAE-based contrastive clustering for jet substructure analysis.</li>
+                        <li>Identified irreducible errors from track-matching inefficiencies.</li>
                     </ul>
                 </div>
             </div>
@@ -497,10 +528,6 @@
                 <span class="date">Nov 2024 - May 2025</span>
                 <div class="timeline-desc">
                     Hardware R&D for ATLAS Experiment readout chain.
-                    
-
-[Image of FPGA logic block diagram]
-
                     <ul>
                         <li>Executed end-to-end FPGA workflow on ALINX board using Vivado.</li>
                         <li>Ported firmware from KC705 (Kintex7) to <strong>AXKU040 (Kintex Ultrascale)</strong>.</li>
@@ -521,83 +548,127 @@
                     </ul>
                 </div>
             </div>
-
-             <div class="timeline-item">
-                <h3 class="role">Computer Vision Researcher</h3>
-                <span class="company">@ Computational Imaging Lab (PI: Dr. Kaushik Mitra)</span>
-                <span class="date">Jan 2024 - May 2024</span>
-                <div class="timeline-desc">
-                    <ul>
-                        <li>Developed GAN-based models (Uformer, NAFNet) for flare artifact removal.</li>
-                        <li>Achieved near state-of-the-art <strong>PSNR (23.52)</strong> and SSIM (0.66).</li>
-                    </ul>
-                </div>
-            </div>
         </div>
     </section>
 
-    <section id="projects" class="fade-in" style="margin-top: 100px;">
-        <h2>Publications & Projects</h2>
+    <section id="output" class="fade-in" style="margin-top: 100px;">
+        <h2>Research Output</h2>
         <div class="grid">
             <div class="card">
                 <div class="card-header">
-                    <i class="far fa-file-alt folder-icon"></i>
+                    <span class="conf-badge">Publication</span>
                     <a href="https://cds.cern.ch/record/2937581" target="_blank"><i class="fas fa-external-link-alt" style="color: var(--text-main); font-size: 1.2rem;"></i></a>
                 </div>
                 <h3>CMS-DP-2025-035</h3>
-                <p>Lead author. "A novel track finding algorithm to identify b-hadrons in b-jets using FusionNet: a geometric deep learning model."</p>
+                <p>Lead Author. "A novel track finding algorithm to identify b-hadrons in b-jets using FusionNet: a geometric deep learning model."</p>
                 <div class="card-tech">
                     <span>CERN CDS</span>
-                    <span>Publication</span>
+                    <span>Geometric DL</span>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <i class="far fa-folder folder-icon"></i>
+                    <span class="conf-badge">EPS-HEP 2025</span>
                 </div>
-                <h3>AstroStellar N-Body</h3>
-                <p>3D Gravitational Simulation. Solved Hamiltonian dynamics using <strong>Leapfrog & Runge-Kutta</strong>. Parallelized to 1M+ particles.</p>
+                <h3>Conference Proceeding</h3>
+                <p>Marseille, France. "B-hadron identification in b-jets using a novel deep learning technique." Submitted to Proceedings of Science.</p>
                 <div class="card-tech">
-                    <span>C++</span>
-                    <span>OpenMP</span>
-                    <span>MATLAB</span>
+                    <span>CMS Collaboration</span>
+                    <span>Speaker</span>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <i class="far fa-folder folder-icon"></i>
+                    <span class="conf-badge">EuCAIF 2025</span>
                 </div>
-                <h3>Audio-Analog System</h3>
-                <p>Composite system synchronizing light & sound. Integrated DC-DC converters, bandpass filters, and Class-D amplifiers.</p>
+                <h3>Poster Presentation</h3>
+                <p>Sardinia, Italy. Presented FusionNet results for pp collisions in CMS at the European Committee for AI in Fundamental Physics.</p>
                 <div class="card-tech">
-                    <span>LTSpice</span>
-                    <span>KiCad</span>
-                    <span>Electronics</span>
+                    <span>AI in Physics</span>
+                    <span>Italy</span>
+                </div>
+            </div>
+
+             <div class="card">
+                <div class="card-header">
+                    <span class="conf-badge">AIRSS 2025</span>
+                </div>
+                <h3>Poster Presentation</h3>
+                <p>IIT Madras. Research Scholar Summit. Showcased deep learning techniques in Heavy Ion collisions.</p>
+                <div class="card-tech">
+                    <span>IIT Madras</span>
+                    <span>Heavy Ion</span>
                 </div>
             </div>
         </div>
     </section>
 
     <section id="teaching" class="fade-in" style="margin-top: 100px;">
-        <h2>Teaching & Community</h2>
+        <h2>Teaching & Mentorship</h2>
         <div class="grid">
              <div class="card">
-                <h3>Foundations of Comp. Physics</h3>
-                <p><strong>Course Instructor</strong> (Aug 2025 - Nov 2025). Taught numerical methods, Python/C++, and ROOT to ~50 undergraduates.</p>
+                <div class="card-header"><i class="fas fa-chalkboard-teacher folder-icon"></i></div>
+                <h3>Teaching Assistant</h3>
+                <p class="role" style="font-size: 1rem; color: var(--accent); margin-bottom: 0.5rem;">Foundations of Computational Physics</p>
+                <p><strong>Aug 2025 - Nov 2025</strong>. Assisted Prof. Prabhat Pujahari. Taught numerical methods, Python/C++, ROOT, and ML modules to ~50 undergraduates. Led lab sessions and graded exams.</p>
             </div>
              <div class="card">
+                <div class="card-header"><i class="fas fa-users folder-icon"></i></div>
                 <h3>Saathi Mentor</h3>
-                <p>Mentoring junior students at IIT Madras to navigate academic and hostel life.</p>
+                <p><strong>Jul 2024 - Present</strong>. Mentoring junior undergraduate students at IIT Madras, helping them navigate the transition from school to college academic and hostel life.</p>
             </div>
              <div class="card">
-                <h3>Shiksha Prayas</h3>
-                <p>Mentored underprivileged high school students from Haryana, improving their academic outcomes.</p>
+                <div class="card-header"><i class="fas fa-hand-holding-heart folder-icon"></i></div>
+                <h3>Shiksha Prayas Mentor</h3>
+                <p><strong>Jan 2023 - Mar 2024</strong>. Mentored two underprivileged high school students from Haryana, guiding their academic development towards satisfactory board exam results.</p>
             </div>
         </div>
      </section>
 
+    <section id="gallery" class="fade-in" style="margin-top: 100px;">
+        <h2>Visual Gallery</h2>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Snapshots from my internships, hardware setups, and simulations.</p>
+        
+        <div class="gallery-grid">
+            <div class="gallery-item" onclick="openModal(this)">
+                <img src="https://via.placeholder.com/600x400?text=LLR+Lab+Setup+(Upload+Photo)" alt="LLR Lab Setup">
+                <div class="gallery-overlay">
+                    <span class="gallery-text">LLR, École Polytechnique</span>
+                    <span class="gallery-subtext">Summer 2025 Research Internship</span>
+                </div>
+                <p style="display:none">Working at Laboratoire Leprince-Ringuet (LLR) in France on CMS High-Granularity Calorimeter studies.</p>
+            </div>
+
+            <div class="gallery-item" onclick="openModal(this)">
+                <img src="https://via.placeholder.com/600x400?text=Kintex+Ultrascale+FPGA+(Upload+Photo)" alt="FPGA Setup">
+                <div class="gallery-overlay">
+                    <span class="gallery-text">ATLAS Firmware R&D</span>
+                    <span class="gallery-subtext">Kintex Ultrascale Board Setup</span>
+                </div>
+                <p style="display:none">The AXKU040 FPGA board used for developing readout firmware for the MALTA pixel sensor.</p>
+            </div>
+
+            <div class="gallery-item" onclick="openModal(this)">
+                <img src="https://via.placeholder.com/600x400?text=GNN+Event+Display+(Upload+Photo)" alt="GNN Visualization">
+                <div class="gallery-overlay">
+                    <span class="gallery-text">FusionNet Visualization</span>
+                    <span class="gallery-subtext">Point Cloud of b-jet Constituents</span>
+                </div>
+                <p style="display:none">Visualization of particle tracks within a jet, processed as a graph for the FusionNet GNN classifier.</p>
+            </div>
+
+             <div class="gallery-item" onclick="openModal(this)">
+                <img src="https://via.placeholder.com/600x400?text=SPEED+Payload+Integration+(Upload+Photo)" alt="SPEED Payload">
+                <div class="gallery-overlay">
+                    <span class="gallery-text">SPEED Payload</span>
+                    <span class="gallery-subtext">IITMSAT Pre-Launch Calibration</span>
+                </div>
+                <p style="display:none">Integration and calibration of the Space-based Proton Electron Energy Detector (SPEED) at the Space Lab.</p>
+            </div>
+        </div>
+    </section>
 
     <footer>
         <div class="socials">
@@ -607,6 +678,12 @@
         </div>
         <p>Designed & Built by Prince Kumar</p>
     </footer>
+</div>
+
+<div id="imgModal" class="modal" onclick="closeModal()">
+    <span class="close">&times;</span>
+    <img id="modalImg" src="">
+    <div id="modalCaption" class="modal-caption"></div>
 </div>
 
 <script>
@@ -634,6 +711,23 @@
     document.querySelectorAll('.fade-in').forEach(section => {
         observer.observe(section);
     });
+
+    // --- Modal Logic ---
+    function openModal(element) {
+        const modal = document.getElementById('imgModal');
+        const img = document.getElementById('modalImg');
+        const caption = document.getElementById('modalCaption');
+        const srcImg = element.querySelector('img');
+        const srcText = element.querySelector('p').innerText;
+        
+        modal.style.display = "flex";
+        img.src = srcImg.src;
+        caption.innerText = srcText;
+    }
+
+    function closeModal() {
+        document.getElementById('imgModal').style.display = "none";
+    }
 
     // --- Particle Background Script ---
     const canvas = document.getElementById('canvas-container');

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GeoCam Verifier</title>
+    <title>TrueView GeoCam</title>
     <style>
         :root {
             --bg-color: #000000;
@@ -142,11 +142,9 @@
             display: inline-block;
         }
         
-        /* Status Colors */
         .status-ok .dot { background: var(--verified-color); box-shadow: 0 0 8px var(--verified-color); }
         .status-warn .dot { background: var(--warning-color); }
         .status-err .dot { background: #ef4444; }
-
     </style>
 </head>
 <body>
@@ -190,7 +188,6 @@
 <canvas id="canvas"></canvas>
 
 <script>
-    // UI Elements
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const photoPreview = document.getElementById('photo-preview');
@@ -207,22 +204,20 @@
     const timePill = document.getElementById('time-pill');
     const timeText = document.getElementById('time-text');
 
-    // State
     let currentStream = null;
     let facingMode = 'environment';
     
-    // Data State
     let state = {
         lat: null,
         lon: null,
         address: null,
-        timeOffset: 0, // Difference between System Time and Internet Time
+        timeOffset: 0,
         isTimeVerified: false,
         fetchingLoc: false,
         fetchingTime: false
     };
 
-    // --- 1. Geolocation Logic ---
+    // --- 1. Geolocation ---
     function initLocation() {
         if ("geolocation" in navigator) {
             navigator.geolocation.watchPosition(
@@ -230,13 +225,11 @@
                     state.lat = pos.coords.latitude;
                     state.lon = pos.coords.longitude;
                     
-                    // Update UI to show we have coordinates
                     if (!state.address) {
                         locText.textContent = `${state.lat.toFixed(4)}, ${state.lon.toFixed(4)}`;
                         locPill.className = "pill status-ok";
                     }
 
-                    // Trigger Data Fetch (Only if not already successful)
                     if (!state.address && !state.fetchingLoc) fetchAddress();
                     if (!state.isTimeVerified && !state.fetchingTime) syncInternetTime();
                 },
@@ -251,12 +244,12 @@
         }
     }
 
-    // --- 2. Address Fetch (Nominatim) ---
+    // --- 2. Address ---
     async function fetchAddress() {
         state.fetchingLoc = true;
         try {
             const ctrl = new AbortController();
-            setTimeout(() => ctrl.abort(), 4000); // 4s timeout
+            setTimeout(() => ctrl.abort(), 4000); 
 
             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${state.lat}&lon=${state.lon}`, { signal: ctrl.signal });
             if (!res.ok) throw new Error("Addr Fail");
@@ -285,21 +278,17 @@
         
         try {
             const ctrl = new AbortController();
-            setTimeout(() => ctrl.abort(), 5000); // 5s timeout
+            setTimeout(() => ctrl.abort(), 5000); 
 
-            // Use timeapi.io to get local time for these coordinates
             const url = `https://timeapi.io/api/Time/current/coordinate?latitude=${state.lat}&longitude=${state.lon}`;
             const res = await fetch(url, { signal: ctrl.signal });
             
             if (!res.ok) throw new Error("Time API Fail");
             
             const data = await res.json();
-            
-            // Parse Internet Time
             const internetTime = new Date(data.dateTime);
             const deviceTime = new Date();
             
-            // Calculate Offset (Internet - Device)
             state.timeOffset = internetTime.getTime() - deviceTime.getTime();
             state.isTimeVerified = true;
             
@@ -317,7 +306,7 @@
         }
     }
 
-    // --- 4. Camera Logic ---
+    // --- 4. Camera ---
     async function startCamera() {
         if (currentStream) currentStream.getTracks().forEach(t => t.stop());
         try {
@@ -341,13 +330,8 @@
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
 
-        // Mirror front camera
-        if (facingMode === 'user') {
-            ctx.translate(canvas.width, 0);
-            ctx.scale(-1, 1);
-        }
+        // Draw image directly (NO Mirroring)
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        if (facingMode === 'user') ctx.setTransform(1, 0, 0, 1, 0, 0);
 
         drawOverlay();
 
@@ -380,8 +364,7 @@
         ctx.shadowBlur = 4;
         ctx.textAlign = "left";
 
-        // --- Calculate Correct Time ---
-        // Apply the offset to get the real internet time right now
+        // Time Calculation
         const now = new Date(Date.now() + state.timeOffset);
         const timeStr = now.toLocaleString([], { 
             weekday: 'short', 
@@ -393,27 +376,25 @@
             second: '2-digit'
         });
 
-        // --- Draw Time ---
+        // Draw Time
         const fontSizeTime = Math.floor(w * 0.045); 
         ctx.font = `bold ${fontSizeTime}px sans-serif`;
         ctx.fillText(timeStr, 20, h - 110);
         
-        // Add "Verified" badge if internet time was used
+        // Draw Verified Badge
+        const badgeSize = Math.floor(w * 0.025);
+        ctx.font = `bold ${badgeSize}px sans-serif`;
+        
         if (state.isTimeVerified) {
-             const badgeSize = Math.floor(w * 0.025);
-             ctx.font = `bold ${badgeSize}px sans-serif`;
              ctx.fillStyle = "#4ade80"; // Green
              ctx.fillText("✓ Internet Time", 20, h - 160);
-             ctx.fillStyle = "white"; // Reset
         } else {
-             const badgeSize = Math.floor(w * 0.025);
-             ctx.font = `bold ${badgeSize}px sans-serif`;
              ctx.fillStyle = "#f59e0b"; // Yellow
              ctx.fillText("⚠ System Time", 20, h - 160);
-             ctx.fillStyle = "white";
         }
+        ctx.fillStyle = "white";
 
-        // --- Draw Location ---
+        // Draw Location
         const fontSizeLoc = Math.floor(w * 0.03);
         ctx.font = `${fontSizeLoc}px sans-serif`;
         const locString = state.address || `Lat: ${state.lat?.toFixed(5)} Lon: ${state.lon?.toFixed(5)}`;
@@ -447,7 +428,6 @@
 
     initLocation();
     startCamera();
-
 </script>
 </body>
 </html>

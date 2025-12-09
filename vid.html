@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GeoCam Pro v2</title>
+    <title>GeoCam Verifier</title>
     <style>
         :root {
             --bg-color: #000000;
             --surface-color: #1e1e1e;
             --primary-color: #3b82f6;
             --text-color: #ffffff;
+            --verified-color: #4ade80; /* Green */
+            --warning-color: #f59e0b;  /* Yellow */
         }
 
         body {
@@ -50,9 +52,10 @@
 
         #photo-preview { display: none; }
 
+        /* Controls */
         #controls {
             height: 140px;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             display: flex;
             align-items: center;
             justify-content: space-around;
@@ -70,7 +73,6 @@
             cursor: pointer;
             transition: transform 0.1s;
         }
-
         .btn-circle:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
 
         .btn-icon {
@@ -106,37 +108,44 @@
 
         canvas { display: none; }
 
-        #status-pill {
+        /* Status Pills */
+        #status-container {
             position: absolute;
             top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .pill {
             background: rgba(0,0,0,0.6);
             backdrop-filter: blur(4px);
             padding: 6px 16px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             color: #ccc;
-            pointer-events: none;
-            z-index: 20;
-            max-width: 80%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
             display: flex;
             align-items: center;
             gap: 6px;
+            max-width: 80%;
         }
 
         .dot {
             width: 8px;
             height: 8px;
-            background: #ef4444;
             border-radius: 50%;
             display: inline-block;
         }
-        .dot.active { background: #4ade80; box-shadow: 0 0 8px #4ade80; }
-        .dot.warn { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+        
+        /* Status Colors */
+        .status-ok .dot { background: var(--verified-color); box-shadow: 0 0 8px var(--verified-color); }
+        .status-warn .dot { background: var(--warning-color); }
+        .status-err .dot { background: #ef4444; }
 
     </style>
 </head>
@@ -144,9 +153,15 @@
 
 <div id="app-container">
     
-    <div id="status-pill">
-        <span class="dot" id="gps-dot"></span>
-        <span id="location-text">Waiting for GPS...</span>
+    <div id="status-container">
+        <div id="loc-pill" class="pill status-warn">
+            <span class="dot"></span>
+            <span id="loc-text">Waiting for GPS...</span>
+        </div>
+        <div id="time-pill" class="pill status-warn">
+            <span class="dot"></span>
+            <span id="time-text">System Time</span>
+        </div>
     </div>
 
     <div id="viewport">
@@ -175,6 +190,7 @@
 <canvas id="canvas"></canvas>
 
 <script>
+    // UI Elements
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const photoPreview = document.getElementById('photo-preview');
@@ -183,36 +199,50 @@
     const retryBtn = document.getElementById('retry-btn');
     const downloadLink = document.getElementById('download-link');
     const resultActions = document.getElementById('result-actions');
-    const locText = document.getElementById('location-text');
-    const gpsDot = document.getElementById('gps-dot');
     const ctx = canvas.getContext('2d');
+    
+    // Status Elements
+    const locPill = document.getElementById('loc-pill');
+    const locText = document.getElementById('loc-text');
+    const timePill = document.getElementById('time-pill');
+    const timeText = document.getElementById('time-text');
 
+    // State
     let currentStream = null;
     let facingMode = 'environment';
-    let humanAddress = null;
-    let rawLat = null;
-    let rawLon = null;
-    let isFetchingAddress = false;
+    
+    // Data State
+    let state = {
+        lat: null,
+        lon: null,
+        address: null,
+        timeOffset: 0, // Difference between System Time and Internet Time
+        isTimeVerified: false,
+        fetchingLoc: false,
+        fetchingTime: false
+    };
 
-    // --- Geolocation ---
+    // --- 1. Geolocation Logic ---
     function initLocation() {
         if ("geolocation" in navigator) {
             navigator.geolocation.watchPosition(
                 async (pos) => {
-                    rawLat = pos.coords.latitude;
-                    rawLon = pos.coords.longitude;
+                    state.lat = pos.coords.latitude;
+                    state.lon = pos.coords.longitude;
                     
-                    gpsDot.classList.add('active');
-                    gpsDot.classList.remove('warn');
-                    
-                    // Only fetch if we don't have an address and aren't currently loading one
-                    if (!humanAddress && !isFetchingAddress) {
-                        await fetchAddress(rawLat, rawLon);
+                    // Update UI to show we have coordinates
+                    if (!state.address) {
+                        locText.textContent = `${state.lat.toFixed(4)}, ${state.lon.toFixed(4)}`;
+                        locPill.className = "pill status-ok";
                     }
+
+                    // Trigger Data Fetch (Only if not already successful)
+                    if (!state.address && !state.fetchingLoc) fetchAddress();
+                    if (!state.isTimeVerified && !state.fetchingTime) syncInternetTime();
                 },
                 (err) => {
-                    gpsDot.classList.remove('active');
                     locText.textContent = "GPS Error";
+                    locPill.className = "pill status-err";
                 },
                 { enableHighAccuracy: true }
             );
@@ -221,48 +251,73 @@
         }
     }
 
-    async function fetchAddress(lat, lon) {
-        isFetchingAddress = true;
-        locText.textContent = "Locating...";
-        
+    // --- 2. Address Fetch (Nominatim) ---
+    async function fetchAddress() {
+        state.fetchingLoc = true;
         try {
-            // Setup 3 second timeout
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000);
+            const ctrl = new AbortController();
+            setTimeout(() => ctrl.abort(), 4000); // 4s timeout
 
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`, {
-                signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-
-            if (!response.ok) throw new Error('API limit or error');
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${state.lat}&lon=${state.lon}`, { signal: ctrl.signal });
+            if (!res.ok) throw new Error("Addr Fail");
+            const data = await res.json();
             
-            const data = await response.json();
+            const a = data.address;
+            const parts = [];
+            if (a.suburb || a.neighbourhood) parts.push(a.suburb || a.neighbourhood);
+            if (a.city || a.town || a.village) parts.push(a.city || a.town || a.village);
+            if (a.country) parts.push(a.country);
             
-            if (data && data.address) {
-                const parts = [];
-                const a = data.address;
-                if (a.suburb || a.neighbourhood) parts.push(a.suburb || a.neighbourhood);
-                if (a.city || a.town || a.village) parts.push(a.city || a.town || a.village);
-                if (a.country) parts.push(a.country);
-
-                humanAddress = parts.slice(0, 3).join(', ');
-                locText.textContent = humanAddress;
-            } else {
-                throw new Error('No address found');
-            }
+            state.address = parts.slice(0, 3).join(', ');
+            locText.textContent = state.address;
+            locPill.className = "pill status-ok";
         } catch (e) {
-            console.log("Fallback to Coordinates:", e);
-            // FALLBACK: Use raw coordinates if API fails/timeouts
-            humanAddress = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-            locText.textContent = "GPS Location (Offline)";
-            gpsDot.classList.add('warn'); // Yellow dot for offline mode
+            console.log("Addr Fetch Failed", e);
         } finally {
-            isFetchingAddress = false;
+            state.fetchingLoc = false;
         }
     }
 
-    // --- Camera ---
+    // --- 3. Internet Time Sync ---
+    async function syncInternetTime() {
+        state.fetchingTime = true;
+        timeText.textContent = "Syncing Time...";
+        
+        try {
+            const ctrl = new AbortController();
+            setTimeout(() => ctrl.abort(), 5000); // 5s timeout
+
+            // Use timeapi.io to get local time for these coordinates
+            const url = `https://timeapi.io/api/Time/current/coordinate?latitude=${state.lat}&longitude=${state.lon}`;
+            const res = await fetch(url, { signal: ctrl.signal });
+            
+            if (!res.ok) throw new Error("Time API Fail");
+            
+            const data = await res.json();
+            
+            // Parse Internet Time
+            const internetTime = new Date(data.dateTime);
+            const deviceTime = new Date();
+            
+            // Calculate Offset (Internet - Device)
+            state.timeOffset = internetTime.getTime() - deviceTime.getTime();
+            state.isTimeVerified = true;
+            
+            timeText.textContent = "Internet Time Verified";
+            timePill.className = "pill status-ok";
+            
+        } catch (e) {
+            console.log("Time Sync Failed", e);
+            state.isTimeVerified = false;
+            state.timeOffset = 0;
+            timeText.textContent = "System Time (Offline)";
+            timePill.className = "pill status-warn";
+        } finally {
+            state.fetchingTime = false;
+        }
+    }
+
+    // --- 4. Camera Logic ---
     async function startCamera() {
         if (currentStream) currentStream.getTracks().forEach(t => t.stop());
         try {
@@ -281,17 +336,17 @@
         startCamera();
     });
 
-    // --- Capture ---
+    // --- 5. Capture & Overlay ---
     captureBtn.addEventListener('click', () => {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
 
+        // Mirror front camera
         if (facingMode === 'user') {
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
         }
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
         if (facingMode === 'user') ctx.setTransform(1, 0, 0, 1, 0, 0);
 
         drawOverlay();
@@ -306,34 +361,62 @@
 
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         downloadLink.href = dataURL;
-        downloadLink.download = `GeoSnap-${timestamp}.jpg`;
+        downloadLink.download = `VerifiedSnap-${timestamp}.jpg`;
     });
 
     function drawOverlay() {
         const h = canvas.height;
         const w = canvas.width;
         
-        const gradient = ctx.createLinearGradient(0, h - 200, 0, h);
+        // Background Gradient
+        const gradient = ctx.createLinearGradient(0, h - 250, 0, h);
         gradient.addColorStop(0, "transparent");
-        gradient.addColorStop(1, "rgba(0,0,0,0.9)");
+        gradient.addColorStop(1, "rgba(0,0,0,0.95)");
         ctx.fillStyle = gradient;
-        ctx.fillRect(0, h - 200, w, 200);
+        ctx.fillRect(0, h - 250, w, 250);
 
         ctx.fillStyle = "white";
         ctx.shadowColor = "black";
         ctx.shadowBlur = 4;
         ctx.textAlign = "left";
 
+        // --- Calculate Correct Time ---
+        // Apply the offset to get the real internet time right now
+        const now = new Date(Date.now() + state.timeOffset);
+        const timeStr = now.toLocaleString([], { 
+            weekday: 'short', 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit'
+        });
+
+        // --- Draw Time ---
         const fontSizeTime = Math.floor(w * 0.045); 
         ctx.font = `bold ${fontSizeTime}px sans-serif`;
-        const timeStr = new Date().toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
-        ctx.fillText(timeStr, 20, h - 100);
-
-        const fontSizeLoc = Math.floor(w * 0.025);
-        ctx.font = `${fontSizeLoc}px sans-serif`;
+        ctx.fillText(timeStr, 20, h - 110);
         
-        // Use human address if available, otherwise force raw coordinates
-        const locString = humanAddress || `Lat: ${rawLat?.toFixed(5)} Lon: ${rawLon?.toFixed(5)}`;
+        // Add "Verified" badge if internet time was used
+        if (state.isTimeVerified) {
+             const badgeSize = Math.floor(w * 0.025);
+             ctx.font = `bold ${badgeSize}px sans-serif`;
+             ctx.fillStyle = "#4ade80"; // Green
+             ctx.fillText("✓ Internet Time", 20, h - 160);
+             ctx.fillStyle = "white"; // Reset
+        } else {
+             const badgeSize = Math.floor(w * 0.025);
+             ctx.font = `bold ${badgeSize}px sans-serif`;
+             ctx.fillStyle = "#f59e0b"; // Yellow
+             ctx.fillText("⚠ System Time", 20, h - 160);
+             ctx.fillStyle = "white";
+        }
+
+        // --- Draw Location ---
+        const fontSizeLoc = Math.floor(w * 0.03);
+        ctx.font = `${fontSizeLoc}px sans-serif`;
+        const locString = state.address || `Lat: ${state.lat?.toFixed(5)} Lon: ${state.lon?.toFixed(5)}`;
         wrapText(ctx, locString, 20, h - 60, w - 40, fontSizeLoc * 1.5);
     }
 

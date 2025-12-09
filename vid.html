@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TrueView GeoCam</title>
+    <title>MirrorCam Geo</title>
     <style>
         :root {
             --bg-color: #000000;
             --surface-color: #1e1e1e;
             --primary-color: #3b82f6;
             --text-color: #ffffff;
-            --verified-color: #4ade80; /* Green */
-            --warning-color: #f59e0b;  /* Yellow */
+            --verified-color: #4ade80;
+            --warning-color: #f59e0b;
         }
 
         body {
@@ -50,6 +50,10 @@
             object-fit: cover;
         }
 
+        /* Crucial: We handle mirroring via JS to sync 
+           video preview AND canvas capture perfectly.
+        */
+        
         #photo-preview { display: none; }
 
         /* Controls */
@@ -108,7 +112,6 @@
 
         canvas { display: none; }
 
-        /* Status Pills */
         #status-container {
             position: absolute;
             top: 20px;
@@ -154,7 +157,7 @@
     <div id="status-container">
         <div id="loc-pill" class="pill status-warn">
             <span class="dot"></span>
-            <span id="loc-text">Waiting for GPS...</span>
+            <span id="loc-text">Acquiring GPS...</span>
         </div>
         <div id="time-pill" class="pill status-warn">
             <span class="dot"></span>
@@ -198,7 +201,6 @@
     const resultActions = document.getElementById('result-actions');
     const ctx = canvas.getContext('2d');
     
-    // Status Elements
     const locPill = document.getElementById('loc-pill');
     const locText = document.getElementById('loc-text');
     const timePill = document.getElementById('time-pill');
@@ -275,26 +277,19 @@
     async function syncInternetTime() {
         state.fetchingTime = true;
         timeText.textContent = "Syncing Time...";
-        
         try {
             const ctrl = new AbortController();
             setTimeout(() => ctrl.abort(), 5000); 
-
             const url = `https://timeapi.io/api/Time/current/coordinate?latitude=${state.lat}&longitude=${state.lon}`;
             const res = await fetch(url, { signal: ctrl.signal });
-            
             if (!res.ok) throw new Error("Time API Fail");
-            
             const data = await res.json();
             const internetTime = new Date(data.dateTime);
             const deviceTime = new Date();
-            
             state.timeOffset = internetTime.getTime() - deviceTime.getTime();
             state.isTimeVerified = true;
-            
             timeText.textContent = "Internet Time Verified";
             timePill.className = "pill status-ok";
-            
         } catch (e) {
             console.log("Time Sync Failed", e);
             state.isTimeVerified = false;
@@ -315,6 +310,15 @@
                 audio: false
             });
             video.srcObject = currentStream;
+
+            // Flip VIDEO element via CSS if user facing
+            // This ensures the Live Preview looks mirrored
+            if (facingMode === 'user') {
+                video.style.transform = "scaleX(-1)";
+            } else {
+                video.style.transform = "none";
+            }
+
         } catch (err) {
             alert("Camera Error: " + err.message);
         }
@@ -330,9 +334,20 @@
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
 
-        // Draw image directly (NO Mirroring)
+        // MIRROR LOGIC FOR SAVED PHOTO
+        if (facingMode === 'user') {
+            // Flip Context horizontally
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+        }
+
+        // Draw the image (It will be flipped if user facing)
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
+        // RESET transform so text is NOT backwards
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+        // Draw overlay on top
         drawOverlay();
 
         const dataURL = canvas.toDataURL('image/jpeg', 0.95);
@@ -345,14 +360,13 @@
 
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         downloadLink.href = dataURL;
-        downloadLink.download = `VerifiedSnap-${timestamp}.jpg`;
+        downloadLink.download = `MirrorSnap-${timestamp}.jpg`;
     });
 
     function drawOverlay() {
         const h = canvas.height;
         const w = canvas.width;
         
-        // Background Gradient
         const gradient = ctx.createLinearGradient(0, h - 250, 0, h);
         gradient.addColorStop(0, "transparent");
         gradient.addColorStop(1, "rgba(0,0,0,0.95)");
@@ -364,7 +378,6 @@
         ctx.shadowBlur = 4;
         ctx.textAlign = "left";
 
-        // Time Calculation
         const now = new Date(Date.now() + state.timeOffset);
         const timeStr = now.toLocaleString([], { 
             weekday: 'short', 
@@ -376,25 +389,22 @@
             second: '2-digit'
         });
 
-        // Draw Time
         const fontSizeTime = Math.floor(w * 0.045); 
         ctx.font = `bold ${fontSizeTime}px sans-serif`;
         ctx.fillText(timeStr, 20, h - 110);
         
-        // Draw Verified Badge
         const badgeSize = Math.floor(w * 0.025);
         ctx.font = `bold ${badgeSize}px sans-serif`;
         
         if (state.isTimeVerified) {
-             ctx.fillStyle = "#4ade80"; // Green
+             ctx.fillStyle = "#4ade80"; 
              ctx.fillText("✓ Internet Time", 20, h - 160);
         } else {
-             ctx.fillStyle = "#f59e0b"; // Yellow
+             ctx.fillStyle = "#f59e0b"; 
              ctx.fillText("⚠ System Time", 20, h - 160);
         }
         ctx.fillStyle = "white";
 
-        // Draw Location
         const fontSizeLoc = Math.floor(w * 0.03);
         ctx.font = `${fontSizeLoc}px sans-serif`;
         const locString = state.address || `Lat: ${state.lat?.toFixed(5)} Lon: ${state.lon?.toFixed(5)}`;

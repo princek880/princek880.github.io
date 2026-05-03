@@ -69,7 +69,7 @@ const Navbar = () => {
             <div style={{ width: '16px', height: '16px', backgroundColor: 'var(--blue)', border: '2px solid var(--border)' }} />
             <div style={{ width: '16px', height: '16px', backgroundColor: 'var(--yellow)', border: '2px solid var(--border)', clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }} />
           </div>
-          PRINCE
+          PK.
         </motion.a>
 
         {/* Desktop nav */}

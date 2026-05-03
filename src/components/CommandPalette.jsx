@@ -42,17 +42,17 @@ const ALL_ITEMS = [
   {
     type: 'LINK',
     label: 'GITHUB PROFILE',
-    sub: 'GITHUB.COM/PRINCE-KUMAR-99',
+    sub: 'GITHUB.COM/PRINCEK880',
     icon: ExternalLink,
-    action: 'https://github.com/prince-kumar-99',
+    action: 'https://github.com/princek880',
     external: true,
   },
   {
     type: 'LINK',
     label: 'LINKEDIN',
-    sub: 'LINKEDIN.COM/IN/PRINCE-KUMAR-9426631B1',
+    sub: 'LINKEDIN.COM/IN/PRINCE-KUMAR880',
     icon: ExternalLink,
-    action: 'https://www.linkedin.com/in/prince-kumar-9426631b1/',
+    action: 'https://www.linkedin.com/in/prince-kumar880/',
     external: true,
   },
 ];

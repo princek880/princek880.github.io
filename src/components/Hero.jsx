@@ -5,10 +5,10 @@ import GeometricSnake from './GeometricSnake';
 
 /* ── Typing effect hook ─────────────────────────────────── */
 const ROLES = [
-  'EXPERIMENTAL PHYSICIST',
-  'ML RESEARCH ENGINEER',
-  'CMS COLLABORATOR',
-  'FPGA DEVELOPER',
+  'PHYSICS STUDENT',
+  'ML RESEARCHER',
+  'CMS CONTRIBUTOR',
+  'HARDWARE ENTHUSIAST',
 ];
 
 function useTypingEffect(words, typingSpeed = 55, deletingSpeed = 30, pauseMs = 1800) {

@@ -15,11 +15,7 @@ const LinkedInIcon = ({ size = 20 }) => (
   </svg>
 );
 
-const XIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-  </svg>
-);
+
 
 const NAV_LINKS = [
   { name: 'ABOUT',      href: '#about' },
@@ -30,9 +26,8 @@ const NAV_LINKS = [
 ];
 
 const SOCIALS = [
-  { Icon: GitHubIcon,   href: 'https://github.com/prince-kumar-99',                  label: 'GitHub' },
-  { Icon: LinkedInIcon, href: 'https://www.linkedin.com/in/prince-kumar-9426631b1/', label: 'LinkedIn' },
-  { Icon: XIcon,        href: 'https://twitter.com/PrinceK7040',                     label: 'X / Twitter' },
+  { Icon: GitHubIcon,   href: 'https://github.com/princek880',                  label: 'GitHub' },
+  { Icon: LinkedInIcon, href: 'https://www.linkedin.com/in/prince-kumar880/', label: 'LinkedIn' },
 ];
 
 const Navbar = () => {

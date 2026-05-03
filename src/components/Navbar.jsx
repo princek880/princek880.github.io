@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Menu, X, FileText } from 'lucide-react';
 
 /* ── Inline SVG brand icons ─────────────────────────────── */
@@ -22,6 +23,7 @@ const NAV_LINKS = [
   { name: 'EXPERIENCE', href: '#experience' },
   { name: 'RESEARCH',   href: '#research' },
   { name: 'PROJECTS',   href: '#projects' },
+  { name: 'HOBBIES',    to: '/hobbies' },
   { name: 'CONTACT',    href: '#contact' },
 ];
 
@@ -74,21 +76,32 @@ const Navbar = () => {
         <nav aria-label="Main navigation" className="hidden md:flex" style={{ alignItems: 'center', gap: '2rem' }}>
 
           <ul style={{ display: 'flex', gap: '2rem', listStyle: 'none', margin: 0, padding: 0 }}>
-            {NAV_LINKS.map(({ name, href }, i) => (
+            {NAV_LINKS.map(({ name, href, to }, i) => (
               <motion.li
                 key={name}
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.06 * i }}
               >
-                <a
-                  href={href}
-                  style={{ fontFamily: 'var(--font-sans)', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', transition: 'color 0.18s', letterSpacing: '0.05em' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--blue)')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-primary)')}
-                >
-                  {name}
-                </a>
+                {to ? (
+                  <Link
+                    to={to}
+                    style={{ fontFamily: 'var(--font-sans)', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', transition: 'color 0.18s', letterSpacing: '0.05em' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = 'var(--blue)')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+                  >
+                    {name}
+                  </Link>
+                ) : (
+                  <a
+                    href={href}
+                    style={{ fontFamily: 'var(--font-sans)', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', transition: 'color 0.18s', letterSpacing: '0.05em' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = 'var(--blue)')}
+                    onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+                  >
+                    {name}
+                  </a>
+                )}
               </motion.li>
             ))}
           </ul>
@@ -153,12 +166,19 @@ const Navbar = () => {
             }}
           >
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {NAV_LINKS.map(({ name, href }, i) => (
+              {NAV_LINKS.map(({ name, href, to }) => (
                 <li key={name}>
-                  <a href={href} onClick={close}
-                    style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--text-primary)', display: 'block' }}>
-                    {name}
-                  </a>
+                  {to ? (
+                    <Link to={to} onClick={close}
+                      style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--text-primary)', display: 'block' }}>
+                      {name}
+                    </Link>
+                  ) : (
+                    <a href={href} onClick={close}
+                      style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--text-primary)', display: 'block' }}>
+                      {name}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

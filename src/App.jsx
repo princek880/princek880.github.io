@@ -11,25 +11,21 @@ function App() {
   return (
     <HashRouter>
       <CustomCursor />
-      <div style={{ color: 'var(--text-primary)', position: 'relative' }}>
-        {/* Global: Bauhaus SVG Background Art */}
-        <div style={{ opacity: 1, pointerEvents: 'none' }}>
-          <GeometricArt />
-        </div>
+      {/* Global: Bauhaus SVG Background Art (fixed, z-index:-1) */}
+      <GeometricArt />
 
-        {/* Global: scroll progress bar */}
-        <ScrollProgress />
+      {/* Global: scroll progress bar */}
+      <ScrollProgress />
 
-        {/* Global: Cmd+K command palette */}
-        <CommandPalette />
+      {/* Global: Cmd+K command palette */}
+      <CommandPalette />
 
-        <Routes>
-          <Route path="/"                 element={<Home />} />
-          <Route path="/projects/:id"     element={<ProjectPage />} />
-          {/* Fallback */}
-          <Route path="*"                 element={<Home />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/"                 element={<Home />} />
+        <Route path="/projects/:id"     element={<ProjectPage />} />
+        {/* Fallback */}
+        <Route path="*"                 element={<Home />} />
+      </Routes>
     </HashRouter>
   );
 }

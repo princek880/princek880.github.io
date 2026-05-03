@@ -60,6 +60,7 @@ const Hero = () => {
         gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
         padding: 0, // Reset section padding
         borderBottom: '4px solid var(--border)',
+        background: 'transparent', // Let body dot-grid show through
       }}
     >
       {/* ── Left Column: Intro & Bio ── */}
@@ -68,7 +69,7 @@ const Hero = () => {
         flexDirection: 'column',
         justifyContent: 'center',
         padding: '6rem 3rem',
-        backgroundColor: 'var(--bg)',
+        backgroundColor: 'rgba(240,240,240,0.88)',
       }}>
         <div style={{ maxWidth: '600px', margin: '0 auto', width: '100%' }}>
           
@@ -95,6 +96,8 @@ const Hero = () => {
             style={{
               fontSize: 'clamp(3.5rem, 8vw, 7rem)',
               marginBottom: '1rem',
+              wordBreak: 'break-word',
+              overflowWrap: 'break-word',
             }}
           >
             PRINCE KUMAR

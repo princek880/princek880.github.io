@@ -17,7 +17,7 @@ const Gallery = () => {
     <section id="gallery" style={{ borderBottom: '4px solid var(--border)' }}>
       <div className="container">
         <h2 className="section-title">
-          <span className="section-number">06</span> GALLERY
+          <span className="section-number">07</span> GALLERY
         </h2>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>

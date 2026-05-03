@@ -26,7 +26,7 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer style={{ borderTop: '4px solid var(--border)', background: 'white', padding: '4rem 0' }}>
+    <footer style={{ borderTop: '4px solid var(--border)', background: 'rgba(255,255,255,0.88)', padding: '4rem 0' }}>
       <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem', textAlign: 'center' }}>
 
         {/* Geometric Logo */}

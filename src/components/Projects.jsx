@@ -95,7 +95,7 @@ const Projects = () => {
     <section id="projects" style={{ borderBottom: '4px solid var(--border)' }}>
       <div className="container">
         <h2 className="section-title">
-          <span className="section-number">05</span> PROJECTS
+          <span className="section-number">06</span> PROJECTS
         </h2>
 
         {/* Category filter boxes */}

@@ -73,10 +73,12 @@ const About = () => {
               width: '100%',
               maxWidth: '400px', 
               margin: '0 auto',
+              marginBottom: '2.5rem', /* space for the overflowing label badge */
               border: '4px solid var(--border)',
               boxShadow: '8px 8px 0px 0px var(--border)',
               backgroundColor: 'white',
-              transition: 'all 0.2s ease-out'
+              transition: 'all 0.2s ease-out',
+              overflow: 'visible', /* allow the label badge to overflow */
             }}
           >
             {/* Image Wrapper */}
@@ -93,7 +95,7 @@ const About = () => {
               />
             </div>
             {/* Bold Label */}
-            <div style={{ position: 'absolute', bottom: '-20px', left: '-20px', backgroundColor: 'var(--yellow)', border: '4px solid var(--border)', padding: '0.5rem 1rem', fontWeight: 900, textTransform: 'uppercase', boxShadow: '4px 4px 0px 0px var(--border)' }}>
+            <div style={{ position: 'absolute', bottom: '-20px', left: '-20px', backgroundColor: 'var(--yellow)', border: '4px solid var(--border)', padding: '0.5rem 1rem', fontWeight: 900, textTransform: 'uppercase', boxShadow: '4px 4px 0px 0px var(--border)', zIndex: 2 }}>
               HARDWARE WORKSHOP
             </div>
           </motion.div>

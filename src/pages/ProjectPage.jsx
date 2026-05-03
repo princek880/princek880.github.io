@@ -56,7 +56,8 @@ const ProjectPage = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '3rem', fontWeight: 900, fontSize: '0.8rem', textTransform: 'uppercase' }}>
               <Link to="/" style={{ color: 'var(--text-muted)' }}>PORTFOLIO</Link>
               <ChevronRight size={16} strokeWidth={3} />
-              <Link to="/#projects" style={{ color: 'var(--text-muted)' }}>PROJECTS</Link>
+              {/* Use a plain <a> for in-page hash anchor — React Router's Link misinterprets /#projects with HashRouter */}
+              <a href="#projects" onClick={() => navigate('/')} style={{ color: 'var(--text-muted)', cursor: 'pointer' }}>PROJECTS</a>
               <ChevronRight size={16} strokeWidth={3} />
               <span style={{ color: accent }}>{project.title.toUpperCase()}</span>
             </div>
@@ -126,7 +127,7 @@ const ProjectPage = () => {
         </section>
 
         {/* ═════════════════ METRICS ═════════════════ */}
-        <section style={{ padding: '6rem 0', backgroundColor: 'white', borderBottom: '6px solid var(--border)' }}>
+        <section style={{ padding: '6rem 0', backgroundColor: 'rgba(255,255,255,0.82)', borderBottom: '6px solid var(--border)' }}>
           <div className="container" style={{ maxWidth: '1000px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
               {project.metrics.map((m, i) => (
@@ -210,7 +211,7 @@ const ProjectPage = () => {
         </section>
 
         {/* ═════════════════ OTHER PROJECTS ═════════════════ */}
-        <section style={{ padding: '6rem 0 8rem', borderTop: '6px solid var(--border)', background: 'white' }}>
+        <section style={{ padding: '6rem 0 8rem', borderTop: '6px solid var(--border)', background: 'rgba(255,255,255,0.82)' }}>
           <div className="container" style={{ maxWidth: '1000px' }}>
             <h2 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '3rem', textAlign: 'center' }}>OTHER PROJECTS</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>

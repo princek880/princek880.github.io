@@ -86,11 +86,11 @@ const Research = () => (
             </div>
 
             {/* Content */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', minWidth: 0 }}>
               <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: pub.color === 'var(--yellow)' ? 'var(--blue)' : pub.color }}>
                 {pub.id}
               </h3>
-              <p style={{ fontSize: '1.1rem', fontWeight: 900, lineHeight: 1.2, color: 'var(--text-primary)' }}>
+              <p style={{ fontSize: '1rem', fontWeight: 900, lineHeight: 1.3, color: 'var(--text-primary)', wordBreak: 'break-word', overflowWrap: 'break-word', hyphens: 'auto' }}>
                 {pub.title}
               </p>
               <p style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--text-secondary)' }}>

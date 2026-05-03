@@ -70,10 +70,10 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" style={{ backgroundColor: 'var(--yellow)', borderBottom: 'none' }}>
+    <section id="contact" style={{ backgroundColor: 'rgba(240,192,32,0.85)', borderBottom: 'none' }}>
       <div className="container" style={{ maxWidth: '1000px' }}>
         <h2 className="section-title">
-          <span className="section-number" style={{ color: 'var(--blue)' }}>06</span> GET IN TOUCH
+          <span className="section-number" style={{ color: 'var(--blue)' }}>08</span> GET IN TOUCH
         </h2>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', alignItems: 'start' }}>

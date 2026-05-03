@@ -55,7 +55,7 @@ const Teaching = () => (
   <section id="teaching" style={{ borderBottom: '4px solid var(--border)' }}>
     <div className="container">
       <h2 className="section-title">
-        <span className="section-number">07</span> TEACHING & MENTORSHIP
+        <span className="section-number">05</span> TEACHING & MENTORSHIP
       </h2>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>

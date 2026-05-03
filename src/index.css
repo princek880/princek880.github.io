@@ -54,6 +54,13 @@ body {
   overflow-x: hidden;
 }
 
+/* Fix for mobile: fixed background-attachment can break on iOS */
+@media (max-width: 768px) {
+  body {
+    background-attachment: scroll;
+  }
+}
+
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: var(--bg); border-left: 3px solid var(--border); }
 ::-webkit-scrollbar-thumb {
@@ -99,7 +106,9 @@ section {
   padding: 6rem 0;
   border-bottom: 4px solid var(--border);
   position: relative;
-  background: var(--bg); /* Opaque by default so dots don't bleed if changed */
+  /* Semi-transparent so the body dot-grid background shows through */
+  background: rgba(240, 240, 240, 0.88);
+  backdrop-filter: blur(0px);
 }
 
 .section-title {
@@ -219,6 +228,10 @@ section {
   padding: 2.5rem;
   position: relative;
   transition: transform 0.2s ease-out;
+  /* Prevent text from overflowing card boundaries */
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
 }
 .bauhaus-card:hover {
   transform: translateY(-4px) translateX(-4px);

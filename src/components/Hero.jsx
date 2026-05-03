@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowDown, ExternalLink, FileText, ChevronRight } from 'lucide-react';
+import GeometricSnake from './GeometricSnake';
 
 /* ── Typing effect hook ─────────────────────────────────── */
 const ROLES = [
@@ -170,7 +171,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* ── Right Column: Bauhaus Geometric Composition ── */}
+      {/* ── Right Column: Geometric Snake Game ── */}
       <div style={{
         backgroundColor: 'var(--blue)',
         borderLeft: '4px solid var(--border)',
@@ -178,32 +179,10 @@ const Hero = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        overflow: 'hidden',
-        minHeight: '400px'
+        overflow: 'visible',
+        minHeight: '400px',
       }}>
-        {/* Abstract geometric "face" constructed from circles, squares */}
-        <div style={{ position: 'relative', width: '300px', height: '400px' }}>
-          {/* Base Red Circle */}
-          <motion.div 
-            initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5, ease: 'easeOut' }}
-            style={{ position: 'absolute', top: '10%', left: '10%', width: '240px', height: '240px', backgroundColor: 'var(--red)', border: '6px solid var(--border)', borderRadius: '50%', boxShadow: '12px 12px 0px 0px var(--border)' }} 
-          />
-          {/* Yellow Rotated Square */}
-          <motion.div 
-            initial={{ scale: 0, rotate: 0 }} animate={{ scale: 1, rotate: 45 }} transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
-            style={{ position: 'absolute', top: '30%', left: '30%', width: '180px', height: '180px', backgroundColor: 'var(--yellow)', border: '6px solid var(--border)', boxShadow: '12px 12px 0px 0px var(--border)' }} 
-          />
-          {/* White Centered Square */}
-          <motion.div 
-            initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5, delay: 0.4, ease: 'easeOut' }}
-            style={{ position: 'absolute', top: '40%', left: '15%', width: '120px', height: '120px', backgroundColor: '#FFFFFF', border: '6px solid var(--border)', boxShadow: '12px 12px 0px 0px var(--border)' }} 
-          />
-          {/* Blue Triangle over it */}
-          <motion.div 
-            initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5, delay: 0.6, ease: 'easeOut' }}
-            style={{ position: 'absolute', top: '55%', left: '25%', width: '80px', height: '80px', backgroundColor: 'var(--blue)', border: '6px solid var(--border)', clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)' }} 
-          />
-        </div>
+        <GeometricSnake />
       </div>
     </section>
   );

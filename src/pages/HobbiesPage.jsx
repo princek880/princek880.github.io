@@ -12,61 +12,61 @@ const HOBBIES = [
     id: 'drawing',
     icon: '✏️',
     title: 'DRAWING',
-    subtitle: 'Sketching & Digital Art',
+    subtitle: 'Sketches & Digital Art',
     color: 'var(--red)',
     shape: 'circle',
     accentText: 'white',
     description: [
-      'Drawing has been a long-standing interest, predating both physics and programming. It serves as a medium for visual thinking — from sketching experimental setups to working through spatial problems on paper.',
-      'The practice ranges from pencil portraiture and architectural sketches to technical diagram illustration, and occasionally extends to digital work and vector composition.',
+      'I have been drawing since I was a kid. It started with sketching my favorite Pokemon and anime characters, which I still enjoy doing. Lately, I have been getting more into drawing scenery and making quick caricatures of people I see.',
+      'It is just a nice way to relax and spend some time away from screens. Whether it is a pencil sketch or something on a tablet, I like the process of starting with nothing and seeing a character or a landscape come together.',
     ],
     highlights: [
-      'Pencil & charcoal portraiture',
-      'Architecture & perspective sketching',
-      'Physics diagram illustration',
-      'Digital art & vector composition',
+      'Anime & Pokemon characters',
+      'Scenery and landscapes',
+      'Caricatures',
+      'Digital illustration',
     ],
-    quote: '"Drawing is thinking made visible — a habit that transfers well to scientific work."',
+    quote: "I just like seeing where a blank page goes.",
   },
   {
     id: 'travelling',
     icon: '✈️',
     title: 'TRAVELLING',
-    subtitle: 'Exploring Places & Cultures',
+    subtitle: 'Exploring the World',
     color: 'var(--blue)',
     shape: 'square',
     accentText: 'white',
     description: [
-      'Travel has been an integral part of academic life — research visits, international conferences, and collaborative exchanges have taken me across Europe and India.',
-      'Beyond the professional context, travel offers a genuine opportunity to engage with different cultures, histories, and perspectives that are difficult to encounter otherwise.',
+      'I have a genuine curiosity about the world and love visiting new places whenever I get the chance. There is something really cool about landing in a city where you do not know anyone and just exploring the streets without much of a plan.',
+      'I am always looking for the next adventure. I want to see different cultures, meet new people, and just experience as much as possible while I am young.',
     ],
     highlights: [
-      'Marseille, France — EPS-HEP 2025 speaker',
-      'Geneva, Switzerland — CERN visits',
-      'Sardinia, Italy — EUCAIF 2025',
-      'Across India — IIT campuses & conferences',
+      'Exploring new cities',
+      'Spontaneous road trips',
+      'Finding local hidden gems',
+      'Learning about new cultures',
     ],
-    quote: '"Each destination offers a distinct perspective — both scientifically and culturally."',
+    quote: "Always looking for the next place to visit.",
   },
   {
     id: 'food',
     icon: '🍜',
     title: 'EXPLORING NEW FOOD',
-    subtitle: 'Culinary Exploration',
+    subtitle: 'Trying everything',
     color: 'var(--yellow)',
     shape: 'triangle',
     accentText: 'black',
     description: [
-      'Trying local cuisine is one of the more immediate ways to engage with a new place. Every city visited has been an opportunity to explore regional food traditions — from South Indian tiffin in Chennai to crêpes near École Polytechnique.',
-      'The interest extends beyond restaurants to understanding how ingredients, techniques, and traditions vary across regions — a kind of informal comparative study.',
+      'I am a big fan of trying new food. I will pretty much give anything a go at least once. I love finding local spots that serve things I have never even heard of before. It is not just about the meals either, I am always on the lookout for interesting fruits or snacks from different parts of the world.',
+      'For me, trying a new dish is the best part of going somewhere new. I do not really have a favorite type of cuisine because I like everything from street food to home-cooked meals. If it looks good, I am eating it.',
     ],
     highlights: [
-      'South Indian tiffin & filter coffee',
-      'French cuisine & regional specialities',
-      'Street food across Indian cities',
-      'Trying local dishes while travelling abroad',
+      'Trying local street food',
+      'Exploring exotic fruits',
+      'Regional dishes and snacks',
+      'Checking out new restaurants',
     ],
-    quote: '"Local food is often the most direct introduction to any culture."',
+    quote: "Life is too short to eat the same thing every day.",
   },
 ];
 
@@ -300,7 +300,7 @@ const HobbiesPage = () => {
                   }}
                 >
                   <span style={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                    Outside the Lab
+                    Personal Interests
                   </span>
                 </motion.div>
 
@@ -319,8 +319,8 @@ const HobbiesPage = () => {
                   transition={{ delay: 0.1 }}
                   style={{ fontSize: '1.15rem', fontWeight: 500, color: 'var(--text-secondary)', maxWidth: '34rem', lineHeight: 1.7 }}
                 >
-                  Interests outside of research and academics — a few things that have been consistent over the years.
-                  Select a card to read more.
+                  A few things I enjoy doing when I am not working. I like to keep things simple and just explore what interests me.
+                  Click a card to see more.
                 </motion.p>
               </div>
 

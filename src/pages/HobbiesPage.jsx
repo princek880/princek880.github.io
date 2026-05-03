@@ -17,8 +17,8 @@ const HOBBIES = [
     shape: 'circle',
     accentText: 'white',
     description: [
-      'Drawing has been my oldest hobby — long before physics or programming. I use it to think visually, sketch out experiment setups, and occasionally make actual art.',
-      'From pencil portraits to Feynman diagram doodles in lecture margins, drawing bridges the abstract and the concrete for me in a way no other medium does.',
+      'Drawing has been a long-standing interest, predating both physics and programming. It serves as a medium for visual thinking — from sketching experimental setups to working through spatial problems on paper.',
+      'The practice ranges from pencil portraiture and architectural sketches to technical diagram illustration, and occasionally extends to digital work and vector composition.',
     ],
     highlights: [
       'Pencil & charcoal portraiture',
@@ -26,7 +26,7 @@ const HOBBIES = [
       'Physics diagram illustration',
       'Digital art & vector composition',
     ],
-    quote: '"Every physicist is a failed artist — I\'m just the one who kept drawing."',
+    quote: '"Drawing is thinking made visible — a habit that transfers well to scientific work."',
   },
   {
     id: 'travelling',
@@ -37,8 +37,8 @@ const HOBBIES = [
     shape: 'square',
     accentText: 'white',
     description: [
-      'Every new place is a new dataset. Travelling rewires the way I see problems — different cultures approach the same challenges with radically different assumptions.',
-      'Physics has taken me far: conference halls in Marseille, CERN corridors in Geneva, and collaborative labs across India. Each trip expands the mental model.',
+      'Travel has been an integral part of academic life — research visits, international conferences, and collaborative exchanges have taken me across Europe and India.',
+      'Beyond the professional context, travel offers a genuine opportunity to engage with different cultures, histories, and perspectives that are difficult to encounter otherwise.',
     ],
     highlights: [
       'Marseille, France — EPS-HEP 2025 speaker',
@@ -46,27 +46,27 @@ const HOBBIES = [
       'Sardinia, Italy — EUCAIF 2025',
       'Across India — IIT campuses & conferences',
     ],
-    quote: '"Travel is just scientific fieldwork for understanding humans."',
+    quote: '"Each destination offers a distinct perspective — both scientifically and culturally."',
   },
   {
     id: 'food',
     icon: '🍜',
     title: 'EXPLORING NEW FOOD',
-    subtitle: 'Culinary Adventures',
+    subtitle: 'Culinary Exploration',
     color: 'var(--yellow)',
     shape: 'triangle',
     accentText: 'black',
     description: [
-      'Food is applied chemistry. I approach menus the way I approach an unknown physical system — with curiosity, no prior assumptions, and zero fear of making a mistake.',
-      'From late-night South Indian tiffin in Chennai to French crêpes near École Polytechnique, I believe food is the fastest way to understand any place or culture.',
+      'Trying local cuisine is one of the more immediate ways to engage with a new place. Every city visited has been an opportunity to explore regional food traditions — from South Indian tiffin in Chennai to crêpes near École Polytechnique.',
+      'The interest extends beyond restaurants to understanding how ingredients, techniques, and traditions vary across regions — a kind of informal comparative study.',
     ],
     highlights: [
       'South Indian tiffin & filter coffee',
-      'French cuisine & street crêpes',
-      'Experimental fusion cooking',
-      'Seeking the spiciest dish everywhere',
+      'French cuisine & regional specialities',
+      'Street food across Indian cities',
+      'Trying local dishes while travelling abroad',
     ],
-    quote: '"The best algorithm for discovering a city: follow your nose."',
+    quote: '"Local food is often the most direct introduction to any culture."',
   },
 ];
 
@@ -300,7 +300,7 @@ const HobbiesPage = () => {
                   }}
                 >
                   <span style={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                    Life Outside the Lab
+                    Outside the Lab
                   </span>
                 </motion.div>
 
@@ -319,8 +319,8 @@ const HobbiesPage = () => {
                   transition={{ delay: 0.1 }}
                   style={{ fontSize: '1.15rem', fontWeight: 500, color: 'var(--text-secondary)', maxWidth: '34rem', lineHeight: 1.7 }}
                 >
-                  Physics keeps the brain busy. These three things keep everything else alive.
-                  Click any card below to learn more.
+                  Interests outside of research and academics — a few things that have been consistent over the years.
+                  Select a card to read more.
                 </motion.p>
               </div>
 
